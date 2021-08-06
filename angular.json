@@ -85,6 +85,12 @@
               "apps/compito/src/assets"
             ],
             "styles": ["apps/compito/src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "apps/compito/src/styles",
+                "apps/compito/src/styles/partials"
+              ]
+            },
             "scripts": []
           },
           "configurations": {

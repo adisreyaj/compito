@@ -1,0 +1,76 @@
+.form-group {
+  @apply flex flex-col;
+  @apply items-start;
+  @apply pb-4;
+  @apply relative;
+  label {
+    @apply text-gray-700;
+    @apply mb-1;
+    @apply text-base;
+    @apply font-medium;
+  }
+
+  input[type='text'],
+  input[type='email'],
+  input[type='number'],
+  input[type='url'],
+  input[type='password'] {
+    @apply focus:ring-1;
+    @apply focus:border-primary;
+    @apply focus:ring-primary;
+
+    &:disabled {
+      @apply text-gray-400;
+    }
+  }
+
+  textarea {
+    @apply focus:ring-1;
+    @apply focus:ring-primary;
+    resize: none;
+    &:disabled {
+      @apply text-gray-400;
+    }
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    @apply text-primary;
+  }
+}
+
+[type='checkbox'],
+[type='radio'] {
+  border-radius: 6px !important;
+}
+
+[type='checkbox']:focus,
+[type='radio']:focus {
+  @apply ring-primary;
+}
+
+[type='text'],
+[type='email'],
+[type='url'],
+[type='password'],
+[type='number'],
+[type='date'],
+[type='datetime-local'],
+[type='month'],
+[type='search'],
+[type='tel'],
+[type='time'],
+[type='week'],
+[multiple],
+textarea,
+select {
+  @apply outline-none;
+  @apply border-gray-100;
+  @apply shadow-md;
+  @apply rounded-md;
+  @apply focus:border-primary;
+  transition: all 0.3s;
+  &::placeholder {
+    @apply text-gray-300;
+  }
+}
