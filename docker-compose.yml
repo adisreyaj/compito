@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: Sr3y4j
+      MYSQL_DATABASE: compito
+      MYSQL_USER: sreyaj
+      MYSQL_PASSWORD: Sr3y4j
+volumes:
+  db_data: {}

@@ -41,6 +41,7 @@
     "@nestjs/core": "^7.0.0",
     "@nestjs/platform-express": "^7.0.0",
     "@nrwl/angular": "12.6.5",
+    "@prisma/client": "^2.28.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
@@ -54,6 +55,8 @@
     "@angular/cli": "~12.1.0",
     "@angular/compiler-cli": "^12.1.0",
     "@angular/language-service": "^12.1.0",
+    "@commitlint/cli": "^13.1.0",
+    "@commitlint/config-conventional": "^13.1.0",
     "@nestjs/schematics": "^7.0.0",
     "@nestjs/testing": "^7.0.0",
     "@nrwl/cli": "12.6.5",
@@ -74,11 +77,19 @@
     "eslint": "7.22.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-cypress": "^2.10.3",
+    "husky": "^7.0.1",
     "jest": "27.0.3",
     "jest-preset-angular": "9.0.4",
+    "lint-staged": "^11.1.2",
     "prettier": "^2.3.1",
+    "prisma": "^2.28.0",
     "ts-jest": "27.0.3",
     "ts-node": "~9.1.1",
     "typescript": "~4.3.5"
-  }
+  },
+  "lint-staged": {
+    "*.{scss,ts}": [
+      "yarn format --uncommitted"
+    ]
+}
 }

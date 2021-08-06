@@ -1,0 +1,53 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  firstName String
+  lastName  String
+  password  String
+  org       Organization @relation(fields: [orgId], references: [id])
+  orgId     String
+}
+
+model Organization {
+  id      String    @id @default(cuid())
+  name    String
+  User    User[]
+  Project Project[]
+  Task    Task[]
+  Tags    Tags[]
+}
+
+model Project {
+  id    String       @id @default(cuid())
+  name  String
+  org   Organization @relation(fields: [orgId], references: [id])
+  orgId String
+  Task  Task[]
+}
+
+model Task {
+  id        String       @id @default(cuid())
+  title     String
+  project   Project      @relation(fields: [projectId], references: [id])
+  projectId String
+  org       Organization @relation(fields: [orgId], references: [id])
+  orgId     String
+}
+
+model Tags {
+  id    String       @id @default(cuid())
+  name  String
+  org   Organization @relation(fields: [orgId], references: [id])
+  orgId String
+
+  @@unique([name, orgId])
+}
