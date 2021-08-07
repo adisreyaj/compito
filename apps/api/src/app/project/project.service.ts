@@ -26,7 +26,7 @@ export class ProjectService {
   }
 
   async findAll(query: RequestParamsDto) {
-    const { skip, limit, search = null } = query;
+    const { skip, limit } = query;
     try {
       const count$ = this.prisma.project.count();
       const orgs$ = this.prisma.project.findMany({
