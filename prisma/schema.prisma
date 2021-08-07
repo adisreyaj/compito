@@ -44,7 +44,7 @@ model Task {
   orgId     String
 }
 
-model Tags {
+model Tag {
   id    String       @id @default(cuid())
   name  String
   org   Organization @relation(fields: [orgId], references: [id])
