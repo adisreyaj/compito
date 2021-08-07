@@ -15,7 +15,7 @@ export class ProjectService {
 
   async create(data: ProjectRequest) {
     try {
-      const project = await this.prisma.organization.create({
+      const project = await this.prisma.project.create({
         data,
       });
       return project;
@@ -28,8 +28,8 @@ export class ProjectService {
   async findAll(query: RequestParamsDto) {
     const { skip, limit, search = null } = query;
     try {
-      const count$ = this.prisma.organization.count();
-      const orgs$ = this.prisma.organization.findMany({
+      const count$ = this.prisma.project.count();
+      const orgs$ = this.prisma.project.findMany({
         skip,
         take: limit,
       });
@@ -48,7 +48,7 @@ export class ProjectService {
 
   async findOne(id: string) {
     try {
-      const project = await this.prisma.organization.findUnique({
+      const project = await this.prisma.project.findUnique({
         where: {
           id,
         },
@@ -65,7 +65,7 @@ export class ProjectService {
 
   async update(id: string, data: ProjectRequest) {
     try {
-      const project = await this.prisma.organization.update({
+      const project = await this.prisma.project.update({
         where: {
           id,
         },
@@ -89,7 +89,7 @@ export class ProjectService {
 
   async remove(id: string) {
     try {
-      const project = await this.prisma.organization.delete({
+      const project = await this.prisma.project.delete({
         where: {
           id,
         },
