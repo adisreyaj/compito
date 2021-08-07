@@ -24,7 +24,7 @@ model Organization {
   User    User[]
   Project Project[]
   Task    Task[]
-  Tags    Tags[]
+  Tag    Tag[]
 }
 
 model Project {
