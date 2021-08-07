@@ -15,7 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@compito/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+      "@compito/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@compito/web/auth": ["libs/web/auth/src/index.ts"],
+      "@compito/web/ui": ["libs/web/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

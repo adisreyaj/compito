@@ -39,6 +39,9 @@
     "compito-e2e": {
       "tags": [],
       "implicitDependencies": ["compito"]
+    },
+    "web-ui": {
+      "tags": []
     }
   }
 }

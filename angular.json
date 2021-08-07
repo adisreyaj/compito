@@ -191,6 +191,31 @@
           }
         }
       }
+    },
+    "web-ui": {
+      "projectType": "library",
+      "root": "libs/web/ui",
+      "sourceRoot": "libs/web/ui/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/ui"],
+          "options": {
+            "jestConfig": "libs/web/ui/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/web/ui/src/**/*.ts",
+              "libs/web/ui/src/**/*.html"
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {
