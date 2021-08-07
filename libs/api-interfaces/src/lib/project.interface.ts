@@ -2,6 +2,7 @@ import { Organization } from './organization.interface';
 
 export interface ProjectBase {
   name: string;
+  slug: string;
 }
 export interface Project extends ProjectBase {
   id: string;
