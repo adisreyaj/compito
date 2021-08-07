@@ -1,5 +1,5 @@
 module.exports = {
-  purge: ['apps/**/*.{ts,html}'],
+  purge: ['apps/**/*.{ts,html}', 'libs/web/**/*.{ts,html}'],
   mode: 'jit',
   darkMode: false,
   theme: {
