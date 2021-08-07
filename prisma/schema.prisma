@@ -19,7 +19,8 @@ model User {
 
 model Organization {
   id      String    @id @default(cuid())
-  name    String
+  name    String    
+  slug    String    @unique
   User    User[]
   Project Project[]
   Task    Task[]
