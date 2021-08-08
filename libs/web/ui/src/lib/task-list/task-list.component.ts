@@ -14,8 +14,9 @@ import {
     [id]="list.name"
     [cdkDropListConnectedTo]="list.name | dropListConnection: allList"
     (cdkDropListDropped)="dropped.emit($event)"
-    class="task-list bg-gray-100 rounded-md transition-all duration-200 ease-in p-4"
+    class="task-list relative bg-gray-100 rounded-md transition-all duration-200 ease-in p-4"
   >
+    <ng-content></ng-content>
     <header class="flex items-center justify-between sticky top-0">
       <p class="font-medium">{{ list?.name }}</p>
       <button
@@ -42,6 +43,11 @@ import {
   </div>`,
   styles: [
     `
+      :host.cdk-drag-preview {
+        .task-list {
+          @apply shadow-xl;
+        }
+      }
       .task-list {
         width: 300px;
         &.cdk-drop-list-dragging {

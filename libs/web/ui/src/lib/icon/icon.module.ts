@@ -7,6 +7,7 @@ import {
   RiArrowDownSLine,
   RiBuildingLine,
   RiCheckboxLine,
+  RiDragMoveLine,
   RiFolder4Line,
   RiHome5Line,
   RiMore2Fill,
@@ -24,6 +25,7 @@ const icons = {
   RiArrowDownSLine,
   RiMore2Fill,
   RiAddLine,
+  RiDragMoveLine,
 };
 
 @NgModule({
