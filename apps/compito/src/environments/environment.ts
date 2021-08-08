@@ -5,8 +5,9 @@
 export const environment = {
   production: false,
   auth: {
+    audience: 'compito-api',
     domain: 'dev-2nisamv9.us.auth0.com',
-    clientId: 'EIvFZSSMXYJtghn2QCiRKWB2ujTaEUuC',
+    clientId: 'Vo9QfkcZjyuldepohhcvgLzu7uGUa6C9',
     redirectUri: window.location.origin,
   },
 };

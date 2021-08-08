@@ -13,7 +13,13 @@ import { AppComponent } from './app.component';
     AppRoutingModule,
     HttpClientModule,
     AuthModule.forRoot({
-      ...environment.auth,
+      domain: environment.auth.domain,
+      audience: environment.auth.audience,
+      clientId: environment.auth.clientId,
+      redirectUri: window.location.origin,
+      httpInterceptor: {
+        allowedList: ['http://localhost:3333/api/*'],
+      },
     }),
   ],
   providers: [

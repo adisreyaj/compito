@@ -13,6 +13,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({
     origin: '*',
+    allowedHeaders: ['authorization'],
   });
   app.use(compression());
   app.use(helmet());
