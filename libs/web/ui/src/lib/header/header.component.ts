@@ -3,17 +3,38 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 @Component({
   selector: 'compito-header',
   template: `
-    <div class="flex space-x-2 items-center">
-      <img
-        src="https://avatar.tobi.sh/adi"
-        alt="Compito"
-        width="40"
-        height="40"
-        class="rounded-full"
-      />
-      <p class="text-lg font-bold">Compito</p>
-    </div>
-    <div class="flex space-x-6 items-center">
+    <section class="flex items-center space-x-10">
+      <div class="flex items-center">
+        <img
+          src="https://avatar.tobi.sh/adi"
+          alt="Compito"
+          width="40"
+          height="40"
+          class="rounded-full"
+        />
+      </div>
+      <nav class="flex-1 text-gray-400 font-medium">
+        <ol class="list-none flex items-center gap-6">
+          <li class="crumb">
+            <a routerLink="/" routerLinkActive="text-gray-800">Home</a>
+          </li>
+          <li class="crumb">
+            <a routerLink="/tasks" routerLinkActive="text-gray-800">Tasks</a>
+          </li>
+          <li class="crumb">
+            <a routerLink="/projects" routerLinkActive="text-gray-800"
+              >Projects</a
+            >
+          </li>
+          <li class="crumb">
+            <a routerLink="/orgs" routerLinkActive="text-gray-800"
+              >Organizations</a
+            >
+          </li>
+        </ol>
+      </nav>
+    </section>
+    <section class="flex space-x-6 items-center">
       <div class="grid grid-cols-2 gap-4 text-gray-400">
         <button>
           <rmx-icon name="add-circle-line"></rmx-icon>
@@ -41,7 +62,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
           <p class="text-xs text-gray-600">Super Admin</p>
         </div>
       </div>
-    </div>
+    </section>
 
     <ng-template #userDropdown let-hide>
       <div class="flex flex-col w-48">
@@ -61,6 +82,8 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
       rmx-icon {
         width: 22px;
         height: 22px;
+      }
+      nav {
       }
     `,
   ],
