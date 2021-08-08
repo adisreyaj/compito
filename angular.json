@@ -192,6 +192,156 @@
         }
       }
     },
+    "web-boards": {
+      "projectType": "library",
+      "root": "libs/web/boards",
+      "sourceRoot": "libs/web/boards/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/boards"],
+          "options": {
+            "jestConfig": "libs/web/boards/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/web/boards/src/**/*.ts",
+              "libs/web/boards/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "web-orgs": {
+      "projectType": "library",
+      "root": "libs/web/orgs",
+      "sourceRoot": "libs/web/orgs/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/orgs"],
+          "options": {
+            "jestConfig": "libs/web/orgs/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/web/orgs/src/**/*.ts",
+              "libs/web/orgs/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "web-profile": {
+      "projectType": "library",
+      "root": "libs/web/profile",
+      "sourceRoot": "libs/web/profile/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/profile"],
+          "options": {
+            "jestConfig": "libs/web/profile/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/web/profile/src/**/*.ts",
+              "libs/web/profile/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "web-projects": {
+      "projectType": "library",
+      "root": "libs/web/projects",
+      "sourceRoot": "libs/web/projects/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/projects"],
+          "options": {
+            "jestConfig": "libs/web/projects/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/web/projects/src/**/*.ts",
+              "libs/web/projects/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "web-settings": {
+      "projectType": "library",
+      "root": "libs/web/settings",
+      "sourceRoot": "libs/web/settings/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/settings"],
+          "options": {
+            "jestConfig": "libs/web/settings/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/web/settings/src/**/*.ts",
+              "libs/web/settings/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "web-tasks": {
+      "projectType": "library",
+      "root": "libs/web/tasks",
+      "sourceRoot": "libs/web/tasks/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/tasks"],
+          "options": {
+            "jestConfig": "libs/web/tasks/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/web/tasks/src/**/*.ts",
+              "libs/web/tasks/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
     "web-ui": {
       "projectType": "library",
       "root": "libs/web/ui",

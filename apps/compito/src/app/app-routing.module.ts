@@ -4,7 +4,6 @@ import { Route, RouterModule } from '@angular/router';
 const routes: Route[] = [
   {
     path: '',
-    pathMatch: 'full',
     // canActivate: [AuthGuard],
     loadChildren: () =>
       import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
@@ -13,6 +12,10 @@ const routes: Route[] = [
     path: 'auth',
     loadChildren: () =>
       import('@compito/web/auth').then((m) => m.WebAuthModule),
+  },
+  {
+    path: '**',
+    redirectTo: 'auth/login',
   },
 ];
 @NgModule({

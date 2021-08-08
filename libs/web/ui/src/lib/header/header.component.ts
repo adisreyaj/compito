@@ -15,20 +15,40 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
       </div>
       <nav class="flex-1 text-gray-400 font-medium">
         <ol class="list-none flex items-center gap-6">
-          <li class="crumb">
-            <a routerLink="/" routerLinkActive="text-gray-800">Home</a>
+          <li>
+            <a
+              class="flex items-center space-x-2"
+              routerLink="/"
+              routerLinkActive="text-gray-800"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <p>Home</p>
+            </a>
           </li>
-          <li class="crumb">
-            <a routerLink="/tasks" routerLinkActive="text-gray-800">Tasks</a>
-          </li>
-          <li class="crumb">
-            <a routerLink="/projects" routerLinkActive="text-gray-800"
-              >Projects</a
+          <li>
+            <a
+              class="flex items-center space-x-2"
+              routerLink="/tasks"
+              routerLinkActive="text-gray-800"
+            >
+              <p>Tasks</p></a
             >
           </li>
-          <li class="crumb">
-            <a routerLink="/orgs" routerLinkActive="text-gray-800"
-              >Organizations</a
+          <li>
+            <a
+              class="flex items-center space-x-2"
+              routerLink="/projects"
+              routerLinkActive="text-gray-800"
+            >
+              <p>Projects</p>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center space-x-2"
+              routerLink="/orgs"
+              routerLinkActive="text-gray-800"
+              ><p>Orgs</p></a
             >
           </li>
         </ol>
@@ -57,9 +77,13 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
           height="40"
           class="rounded-full"
         />
-        <div>
+        <div class="flex items-center">
           <p class="text-sm font-medium">Adithya</p>
-          <p class="text-xs text-gray-600">Super Admin</p>
+          <rmx-icon
+            class="text-gray-400"
+            style="width: 16px;height: 16px;"
+            name="arrow-down-s-line"
+          ></rmx-icon>
         </div>
       </div>
     </section>
@@ -83,7 +107,8 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
         width: 22px;
         height: 22px;
       }
-      nav {
+      nav a {
+        transition: color 0.2s ease-in;
       }
     `,
   ],
