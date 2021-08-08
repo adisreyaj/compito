@@ -15,7 +15,7 @@ export interface UserAvatarGroupData {
   template: `
     <div>
       <ul class="flex items-center -space-x-4">
-        <ng-container *ngFor="let item of data">
+        <ng-container *ngFor="let item of data | slice: 0:itemsToShow">
           <li
             [tippy]="item.name"
             class="rounded-full bg-white p-1 cursor-pointer"
@@ -29,6 +29,15 @@ export interface UserAvatarGroupData {
             />
           </li>
         </ng-container>
+        <ng-container *ngIf="data.length - itemsToShow > 0">
+          <li class="rounded-full bg-gray-100 cursor-pointer">
+            <div
+              class="w-10 h-10 flex justify-center items-center text-gray-500"
+            >
+              <p class="text-sm">+{{ data.length - itemsToShow }}</p>
+            </div>
+          </li>
+        </ng-container>
       </ul>
     </div>
   `,
@@ -37,6 +46,7 @@ export interface UserAvatarGroupData {
 })
 export class UserAvatarGroupComponent implements OnInit {
   @Input() data: UserAvatarGroupData[] = [];
+  @Input() itemsToShow = 5;
   constructor() {}
 
   ngOnInit(): void {}

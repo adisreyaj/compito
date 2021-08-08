@@ -14,7 +14,12 @@ import { UserAvatarGroupData } from '@compito/web/ui';
       border-gray-100 bg-white shadow-sm hover:border-gray-200"
     >
       <header class="flex items-center justify-between">
-        <p class="text-lg font-medium cursor-pointer">Compito Web</p>
+        <div>
+          <p class="text-lg font-medium cursor-pointer">Compito Web</p>
+          <p class="text-gray-400 text-sm line-clamp-2">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          </p>
+        </div>
         <button class="text-gray-500">
           <rmx-icon name="more-2-fill"></rmx-icon>
         </button>
