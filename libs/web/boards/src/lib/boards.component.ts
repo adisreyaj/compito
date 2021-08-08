@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   template: `
     <compito-page-header title="Compito UI"> </compito-page-header>
     <section
-      class="board__container p-8 bg-white flex space-x-2"
+      class="board__container p-8 flex space-x-2"
       cdkDropList
       [cdkDropListData]="list"
       cdkDropListOrientation="horizontal"
@@ -43,7 +43,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
     `
       .board {
         &__container {
-          min-height: calc(100vh - var(--header-height) - 65px);
+          /* min-height: calc(100vh - var(--header-height) - 64px); */
         }
       }
 

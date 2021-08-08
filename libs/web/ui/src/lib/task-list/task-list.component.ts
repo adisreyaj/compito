@@ -14,7 +14,7 @@ import {
     [id]="list.name"
     [cdkDropListConnectedTo]="list.name | dropListConnection: allList"
     (cdkDropListDropped)="dropped.emit($event)"
-    class="task-list relative bg-gray-100 rounded-md transition-all duration-200 ease-in p-4"
+    class="task-list relative border border-gray-200 bg-gray-100 rounded-md transition-all duration-200 ease-in p-4"
   >
     <ng-content></ng-content>
     <header class="flex items-center justify-between sticky top-0">
@@ -51,7 +51,7 @@ import {
       .task-list {
         width: 300px;
         &.cdk-drop-list-dragging {
-          @apply bg-gray-200 ring ring-gray-300;
+          @apply bg-gray-200 ring ring-gray-200;
           .no-task {
             @apply hidden;
           }
@@ -59,7 +59,7 @@ import {
       }
       .task-list__container {
         @apply overflow-y-auto;
-        max-height: calc(100vh - var(--header-height) - 65px - 140px);
+        max-height: calc(100vh - var(--header-height) - 64px - 140px);
       }
       .task-card.cdk-drag-preview {
         @apply shadow-xl;

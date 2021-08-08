@@ -8,7 +8,7 @@ import {
 @Component({
   selector: 'compito-task-card',
   template: `
-    <div class="bg-white rounded-md p-4">
+    <div class="bg-white rounded-md p-4 shadow-sm border hover:shadow-md">
       <header>
         <p class="font-medium">Login UI</p>
       </header>

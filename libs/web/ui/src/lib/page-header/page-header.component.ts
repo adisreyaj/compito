@@ -8,7 +8,7 @@ import {
 @Component({
   selector: 'compito-page-header',
   template: `
-    <header class="py-4 px-8 border-b">
+    <header class="py-4 px-8 bg-gray-100 shadow-inner">
       <div>
         <h1 class="text-2xl font-bold">{{ title }}</h1>
       </div>
