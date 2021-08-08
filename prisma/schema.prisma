@@ -8,47 +8,123 @@ generator client {
 }
 
 model User {
-  id        String       @id @default(cuid())
-  email     String       @unique
-  firstName String
-  lastName  String
-  password  String
-  org       Organization @relation(fields: [orgId], references: [id])
-  orgId     String
+  id                String       @id @default(cuid())
+  email             String       @unique
+  firstName         String
+  lastName          String
+  password          String
+  org               Organization @relation(fields: [orgId], references: [id])
+  orgId             String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  taskAssignedBy    Task[]       @relation("assignedBy")
+  taskAssignee      Task?        @relation("assignees", fields: [taskId], references: [id])
+  taskId            String?
+  subTaskAssignedBy SubTask[]    @relation("subTaskAssignedBy")
+  subTaskAssignee   SubTask?     @relation("subTaskAssignees", fields: [subTaskId], references: [id])
+  subTaskId         String?
+  project           Project[]
+  task              Task[]
+  subTask           SubTask[]
+  Comment           Comment[]
 }
 
 model Organization {
-  id      String    @id @default(cuid())
-  name    String    
-  slug    String    @unique
-  User    User[]
-  Project Project[]
-  Task    Task[]
-  Tag    Tag[]
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User[]
+  project   Project[]
+  task      Task[]
+  tag       Tag[]
 }
 
 model Project {
-  id    String       @id @default(cuid())
-  name  String
-  org   Organization @relation(fields: [orgId], references: [id])
-  orgId String
-  Task  Task[]
+  id          String       @id @default(cuid())
+  name        String
+  org         Organization @relation(fields: [orgId], references: [id])
+  orgId       String
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  task        Task[]
 }
 
 model Task {
-  id        String       @id @default(cuid())
-  title     String
-  project   Project      @relation(fields: [projectId], references: [id])
-  projectId String
-  org       Organization @relation(fields: [orgId], references: [id])
-  orgId     String
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  project      Project      @relation(fields: [projectId], references: [id])
+  projectId    String
+  org          Organization @relation(fields: [orgId], references: [id])
+  orgId        String
+  assignedBy   User         @relation("assignedBy", fields: [assignedById], references: [id])
+  assignedById String
+  assignees    User[]       @relation("assignees")
+  tags         Tag[]
+  priority     Priority
+  stateDate    DateTime?
+  dueDate      DateTime?
+  createdBy    User         @relation(fields: [createdById], references: [id])
+  createdById  String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  completed    Boolean      @default(false)
+  subTasks     SubTask[]
+  comments     Comment[]
+}
+
+model SubTask {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  assignedBy   User      @relation("subTaskAssignedBy", fields: [assignedById], references: [id])
+  assignedById String
+  assignees    User[]    @relation("subTaskAssignees")
+  stateDate    DateTime?
+  dueDate      DateTime?
+  createdBy    User      @relation(fields: [createdById], references: [id])
+  createdById  String
+  priority     Priority
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  completed    Boolean   @default(false)
+  task         Task?     @relation(fields: [taskId], references: [id])
+  taskId       String?
 }
 
 model Tag {
-  id    String       @id @default(cuid())
-  name  String
-  org   Organization @relation(fields: [orgId], references: [id])
-  orgId String
+  id        String       @id @default(cuid())
+  name      String
+  org       Organization @relation(fields: [orgId], references: [id])
+  orgId     String
+  task      Task?        @relation(fields: [taskId], references: [id])
+  taskId    String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@unique([name, orgId])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  reactions   Json?
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Task        Task?    @relation(fields: [taskId], references: [id])
+  taskId      String?
+}
+
+enum Priority {
+  Lowest
+  Low
+  Medium
+  High
+  Highest
 }
