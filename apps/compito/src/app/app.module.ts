@@ -2,6 +2,11 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AuthHttpInterceptor, AuthModule } from '@auth0/auth0-angular';
+import {
+  popperVariation,
+  TippyModule,
+  tooltipVariation,
+} from '@ngneat/helipopper';
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +24,20 @@ import { AppComponent } from './app.component';
       redirectUri: window.location.origin,
       httpInterceptor: {
         allowedList: ['http://localhost:3333/api/*'],
+      },
+    }),
+    TippyModule.forRoot({
+      defaultVariation: 'tooltip',
+      variations: {
+        tooltip: tooltipVariation,
+        popper: popperVariation,
+        menu: {
+          ...popperVariation,
+          role: 'dropdown',
+          arrow: false,
+          hideOnClick: true,
+          zIndex: 99,
+        },
       },
     }),
   ],

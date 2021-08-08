@@ -43,9 +43,11 @@
     "@nestjs/core": "^7.0.0",
     "@nestjs/passport": "^8.0.1",
     "@nestjs/platform-express": "^7.0.0",
+    "@ngneat/helipopper": "^4.1.1",
     "@ngxs/store": "^3.7.2",
     "@nrwl/angular": "12.6.5",
     "@prisma/client": "^2.28.0",
+    "angular-remix-icon": "^2.0.0",
     "auth0": "^2.36.1",
     "compression": "^1.7.4",
     "express-rate-limit": "^5.3.0",
@@ -57,7 +59,8 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "@ngneat/overview": "^1.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.1.0",

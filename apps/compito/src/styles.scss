@@ -2,7 +2,10 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+
 @import 'partials/colors';
+@import 'partials/buttons';
+@import 'partials/poppers';
 @import 'partials/forms';
 @import 'partials/select';
 
@@ -13,4 +16,6 @@
 }
 body {
   font-family: 'Poppins', sans-serif;
+  background-color: #F4F5F8;
+  @apply text-gray-900;
 }

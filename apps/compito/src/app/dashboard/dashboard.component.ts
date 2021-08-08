@@ -11,7 +11,4 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  call() {
-    this.http.get('http://localhost:3333/api/organizations').subscribe();
-  }
 }
