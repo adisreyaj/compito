@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'compito-projects',
-  template: ` <section class="p-8">
+  template: ` <section class="pb-8">
     <compito-page-header title="Projects"> </compito-page-header>
-    <div class="projects__list">
+    <div class="projects__list px-8">
       <compito-project-card></compito-project-card>
       <compito-project-card></compito-project-card>
       <compito-project-card></compito-project-card>

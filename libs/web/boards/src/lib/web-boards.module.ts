@@ -1,8 +1,9 @@
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { IconModule, PageHeaderModule, TaskListModule } from '@compito/web/ui';
 import { BoardsComponent } from './boards.component';
-
 @NgModule({
   imports: [
     CommonModule,
@@ -12,6 +13,10 @@ import { BoardsComponent } from './boards.component';
         component: BoardsComponent,
       },
     ]),
+    PageHeaderModule,
+    IconModule,
+    DragDropModule,
+    TaskListModule,
   ],
   declarations: [BoardsComponent],
 })

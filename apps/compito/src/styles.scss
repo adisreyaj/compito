@@ -5,6 +5,7 @@
 
 @import 'partials/colors';
 @import 'partials/buttons';
+@import 'partials/scrollbar';
 @import 'partials/poppers';
 @import 'partials/forms';
 @import 'partials/select';
@@ -18,4 +19,21 @@ body {
   font-family: 'Poppins', sans-serif;
   background-color: #F4F5F8;
   @apply text-gray-900;
+}
+
+:root {
+  --header-height: 64px;
+}
+
+/* Animate items as they're being sorted. */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Animate an item that has been dropped. */
+.cdk-drag-animating {
+  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+}
+.cdk-drag-placeholder	{
+  @apply shadow-xl rounded-md;
 }

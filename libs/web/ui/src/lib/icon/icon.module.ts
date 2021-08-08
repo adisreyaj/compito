@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import {
   RemixIconModule,
   RiAddCircleLine,
+  RiAddLine,
   RiArrowDownSLine,
   RiBuildingLine,
   RiCheckboxLine,
@@ -22,6 +23,7 @@ const icons = {
   RiBuildingLine,
   RiArrowDownSLine,
   RiMore2Fill,
+  RiAddLine,
 };
 
 @NgModule({
