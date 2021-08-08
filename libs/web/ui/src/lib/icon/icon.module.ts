@@ -8,6 +8,7 @@ import {
   RiCheckboxLine,
   RiFolder4Line,
   RiHome5Line,
+  RiMore2Fill,
   RiNotification2Line,
   RiTableLine,
 } from 'angular-remix-icon';
@@ -20,6 +21,7 @@ const icons = {
   RiCheckboxLine,
   RiBuildingLine,
   RiArrowDownSLine,
+  RiMore2Fill,
 };
 
 @NgModule({
