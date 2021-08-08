@@ -43,6 +43,10 @@ export class BoardsComponent implements OnInit {
       name: 'Done',
       data: ['Test', 'Foo', 'Bar'],
     },
+    {
+      name: 'Deployed',
+      data: [],
+    },
   ];
   constructor() {}
 

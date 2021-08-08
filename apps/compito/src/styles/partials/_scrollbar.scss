@@ -16,7 +16,7 @@
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: var(--primary);
+    @apply bg-gray-400;
     border-radius: 10px;
 }
 
@@ -40,7 +40,7 @@
 
 /* Handle */
 ::scrollbar-thumb {
-    background: var(--primary);
+    @apply bg-gray-400;
     border-radius: 10px;
 }
 

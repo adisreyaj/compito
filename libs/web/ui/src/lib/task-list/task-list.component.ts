@@ -9,14 +9,14 @@ import {
 @Component({
   selector: 'compito-task-list',
   template: `<div
-    class="task-list bg-gray-100 rounded-md transition-all duration-200 ease-in py-4"
     cdkDropList
     [cdkDropListData]="list.data"
     [id]="list.name"
     [cdkDropListConnectedTo]="list.name | dropListConnection: allList"
     (cdkDropListDropped)="dropped.emit($event)"
+    class="task-list bg-gray-100 rounded-md transition-all duration-200 ease-in p-4"
   >
-    <header class="flex items-center justify-between sticky top-0 px-4">
+    <header class="flex items-center justify-between sticky top-0">
       <p class="font-medium">{{ list?.name }}</p>
       <button
         class="text-gray-500 bg-white border rounded-md shadow-sm hover:shadow-md"
@@ -24,13 +24,21 @@ import {
         <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
       </button>
     </header>
-    <ul class="task-list__container space-y-4 px-4 mt-4">
+    <ul
+      *ngIf="list.data.length > 0; else noTask"
+      class="task-list__container space-y-4 mt-4 -mx-4 px-4"
+    >
       <ng-container *ngFor="let task of list.data">
         <article cdkDrag class="task-card cursor-pointer">
           <compito-task-card [task]="task"></compito-task-card>
         </article>
       </ng-container>
     </ul>
+    <ng-template #noTask>
+      <div class="no-task mt-4">
+        <p class="text-sm text-gray-400">No tasks available</p>
+      </div>
+    </ng-template>
   </div>`,
   styles: [
     `
@@ -38,9 +46,9 @@ import {
         width: 300px;
         &.cdk-drop-list-dragging {
           @apply bg-gray-200 ring ring-gray-300;
-        }
-        &__placeholder {
-          @apply bg-gray-400;
+          .no-task {
+            @apply hidden;
+          }
         }
       }
       .task-list__container {
