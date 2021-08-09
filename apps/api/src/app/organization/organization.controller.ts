@@ -13,20 +13,24 @@ import {
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
 import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
 import { PermissionsGuard } from 'apps/api/src/app/core/guards/permissions.guard';
+import { Role } from '../core/decorators/roles.decorator';
+import { RolesGuard } from '../core/guards/roles.guard';
 import { OrganizationService } from './organization.service';
 
-@Controller('organizations')
+@Controller('orgs')
 export class OrganizationController {
   constructor(private organizationService: OrganizationService) {}
 
-  @UseGuards(PermissionsGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('super-admin')
   @Permissions(PERMISSIONS.org.create)
   @Post()
   create(@Body() organization: OrganizationRequest) {
     return this.organizationService.create(organization);
   }
 
-  @UseGuards(PermissionsGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('super-admin')
   @Permissions(PERMISSIONS.org.read)
   @Get()
   findAll(@Query() query: RequestParamsDto) {
@@ -41,13 +45,15 @@ export class OrganizationController {
   }
 
   @UseGuards(PermissionsGuard)
+  @Role('super-admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id')
   update(@Param('id') id: string, @Body() organization: OrganizationRequest) {
     return this.organizationService.update(id, organization);
   }
 
-  @UseGuards(PermissionsGuard)
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('super-admin')
   @Permissions(PERMISSIONS.org.delete)
   @Delete(':id')
   remove(@Param('id') id: string) {

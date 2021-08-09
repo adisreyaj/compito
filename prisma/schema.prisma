@@ -13,6 +13,9 @@ model User {
   firstName         String
   lastName          String
   password          String
+  image             String?
+  blocked           Boolean      @default(false)
+  verified          Boolean      @default(false)
   org               Organization @relation(fields: [orgId], references: [id])
   orgId             String
   createdAt         DateTime     @default(now())
