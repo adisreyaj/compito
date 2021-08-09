@@ -31,6 +31,8 @@ model User {
   subTasks          SubTask[]
   comments          Comment[]
   boards            Board[]
+  project           Project?     @relation("members", fields: [projectId], references: [id])
+  projectId         String?
 }
 
 model Organization {
@@ -49,8 +51,11 @@ model Organization {
 model Project {
   id          String       @id @default(cuid())
   name        String
+  slug        String       @unique
+  description String
   org         Organization @relation(fields: [orgId], references: [id])
   orgId       String
+  members     User[]       @relation("members")
   createdBy   User         @relation(fields: [createdById], references: [id])
   createdById String
   createdAt   DateTime     @default(now())

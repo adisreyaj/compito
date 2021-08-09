@@ -1,10 +1,12 @@
-import { ProjectRequest, RequestParamsDto } from '@compito/api-interfaces';
+import { ProjectRequest, RequestParamsDto, UserPayload } from '@compito/api-interfaces';
 import {
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '../prisma.service';
 
@@ -13,10 +15,26 @@ export class ProjectService {
   private logger = new Logger('PROJECT');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: ProjectRequest) {
+  async create(data: ProjectRequest, user: UserPayload) {
+    const {
+      'https://compito.adi.so/roles': roles,
+      'https://compito.adi.so/org': org,
+      'https://compito.adi.so/userId': userId,
+    } = user;
+    if (roles[0] !== 'super-admin' && data.orgId !== org) {
+      throw new UnauthorizedException('No access to create project');
+    }
     try {
+      const projectData: Prisma.ProjectUncheckedCreateInput = {
+        ...data,
+        orgId: org,
+        createdById: userId,
+        members: {
+          connect: data.members.map((id) => ({ id })),
+        },
+      };
       const project = await this.prisma.project.create({
-        data,
+        data: projectData,
       });
       return project;
     } catch (error) {
@@ -69,7 +87,7 @@ export class ProjectService {
         where: {
           id,
         },
-        data,
+        data: {},
       });
       this.logger.debug(project);
       if (project) {
