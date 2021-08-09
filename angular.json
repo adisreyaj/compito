@@ -80,16 +80,10 @@
             "polyfills": "apps/compito/src/polyfills.ts",
             "tsConfig": "apps/compito/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "apps/compito/src/favicon.ico",
-              "apps/compito/src/assets"
-            ],
+            "assets": ["apps/compito/src/favicon.ico", "apps/compito/src/assets"],
             "styles": ["apps/compito/src/styles.scss"],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "apps/compito/src/styles",
-                "apps/compito/src/styles/partials"
-              ]
+              "includePaths": ["apps/compito/src/styles", "apps/compito/src/styles/partials"]
             },
             "scripts": []
           },
@@ -150,10 +144,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/compito/src/**/*.ts",
-              "apps/compito/src/**/*.html"
-            ]
+            "lintFilePatterns": ["apps/compito/src/**/*.ts", "apps/compito/src/**/*.html"]
           }
         },
         "test": {
@@ -209,10 +200,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/boards/src/**/*.ts",
-              "libs/web/boards/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/boards/src/**/*.ts", "libs/web/boards/src/**/*.html"]
           }
         }
       }
@@ -234,10 +222,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/orgs/src/**/*.ts",
-              "libs/web/orgs/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/orgs/src/**/*.ts", "libs/web/orgs/src/**/*.html"]
           }
         }
       }
@@ -259,10 +244,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/profile/src/**/*.ts",
-              "libs/web/profile/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/profile/src/**/*.ts", "libs/web/profile/src/**/*.html"]
           }
         }
       }
@@ -284,10 +266,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/projects/src/**/*.ts",
-              "libs/web/projects/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/projects/src/**/*.ts", "libs/web/projects/src/**/*.html"]
           }
         }
       }
@@ -309,10 +288,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/settings/src/**/*.ts",
-              "libs/web/settings/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/settings/src/**/*.ts", "libs/web/settings/src/**/*.html"]
           }
         }
       }
@@ -334,10 +310,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/tasks/src/**/*.ts",
-              "libs/web/tasks/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/tasks/src/**/*.ts", "libs/web/tasks/src/**/*.html"]
           }
         }
       }
@@ -359,10 +332,29 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/ui/src/**/*.ts",
-              "libs/web/ui/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/ui/src/**/*.ts", "libs/web/ui/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-users": {
+      "projectType": "library",
+      "root": "libs/web/users",
+      "sourceRoot": "libs/web/users/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/users"],
+          "options": {
+            "jestConfig": "libs/web/users/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/users/src/**/*.ts", "libs/web/users/src/**/*.html"]
           }
         }
       }
