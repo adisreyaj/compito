@@ -2,6 +2,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AuthHttpInterceptor, AuthModule } from '@auth0/auth0-angular';
+import { DialogModule } from '@ngneat/dialog';
 import {
   popperVariation,
   TippyModule,
@@ -26,6 +27,7 @@ import { AppComponent } from './app.component';
         allowedList: ['http://localhost:3333/api/*'],
       },
     }),
+    DialogModule.forRoot(),
     TippyModule.forRoot({
       defaultVariation: 'tooltip',
       variations: {

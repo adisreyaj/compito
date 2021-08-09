@@ -12,7 +12,7 @@ export const BUTTON_SIZE_PADDINGS = {
 
 @Component({
   selector: 'button[btn], a[btn]',
-  template: ` <p>button works!</p> `,
+  template: ` <ng-content></ng-content>`,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,12 +20,7 @@ export class ButtonComponent {
   @HostBinding('class') get classes() {
     return `btn rounded-md
     flex items-center
-    btn-${this.variant}
-    ${
-      this.variant === 'warn'
-        ? 'bg-red-600 hover:bg-red-700'
-        : 'bg-primary hover:bg-primary-dark'
-    }
+    btn--${this.variant}
     ${BUTTON_SIZE_PADDINGS[this.size]}
     ${this.size === 'sm' ? 'text-sm' : 'text-base'}
     text-white
@@ -33,7 +28,6 @@ export class ButtonComponent {
     border-transparent
     hover:shadow-m
     focus:outline-none
-    focus:ring-primary focus:ring-1 focus:ring-offset-1
     `;
   }
 

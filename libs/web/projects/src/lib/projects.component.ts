@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-
+import { DialogService } from '@ngneat/dialog';
+import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
 @Component({
   selector: 'compito-projects',
   template: ` <compito-page-header title="Projects"> </compito-page-header>
@@ -13,6 +14,19 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
         <compito-project-card></compito-project-card>
         <compito-project-card></compito-project-card>
         <compito-project-card></compito-project-card>
+        <article
+          (click)="createNew()"
+          class="p-4 cursor-pointer rounded-md border transition-all duration-200 ease-in
+        border-gray-300 border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-gray-200
+          grid place-items-center"
+        >
+          <div class="flex items-center space-x-2 text-gray-500">
+            <div class=" border rounded-md shadow-sm hover:shadow-md bg-white">
+              <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+            </div>
+            <p class="text-sm">Add New Project</p>
+          </div>
+        </article>
       </div>
     </section>`,
   styles: [
@@ -30,7 +44,11 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent implements OnInit {
-  constructor() {}
+  constructor(private dialog: DialogService) {}
 
   ngOnInit(): void {}
+
+  createNew() {
+    this.dialog.open(ProjectsCreateModalComponent);
+  }
 }

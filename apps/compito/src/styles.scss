@@ -4,6 +4,7 @@
 
 @import 'partials/colors';
 @import 'partials/buttons';
+@import 'partials/dialog';
 @import 'partials/scrollbar';
 @import 'partials/poppers';
 @import 'partials/forms';
@@ -36,7 +37,7 @@ body {
   @apply shadow-xl rounded-md;
 }
 
-.task-list:hover,compito-task-list.cdk-drag-preview:not(.cdk-drag-dragging) {
+.task-list:hover:not(.cdk-drag-preview):not(.cdk-drag-dragging):not(.cdk-drop-list-dragging) {
   .list__drag {
     @apply opacity-100;
   }
