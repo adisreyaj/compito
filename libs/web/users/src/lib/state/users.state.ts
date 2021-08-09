@@ -1,24 +1,41 @@
-import { Injectable } from '@angular/core';
-import { State, Action, StateContext } from '@ngxs/store';
+import { Injectable } from '@angular/core';
+import { User } from '@compito/api-interfaces';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { tap } from 'rxjs/operators';
+import { UsersService } from '../users.service';
 import { UsersAction } from './users.actions';
 
 export class UsersStateModel {
-  public items: string[];
+  public users: User[] = [];
 }
 
 const defaults = {
-  items: []
+  users: [],
 };
 
 @State<UsersStateModel>({
   name: 'users',
-  defaults
+  defaults,
 })
 @Injectable()
 export class UsersState {
-  @Action(UsersAction)
-  add({ getState, setState }: StateContext<UsersStateModel>, { payload }: UsersAction) {
-    const state = getState();
-    setState({ items: [ ...state.items, payload ] });
+  @Selector()
+  static getAllUsers(state: UsersStateModel) {
+    return state.users;
+  }
+  constructor(private userService: UsersService) {}
+
+  @Action(UsersAction.Add)
+  add({ getState, setState }: StateContext<UsersStateModel>, { payload }: UsersAction.Add) {}
+
+  @Action(UsersAction.GetAll)
+  getAll({ getState, patchState }: StateContext<UsersStateModel>, { payload }: UsersAction.GetAll) {
+    return this.userService.getAll().pipe(
+      tap((result) => {
+        patchState({
+          users: result.payload,
+        });
+      }),
+    );
   }
 }
