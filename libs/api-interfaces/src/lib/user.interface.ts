@@ -4,11 +4,14 @@ export interface UserBase {
   email: string;
   firstName: string;
   lastName: string;
+  image: string;
 }
 
 export interface User extends UserBase {
   password: string;
   org: Organization;
+  blocked: boolean;
+  verified: boolean;
 }
 
 export interface UserRequest extends UserBase {

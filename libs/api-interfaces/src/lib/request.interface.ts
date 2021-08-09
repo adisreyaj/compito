@@ -10,10 +10,10 @@ export interface SearchParams {
 export interface RequestParams extends PaginationParams, SearchParams {}
 
 export class RequestParamsDto {
-  page: number;
-  limit: number;
-  skip: number;
-  search: string | null;
+  page!: number;
+  limit!: number;
+  skip!: number;
+  search!: string | null;
   constructor(pageValue: string, limit: string, search: string) {
     this.page = +pageValue;
     this.limit = +limit;
@@ -23,3 +23,12 @@ export class RequestParamsDto {
     }
   }
 }
+
+export interface UserPayload {
+  'https://compito.adi.so/roles': string[];
+  'https://compito.adi.so/org': string;
+  'https://compito.adi.so/userId': string;
+  email: string;
+}
+
+export type RequestWithUser = Request & { user: UserPayload };

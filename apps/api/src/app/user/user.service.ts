@@ -47,12 +47,12 @@ export class UserService {
           email,
           user_metadata: {
             org: orgId,
+            userId: user.id,
           },
           blocked: false,
           app_metadata: {},
           given_name: firstName,
           family_name: lastName,
-          user_id: user.id,
           password,
         });
       }

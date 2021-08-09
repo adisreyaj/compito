@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  api: 'http://localhost:3333/api',
   auth: {
     audience: 'compito-api',
     domain: 'dev-2nisamv9.us.auth0.com',

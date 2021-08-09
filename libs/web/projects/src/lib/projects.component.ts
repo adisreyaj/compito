@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { DialogService } from '@ngneat/dialog';
+import { Store } from '@ngxs/store';
 import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
+import { ProjectsAction } from './state/projects.actions';
 @Component({
   selector: 'compito-projects',
   template: ` <compito-page-header title="Projects"> </compito-page-header>
@@ -22,7 +24,7 @@ import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/c
           style="min-height: 180px;"
         >
           <div class="flex items-center space-x-2 text-gray-500">
-            <div class=" border rounded-md shadow-sm hover:shadow-md bg-white">
+            <div class=" border rounded-md shadow-sm bg-white">
               <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
             </div>
             <p class="text-sm">Add New Project</p>
@@ -46,11 +48,16 @@ import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/c
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent implements OnInit {
-  constructor(private dialog: DialogService) {}
+  constructor(private dialog: DialogService, private store: Store) {}
 
   ngOnInit(): void {}
 
   createNew() {
     const ref = this.dialog.open(ProjectsCreateModalComponent);
+    ref.afterClosed$.subscribe((data) => {
+      if (data) {
+        this.store.dispatch(new ProjectsAction.Add(data));
+      }
+    });
   }
 }

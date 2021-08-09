@@ -15,7 +15,7 @@ import { ModalActionsDirective } from 'libs/web/ui/src/lib/modal/modal-actions/m
         <p class="font-medium text-gray-600 text-lg">{{ title }}</p>
       </div>
     </header>
-    <section class="flex-1">
+    <section class="flex-1 mt-6">
       <ng-content></ng-content>
     </section>
     <footer>

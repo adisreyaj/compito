@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
   selector: 'compito-header',
@@ -73,6 +74,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
           </button>
         </div>
         <div
+          *ngIf="auth.user$ | async as user"
           class="flex items-center space-x-2 cursor-pointer"
           [tippy]="userDropdown"
           placement="bottom-start"
@@ -80,14 +82,14 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
           [offset]="[-10, 10]"
         >
           <img
-            src="https://avatars.githubusercontent.com/u/29002760?v=4"
+            [src]="user.picture"
             alt="Adithya"
             width="40"
             height="40"
             class="rounded-full"
           />
           <div class="flex items-center">
-            <p class="text-sm font-medium">Adithya</p>
+            <p class="text-sm font-medium">{{ user.given_name }}</p>
             <rmx-icon
               class="text-gray-400"
               style="width: 16px;height: 16px;"
@@ -102,7 +104,9 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
         <div class="dropdown-item" routerLink="/profile" (click)="hide()">
           Preferences
         </div>
-        <div class="text-red-600 dropdown-item" (click)="hide()">Logout</div>
+        <div class="text-red-600 dropdown-item" (click)="auth.logout(); hide()">
+          Logout
+        </div>
       </div>
     </ng-template>
   `,
@@ -125,7 +129,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit {
-  constructor() {}
+  constructor(public auth: AuthService) {}
 
   ngOnInit(): void {}
 }

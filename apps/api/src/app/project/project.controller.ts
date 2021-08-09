@@ -1,4 +1,8 @@
-import { ProjectRequest, RequestParamsDto } from '@compito/api-interfaces';
+import {
+  ProjectRequest,
+  RequestParamsDto,
+  RequestWithUser,
+} from '@compito/api-interfaces';
 import {
   Body,
   Controller,
@@ -8,6 +12,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
@@ -25,8 +30,8 @@ export class ProjectController {
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.create)
   @Post()
-  create(@Body() project: ProjectRequest) {
-    return this.projectService.create(project);
+  create(@Body() project: ProjectRequest, @Req() req: RequestWithUser) {
+    return this.projectService.create(project, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
