@@ -17,40 +17,40 @@ import { ProjectService } from './project.service';
 
 @Controller('projects')
 export class ProjectController {
-  constructor(private organizationService: ProjectService) {}
+  constructor(private projectService: ProjectService) {}
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.create)
   @Post()
-  create(@Body() organization: ProjectRequest) {
-    return this.organizationService.create(organization);
+  create(@Body() project: ProjectRequest) {
+    return this.projectService.create(project);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.read)
   @Get()
   findAll(@Query() query: RequestParamsDto) {
-    return this.organizationService.findAll(query);
+    return this.projectService.findAll(query);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.read)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.organizationService.findOne(id);
+    return this.projectService.findOne(id);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() organization: ProjectRequest) {
-    return this.organizationService.update(id, organization);
+  update(@Param('id') id: string, @Body() project: ProjectRequest) {
+    return this.projectService.update(id, project);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.delete)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.organizationService.remove(id);
+    return this.projectService.remove(id);
   }
 }
