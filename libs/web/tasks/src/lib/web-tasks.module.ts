@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ButtonModule, ModalModule } from '@compito/web/ui';
+import { ButtonModule, ModalModule, PageHeaderModule } from '@compito/web/ui';
 import { TasksCreateModalComponent } from './shared/components/tasks-create-modal/tasks-create-modal.component';
 import { TasksComponent } from './tasks.component';
 @NgModule({
@@ -16,6 +16,7 @@ import { TasksComponent } from './tasks.component';
     ]),
     ModalModule,
     ButtonModule,
+    PageHeaderModule,
   ],
 })
 export class WebTasksModule {}
