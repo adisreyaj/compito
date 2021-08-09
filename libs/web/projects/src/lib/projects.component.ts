@@ -19,6 +19,7 @@ import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/c
           class="p-4 cursor-pointer rounded-md border transition-all duration-200 ease-in
         border-gray-300 border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-gray-200
           grid place-items-center"
+          style="min-height: 180px;"
         >
           <div class="flex items-center space-x-2 text-gray-500">
             <div class=" border rounded-md shadow-sm hover:shadow-md bg-white">
@@ -33,6 +34,7 @@ import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/c
     `
       .projects {
         &__container {
+          @apply pb-10;
         }
         &__list {
           @apply pt-8;
@@ -49,6 +51,6 @@ export class ProjectsComponent implements OnInit {
   ngOnInit(): void {}
 
   createNew() {
-    this.dialog.open(ProjectsCreateModalComponent);
+    const ref = this.dialog.open(ProjectsCreateModalComponent);
   }
 }

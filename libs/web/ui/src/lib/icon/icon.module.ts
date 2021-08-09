@@ -5,12 +5,14 @@ import {
   RiAddCircleLine,
   RiAddLine,
   RiArrowDownSLine,
+  RiAttachment2,
   RiBuildingLine,
   RiCheckboxLine,
   RiCloseLine,
   RiDragMoveLine,
   RiFolder4Line,
   RiHome5Line,
+  RiMessage3Line,
   RiMore2Fill,
   RiNotification2Line,
   RiTableLine,
@@ -28,6 +30,8 @@ const icons = {
   RiAddLine,
   RiDragMoveLine,
   RiCloseLine,
+  RiMessage3Line,
+  RiAttachment2,
 };
 
 @NgModule({

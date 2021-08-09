@@ -4,6 +4,8 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { TasksCreateModalComponent } from '@compito/web/tasks';
+import { DialogService } from '@ngneat/dialog';
 @Component({
   selector: 'compito-boards',
   template: `
@@ -21,6 +23,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
           [list]="item"
           [allList]="list"
           (dropped)="drop($event)"
+          (newTask)="createNewTask()"
         >
           <div
             class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md"
@@ -43,7 +46,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
     `
       .board {
         &__container {
-          /* min-height: calc(100vh - var(--header-height) - 64px); */
+          min-height: calc(100vh - var(--header-height) - 64px);
         }
       }
 
@@ -75,7 +78,7 @@ export class BoardsComponent implements OnInit {
       data: [],
     },
   ];
-  constructor() {}
+  constructor(private dialog: DialogService) {}
 
   ngOnInit(): void {}
 
@@ -94,5 +97,9 @@ export class BoardsComponent implements OnInit {
         event.currentIndex
       );
     }
+  }
+
+  createNewTask() {
+    const ref = this.dialog.open(TasksCreateModalComponent);
   }
 }

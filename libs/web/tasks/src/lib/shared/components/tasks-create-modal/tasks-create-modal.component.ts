@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { DialogRef } from '@ngneat/dialog';
 
 @Component({
-  selector: 'compito-projects-create-modal',
+  selector: 'compito-tasks-create-modal',
   template: `
-    <compito-modal title="Add New Project" [ref]="ref">
+    <compito-modal title="Add New Task" [ref]="ref">
       <p>Something</p>
 
       <ng-template compitoModalActions>
@@ -15,10 +15,10 @@ import { DialogRef } from '@ngneat/dialog';
       </ng-template>
     </compito-modal>
   `,
-  styles: [``],
+  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProjectsCreateModalComponent implements OnInit {
+export class TasksCreateModalComponent implements OnInit {
   constructor(public ref: DialogRef) {}
 
   ngOnInit(): void {}

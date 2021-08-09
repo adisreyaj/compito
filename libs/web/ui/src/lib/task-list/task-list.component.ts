@@ -14,12 +14,13 @@ import {
     [id]="list.name"
     [cdkDropListConnectedTo]="list.name | dropListConnection: allList"
     (cdkDropListDropped)="dropped.emit($event)"
-    class="task-list relative border-2 border-transparent border-dashed bg-gray-100 rounded-md transition-all duration-200 ease-in p-4"
+    class="task-list relative h-full border-2 border-transparent border-dashed bg-gray-50 rounded-md transition-all duration-200 ease-in p-4"
   >
     <ng-content></ng-content>
     <header class="flex items-center justify-between sticky top-0">
       <p class="font-medium">{{ list?.name }}</p>
       <button
+        (click)="newTask.emit(list.name)"
         class="text-gray-500 bg-white border rounded-md shadow-sm hover:shadow-md"
       >
         <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
@@ -27,7 +28,7 @@ import {
     </header>
     <ul
       *ngIf="list.data.length > 0; else noTask"
-      class="task-list__container space-y-4 mt-4 -mx-4 px-4"
+      class="task-list__container space-y-4 mt-4 -mx-4 px-4 pb-2"
     >
       <ng-container *ngFor="let task of list.data">
         <article cdkDrag class="task-card cursor-pointer">
@@ -51,7 +52,7 @@ import {
       .task-list {
         width: 300px;
         &.cdk-drop-list-dragging {
-          @apply bg-gray-200 border-primary border-2;
+          @apply bg-gray-100 border-primary border-2;
           .task-list__container {
             /* @apply opacity-0; */
           }
@@ -76,4 +77,5 @@ export class TaskListComponent {
   @Input() allList: any[] = [];
 
   @Output() dropped = new EventEmitter();
+  @Output() newTask = new EventEmitter<string>();
 }

@@ -22,8 +22,8 @@ export interface UserAvatarGroupData {
           >
             <img
               class="rounded-full"
-              width="40"
-              height="40"
+              [width]="size"
+              [height]="size"
               [src]="item.image"
               [alt]="item.name"
             />
@@ -46,6 +46,7 @@ export interface UserAvatarGroupData {
 })
 export class UserAvatarGroupComponent implements OnInit {
   @Input() data: UserAvatarGroupData[] = [];
+  @Input() size = 40;
   @Input() itemsToShow = 5;
   constructor() {}
 

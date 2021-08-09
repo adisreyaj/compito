@@ -5,8 +5,8 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
+import { DialogRef } from '@ngneat/dialog';
 import { ModalActionsDirective } from 'libs/web/ui/src/lib/modal/modal-actions/modal-actions.directive';
-
 @Component({
   selector: 'compito-modal',
   template: `<div class="p-4 flex flex-col">
@@ -26,7 +26,7 @@ import { ModalActionsDirective } from 'libs/web/ui/src/lib/modal/modal-actions/m
 
     <ng-template #defaultFooterAction>
       <div class="flex items-center justify-end">
-        <button btn variant="secondary">Close</button>
+        <button btn variant="secondary" (click)="ref?.close()">Close</button>
       </div>
     </ng-template>
   </div>`,
@@ -42,9 +42,14 @@ import { ModalActionsDirective } from 'libs/web/ui/src/lib/modal/modal-actions/m
 })
 export class ModalComponent implements OnInit {
   @Input() title = '';
+  @Input() ref: DialogRef | null = null;
   @ContentChild(ModalActionsDirective)
   modalActions: ModalActionsDirective | null = null;
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.ref === null) {
+      throw new Error('ref was not passed to the model');
+    }
+  }
 }
