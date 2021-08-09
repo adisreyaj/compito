@@ -1,8 +1,4 @@
-import {
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem,
-} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
 import { DialogService } from '@ngneat/dialog';
@@ -18,24 +14,13 @@ import { DialogService } from '@ngneat/dialog';
       (cdkDropListDropped)="drop($event)"
     >
       <ng-container *ngFor="let item of list">
-        <compito-task-list
-          cdkDrag
-          [list]="item"
-          [allList]="list"
-          (dropped)="drop($event)"
-          (newTask)="createNewTask()"
-        >
-          <div
-            class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md"
-          >
+        <compito-task-list cdkDrag [list]="item" [allList]="list" (dropped)="drop($event)" (newTask)="createNewTask()">
+          <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
             <div
               cdkDragHandle
               class="list__drag transition-opacity duration-300 ease-in opacity-0 w-8 h-8 -mt-4 grid cursor-move place-items-center bg-gray-100 rounded-full"
             >
-              <rmx-icon
-                style="width: 20px; height:20px"
-                name="drag-move-line"
-              ></rmx-icon>
+              <rmx-icon style="width: 20px; height:20px" name="drag-move-line"></rmx-icon>
             </div>
           </div>
         </compito-task-list>
@@ -46,6 +31,7 @@ import { DialogService } from '@ngneat/dialog';
     `
       .board {
         &__container {
+          @apply overflow-x-auto;
           min-height: calc(100vh - var(--header-height) - 64px);
         }
       }
@@ -84,18 +70,9 @@ export class BoardsComponent implements OnInit {
 
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
   }
 
