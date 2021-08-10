@@ -1,0 +1,7 @@
+<compito-page-header [title]="(projectDetails$ | async)?.name"></compito-page-header>
+<ng-container *ngIf="(projectDetails$ | async) as details">
+  <ng-container *ngFor="let board of details.boards">
+    <p [routerLink]="['/boards', board.id]">{{board?.name}}</p>
+  </ng-container>
+</ng-container>
+<button (click)="addNewBoard()">Add Board</button>

@@ -5,6 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Web",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
       "type": "pwa-node",
       "request": "launch",
       "name": "Launch API",

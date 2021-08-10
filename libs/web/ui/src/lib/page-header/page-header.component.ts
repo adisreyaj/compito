@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'compito-page-header',
@@ -17,7 +12,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageHeaderComponent implements OnInit {
-  @Input() title = '';
+  @Input() title: string | undefined = '';
   constructor() {}
 
   ngOnInit(): void {}

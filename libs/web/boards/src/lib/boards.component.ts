@@ -1,11 +1,17 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Board } from '@compito/api-interfaces';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
 import { DialogService } from '@ngneat/dialog';
+import { Select, Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+import { BoardsAction } from './state/boards.actions';
+import { BoardsState } from './state/boards.state';
 @Component({
   selector: 'compito-boards',
   template: `
-    <compito-page-header title="Compito UI"> </compito-page-header>
+    <compito-page-header [title]="(board$ | async)?.name"> </compito-page-header>
     <section
       class="board__container p-8 flex space-x-2"
       cdkDropList
@@ -14,7 +20,13 @@ import { DialogService } from '@ngneat/dialog';
       (cdkDropListDropped)="drop($event)"
     >
       <ng-container *ngFor="let item of list">
-        <compito-task-list cdkDrag [list]="item" [allList]="list" (dropped)="drop($event)" (newTask)="createNewTask()">
+        <compito-task-list
+          cdkDrag
+          [list]="item"
+          [allList]="list"
+          (dropped)="drop($event)"
+          (newTask)="createNewTask($event)"
+        >
           <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
             <div
               cdkDragHandle
@@ -64,9 +76,14 @@ export class BoardsComponent implements OnInit {
       data: [],
     },
   ];
-  constructor(private dialog: DialogService) {}
 
-  ngOnInit(): void {}
+  @Select(BoardsState.getBoard)
+  board$!: Observable<Board | null>;
+  constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.store.dispatch(new BoardsAction.Get(this.boardId));
+  }
 
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
@@ -76,7 +93,16 @@ export class BoardsComponent implements OnInit {
     }
   }
 
-  createNewTask() {
+  createNewTask(listId: string) {
     const ref = this.dialog.open(TasksCreateModalComponent);
+    ref.afterClosed$.subscribe((data) => {
+      if (data) {
+        this.store.dispatch(new BoardsAction.AddTask({ ...data, list: listId }));
+      }
+    });
+  }
+
+  private get boardId() {
+    return this.activatedRoute.snapshot.params?.id ?? null;
   }
 }

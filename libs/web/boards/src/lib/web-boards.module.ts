@@ -3,16 +3,19 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IconModule, PageHeaderModule, TaskListModule } from '@compito/web/ui';
+import { NgxsModule } from '@ngxs/store';
 import { BoardsComponent } from './boards.component';
+import { BoardsState } from './state/boards.state';
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild([
       {
-        path: '',
+        path: ':id',
         component: BoardsComponent,
       },
     ]),
+    NgxsModule.forFeature([BoardsState]),
     PageHeaderModule,
     IconModule,
     DragDropModule,

@@ -17,11 +17,19 @@ import { ProjectsComponent } from './projects.component';
 import { ProjectCardComponent } from './shared/components/project-card/project-card.component';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
 import { ProjectsState } from './state/projects.state';
+import { BoardCreateModalComponent } from './shared/components/board-create-modal/board-create-modal.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild([{ path: '', pathMatch: 'full', component: ProjectsComponent }]),
+    RouterModule.forChild([
+      { path: '', pathMatch: 'full', component: ProjectsComponent },
+      {
+        path: ':id',
+        loadChildren: () =>
+          import('./pages/projects-detail/projects-detail.module').then((m) => m.ProjectsDetailModule),
+      },
+    ]),
     ReactiveFormsModule,
     FormsModule,
     PageHeaderModule,
@@ -34,6 +42,6 @@ import { ProjectsState } from './state/projects.state';
     TippyModule,
     TimeAgoModule,
   ],
-  declarations: [ProjectsComponent, ProjectCardComponent, ProjectsCreateModalComponent],
+  declarations: [ProjectsComponent, ProjectCardComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
 })
 export class WebProjectsModule {}
