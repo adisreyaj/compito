@@ -90,12 +90,12 @@ model Task {
   boardId      String
   org          Organization @relation(fields: [orgId], references: [id])
   orgId        String
-  assignedBy   User         @relation("assignedBy", fields: [assignedById], references: [id])
-  assignedById String
+  assignedBy   User?        @relation("assignedBy", fields: [assignedById], references: [id])
+  assignedById String?
   assignees    User[]       @relation("assignees")
   tags         Tag[]
   priority     Priority
-  stateDate    DateTime?
+  startDate    DateTime?
   dueDate      DateTime?
   createdBy    User         @relation(fields: [createdById], references: [id])
   createdById  String

@@ -1,7 +1,8 @@
 import { RequestParamsDto, TaskRequest, UserPayload } from '@compito/api-interfaces';
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Priority, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { getUserDetails } from '../core/utils/payload.util';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
@@ -11,10 +12,14 @@ export class TaskService {
 
   async create(data: TaskRequest, user: UserPayload) {
     try {
+      const { org, userId } = getUserDetails(user);
+
       const { assignees, priority, tags, ...rest } = data;
       let taskData: Prisma.TaskUncheckedCreateInput = {
         ...rest,
-        priority: priority as any,
+        priority: priority ?? Priority.Medium,
+        createdById: userId,
+        orgId: org,
         assignees: {
           connect: assignees.map((id) => ({ id })),
         },
