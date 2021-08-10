@@ -6,6 +6,7 @@ import { TasksCreateModalComponent } from '@compito/web/tasks';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { withLatestFrom } from 'rxjs/operators';
 import { BoardsAction } from './state/boards.actions';
 import { BoardsState } from './state/boards.state';
 @Component({
@@ -95,9 +96,11 @@ export class BoardsComponent implements OnInit {
 
   createNewTask(listId: string) {
     const ref = this.dialog.open(TasksCreateModalComponent);
-    ref.afterClosed$.subscribe((data) => {
+    ref.afterClosed$.pipe(withLatestFrom(this.board$)).subscribe(([data, board]) => {
       if (data) {
-        this.store.dispatch(new BoardsAction.AddTask({ ...data, list: listId }));
+        this.store.dispatch(
+          new BoardsAction.AddTask({ ...data, list: listId, boardId: board?.id, projectId: board?.project.id }),
+        );
       }
     });
   }
