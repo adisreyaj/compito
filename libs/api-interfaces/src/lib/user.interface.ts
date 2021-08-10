@@ -8,8 +8,9 @@ export interface UserBase {
 }
 
 export interface User extends UserBase {
+  id: string;
   password: string;
-  org: Organization;
+  org: Organization[];
   blocked: boolean;
   verified: boolean;
 }

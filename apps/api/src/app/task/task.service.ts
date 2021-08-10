@@ -1,10 +1,5 @@
-import { RequestParamsDto, TaskRequest } from '@compito/api-interfaces';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { RequestParamsDto, TaskRequest, UserPayload } from '@compito/api-interfaces';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '../prisma.service';
@@ -14,7 +9,7 @@ export class TaskService {
   private logger = new Logger('TASK');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: TaskRequest) {
+  async create(data: TaskRequest, user: UserPayload) {
     try {
       const { assignees, priority, tags, ...rest } = data;
       let taskData: Prisma.TaskUncheckedCreateInput = {
@@ -31,7 +26,7 @@ export class TaskService {
       return task;
     } catch (error) {
       this.logger.error('Failed to create task', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -52,7 +47,7 @@ export class TaskService {
       };
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -69,7 +64,7 @@ export class TaskService {
       return new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to fetch task', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -111,15 +106,15 @@ export class TaskService {
       if (task) {
         return task;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update task', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -133,10 +128,10 @@ export class TaskService {
       if (task) {
         return task;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to delete task', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 }

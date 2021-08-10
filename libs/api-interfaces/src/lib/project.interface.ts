@@ -1,3 +1,4 @@
+import { Board } from './board.interface';
 import { Organization } from './organization.interface';
 import { User } from './user.interface';
 
@@ -9,6 +10,7 @@ export interface ProjectBase {
 export interface Project extends ProjectBase {
   id: string;
   org: Organization;
+  boards: Board[];
   createdBy: User;
   members: User[];
   updatedAt: Date;

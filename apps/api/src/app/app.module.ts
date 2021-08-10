@@ -4,8 +4,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
+import { BoardsModule } from './boards/boards.module';
 import { OrganizationModule } from './organization/organization.module';
 import { ProjectModule } from './project/project.module';
+import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -17,9 +19,9 @@ import { UserModule } from './user/user.module';
     OrganizationModule,
     ProjectModule,
     UserModule,
-    // TaskModule,
+    BoardsModule,
+    TaskModule,
     // TagModule,
-    // UserModule,
   ],
   controllers: [AppController],
   providers: [

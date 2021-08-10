@@ -1,4 +1,4 @@
-import { ProjectRequest, RequestParamsDto, UserPayload } from '@compito/api-interfaces';
+import { BoardRequest, RequestParamsDto, UserPayload } from '@compito/api-interfaces';
 import {
   Injectable,
   InternalServerErrorException,
@@ -10,32 +10,30 @@ import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
 import { PrismaService } from '../prisma.service';
+import { GET_SINGLE_BOARD_SELECT } from './boards.config';
 
 @Injectable()
-export class ProjectService {
-  private logger = new Logger('PROJECT');
+export class BoardsService {
+  private logger = new Logger('BOARD');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: ProjectRequest, user: UserPayload) {
+  async create(data: BoardRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
     if (role !== 'super-admin' && data.orgId !== org) {
-      throw new UnauthorizedException('No access to create project');
+      throw new UnauthorizedException('No access to create board');
     }
     try {
-      const projectData: Prisma.ProjectUncheckedCreateInput = {
+      const boardData: Prisma.BoardUncheckedCreateInput = {
         ...data,
         orgId: org,
         createdById: userId,
-        members: {
-          connect: data.members.map((id) => ({ id })),
-        },
       };
-      const project = await this.prisma.project.create({
-        data: projectData,
+      const board = await this.prisma.board.create({
+        data: boardData,
       });
-      return project;
+      return board;
     } catch (error) {
-      this.logger.error('Failed to create project', error);
+      this.logger.error('Failed to create board', error);
       return new InternalServerErrorException();
     }
   }
@@ -43,8 +41,8 @@ export class ProjectService {
   async findAll(query: RequestParamsDto) {
     const { skip, limit } = query;
     try {
-      const count$ = this.prisma.project.count();
-      const orgs$ = this.prisma.project.findMany({
+      const count$ = this.prisma.board.count();
+      const orgs$ = this.prisma.board.findMany({
         skip,
         take: limit,
       });
@@ -63,39 +61,33 @@ export class ProjectService {
 
   async findOne(id: string) {
     try {
-      const project = await this.prisma.project.findUnique({
+      const board = await this.prisma.board.findUnique({
         where: {
           id,
         },
-        select: {
-          name: true,
-          description: true,
-          createdAt: true,
-          updatedAt: true,
-          boards: true,
-        },
+        select: GET_SINGLE_BOARD_SELECT,
       });
-      if (project) {
-        return project;
+      if (board) {
+        return board;
       }
       return new NotFoundException();
     } catch (error) {
-      this.logger.error('Failed to fetch project', error);
+      this.logger.error('Failed to fetch board', error);
       return new InternalServerErrorException();
     }
   }
 
-  async update(id: string, data: ProjectRequest) {
+  async update(id: string, data: BoardRequest) {
     try {
-      const project = await this.prisma.project.update({
+      const board = await this.prisma.board.update({
         where: {
           id,
         },
         data: {},
       });
-      this.logger.debug(project);
-      if (project) {
-        return project;
+      this.logger.debug(board);
+      if (board) {
+        return board;
       }
       return new NotFoundException();
     } catch (error) {
@@ -104,24 +96,24 @@ export class ProjectService {
           return new NotFoundException();
         }
       }
-      this.logger.error('Failed to update project', error);
+      this.logger.error('Failed to update board', error);
       return new InternalServerErrorException();
     }
   }
 
   async remove(id: string) {
     try {
-      const project = await this.prisma.project.delete({
+      const board = await this.prisma.board.delete({
         where: {
           id,
         },
       });
-      if (project) {
-        return project;
+      if (board) {
+        return board;
       }
       return new NotFoundException();
     } catch (error) {
-      this.logger.error('Failed to delete project', error);
+      this.logger.error('Failed to delete board', error);
       return new InternalServerErrorException();
     }
   }

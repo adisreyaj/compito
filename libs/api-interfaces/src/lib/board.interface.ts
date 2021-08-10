@@ -5,6 +5,8 @@ import { User } from './user.interface';
 
 export interface BoardBase {
   name: string;
+  lists: any[];
+  description: string;
 }
 export interface Board extends BoardBase {
   id: string;

@@ -1,3 +1,4 @@
+export * from './lib/board.interface';
 export * from './lib/general.interface';
 export * from './lib/organization.interface';
 export * from './lib/project.interface';
