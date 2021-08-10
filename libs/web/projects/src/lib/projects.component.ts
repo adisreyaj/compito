@@ -1,21 +1,19 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Project } from '@compito/api-interfaces';
 import { DialogService } from '@ngneat/dialog';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
+import { Observable } from 'rxjs';
 import { ProjectsAction } from './state/projects.actions';
+import { ProjectsState } from './state/projects.state';
 @Component({
   selector: 'compito-projects',
   template: ` <compito-page-header title="Projects"> </compito-page-header>
     <section class="projects__container">
       <div class="projects__list px-8">
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
+        <ng-container *ngFor="let project of projects$ | async">
+          <compito-project-card [data]="project"></compito-project-card>
+        </ng-container>
         <article
           (click)="createNew()"
           class="p-4 cursor-pointer rounded-md border transition-all duration-200 ease-in
@@ -48,9 +46,14 @@ import { ProjectsAction } from './state/projects.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent implements OnInit {
+  @Select(ProjectsState.getAllProjects)
+  projects$!: Observable<Project[]>;
+
   constructor(private dialog: DialogService, private store: Store) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.store.dispatch(new ProjectsAction.GetAll({}));
+  }
 
   createNew() {
     const ref = this.dialog.open(ProjectsCreateModalComponent);

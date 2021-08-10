@@ -64,7 +64,7 @@
 textarea,
 select {
   @apply outline-none;
-  @apply border-gray-200 bg-gray-100;
+  @apply border-gray-300 bg-gray-50;
   @apply rounded-md;
   @apply focus:border-primary;
   transition: all 0.3s;

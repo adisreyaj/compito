@@ -11,6 +11,8 @@ export interface Project extends ProjectBase {
   org: Organization;
   createdBy: User;
   members: User[];
+  updatedAt: Date;
+  createdAt: Date;
 }
 
 export interface ProjectRequest extends ProjectBase {
