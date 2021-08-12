@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Project } from '@compito/api-interfaces';
+import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
@@ -8,7 +9,7 @@ import { ProjectsAction } from './state/projects.actions';
 import { ProjectsState } from './state/projects.state';
 @Component({
   selector: 'compito-projects',
-  template: ` <compito-page-header title="Projects"> </compito-page-header>
+  template: ` <compito-page-header title="Projects" [breadcrumbs]="breadcrumbs"> </compito-page-header>
     <section class="projects__container">
       <div class="projects__list px-8">
         <ng-container *ngFor="let project of projects$ | async">
@@ -46,6 +47,8 @@ import { ProjectsState } from './state/projects.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
+
   @Select(ProjectsState.getAllProjects)
   projects$!: Observable<Project[]>;
 

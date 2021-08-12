@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Project } from '@compito/api-interfaces';
+import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -15,10 +16,13 @@ import { ProjectsState } from '../../state/projects.state';
     `
       .projects {
         &__container {
-          @apply pb-10;
+          @apply pb-6 pt-4;
+          &:not(:last-child) {
+            @apply border-b;
+          }
         }
         &__list {
-          @apply pt-8;
+          @apply pt-2;
           @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4;
         }
       }
@@ -26,6 +30,11 @@ import { ProjectsState } from '../../state/projects.state';
   ],
 })
 export class ProjectsDetailComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', link: '/' },
+    { label: 'Projects', link: '/projects' },
+  ];
+
   @Select(ProjectsState.getProjectDetail)
   projectDetails$!: Observable<Project | null>;
 

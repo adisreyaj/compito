@@ -3,17 +3,18 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Board, BoardListWithTasks, Task } from '@compito/api-interfaces';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
+import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import produce from 'immer';
 import { Observable } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
+import { filter, map, take, withLatestFrom } from 'rxjs/operators';
 import { BoardsAction } from './state/boards.actions';
 import { BoardsState } from './state/boards.state';
 @Component({
   selector: 'compito-boards',
   template: `
-    <compito-page-header [title]="(board$ | async)?.name"> </compito-page-header>
+    <compito-page-header [title]="(board$ | async)?.name" [breadcrumbs]="breadcrumbs"> </compito-page-header>
     <ng-container *ngIf="lists$ | async as lists">
       <section
         class="board__container p-8 flex space-x-2"
@@ -62,6 +63,11 @@ import { BoardsState } from './state/boards.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardsComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', link: '/' },
+    { label: 'Projects', link: '/projects' },
+  ];
+
   @Select(BoardsState.getBoard)
   board$!: Observable<Board | null>;
 
@@ -72,6 +78,16 @@ export class BoardsComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(new BoardsAction.Get(this.boardId));
+
+    this.board$
+      .pipe(
+        filter((data) => data != null),
+        map((data) => (data ? { link: `/projects/${data.project.id}`, label: data.project.name } : null)),
+        take(1),
+      )
+      .subscribe((data: Breadcrumb | null) => {
+        data && this.breadcrumbs.push(data);
+      });
   }
 
   drop(event: CdkDragDrop<BoardListWithTasks[]>) {

@@ -8,18 +8,22 @@ import { Board } from '@compito/api-interfaces';
       class="p-4 rounded-md border transition-all hover:shadow-lg duration-200 ease-in
       border-gray-100 bg-white shadow-sm hover:border-gray-200"
     >
-      <header class="flex items-center justify-between">
-        <div>
-          <div class="flex items-center justify-between">
-            <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/boards', data.id]">
-              {{ data?.name }}
-            </p>
-            <button [tippy]="moreOptions" placement="bottom-start" variation="menu" class="text-gray-500">
-              <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
-            </button>
-          </div>
-          <p class="text-gray-400 text-sm line-clamp-2">{{ data?.description }}</p>
+      <header class="">
+        <div class="flex items-center justify-between">
+          <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/boards', data.id]">
+            {{ data?.name }}
+          </p>
+          <button
+            [tippy]="moreOptions"
+            placement="bottom-start"
+            variation="menu"
+            aria-label="More options"
+            class="text-gray-500 hover:bg-gray-100 p-1 rounded-md"
+          >
+            <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
+          </button>
         </div>
+        <p class="text-gray-400 text-sm line-clamp-2">{{ data?.description }}</p>
       </header>
       <div class="my-4"></div>
       <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">

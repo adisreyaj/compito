@@ -68,6 +68,7 @@
     "passport-jwt": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~6.6.0",
+    "subsink": "^1.0.2",
     "timeago.js": "^4.0.2",
     "tslib": "^2.0.0",
     "voca": "^1.4.0",

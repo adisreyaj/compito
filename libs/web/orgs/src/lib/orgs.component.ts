@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Organization } from '@compito/api-interfaces';
+import { Breadcrumb } from '@compito/web/ui';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { OrgsAction } from './state/orgs.actions';
@@ -7,7 +8,7 @@ import { OrgsState } from './state/orgs.state';
 
 @Component({
   selector: 'compito-orgs',
-  template: ` <compito-page-header title="Orgs"> </compito-page-header>
+  template: ` <compito-page-header title="Orgs" [breadcrumbs]="breadcrumbs"></compito-page-header>
     <section class="orgs__container">
       <div class="orgs__list px-8">
         <ng-container *ngFor="let org of orgs$ | async">
@@ -31,6 +32,7 @@ import { OrgsState } from './state/orgs.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrgsComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
   @Select(OrgsState.getAllOrgs)
   orgs$!: Observable<Organization[]>;
   constructor(private store: Store) {}
