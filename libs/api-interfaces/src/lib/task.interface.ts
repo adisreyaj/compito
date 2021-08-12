@@ -10,6 +10,7 @@ export interface TaskBase {
   description: string;
   priority: Priority;
   completed: boolean;
+  list: string;
 }
 
 export interface Task extends TaskBase, DocDates {

@@ -23,4 +23,10 @@ export const PERMISSIONS = {
     update: 'user:update',
     delete: 'user:delete',
   },
+  board: {
+    read: 'board:read',
+    create: 'board:create',
+    update: 'board:update',
+    delete: 'board:delete',
+  },
 };

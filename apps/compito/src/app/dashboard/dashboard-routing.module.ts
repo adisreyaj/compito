@@ -9,33 +9,31 @@ const routes: Routes = [
     children: [
       {
         path: 'orgs',
-        loadChildren: () =>
-          import('@compito/web/orgs').then((m) => m.WebOrgsModule),
+        loadChildren: () => import('@compito/web/orgs').then((m) => m.WebOrgsModule),
       },
       {
         path: 'projects',
-        loadChildren: () =>
-          import('@compito/web/projects').then((m) => m.WebProjectsModule),
+        loadChildren: () => import('@compito/web/projects').then((m) => m.WebProjectsModule),
       },
       {
         path: 'boards',
-        loadChildren: () =>
-          import('@compito/web/boards').then((m) => m.WebBoardsModule),
+        loadChildren: () => import('@compito/web/boards').then((m) => m.WebBoardsModule),
       },
       {
         path: 'tasks',
-        loadChildren: () =>
-          import('@compito/web/tasks').then((m) => m.WebTasksModule),
+        loadChildren: () => import('@compito/web/tasks').then((m) => m.WebTasksModule),
       },
       {
         path: 'profile',
-        loadChildren: () =>
-          import('@compito/web/profile').then((m) => m.WebProfileModule),
+        loadChildren: () => import('@compito/web/profile').then((m) => m.WebProfileModule),
+      },
+      {
+        path: 'users',
+        loadChildren: () => import('@compito/web/users').then((m) => m.WebUsersModule),
       },
       {
         path: 'settings',
-        loadChildren: () =>
-          import('@compito/web/settings').then((m) => m.WebSettingsModule),
+        loadChildren: () => import('@compito/web/settings').then((m) => m.WebSettingsModule),
       },
     ],
   },

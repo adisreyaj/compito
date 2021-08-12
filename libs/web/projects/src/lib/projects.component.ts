@@ -1,25 +1,21 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Project } from '@compito/api-interfaces';
+import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
+import { Observable } from 'rxjs';
 import { ProjectsAction } from './state/projects.actions';
+import { ProjectsState } from './state/projects.state';
 @Component({
   selector: 'compito-projects',
-  template: ` <compito-page-header title="Projects"> </compito-page-header>
+  template: ` <compito-page-header title="Projects" [breadcrumbs]="breadcrumbs"> </compito-page-header>
     <section class="projects__container">
       <div class="projects__list px-8">
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
-        <compito-project-card></compito-project-card>
         <article
           (click)="createNew()"
-          class="p-4 cursor-pointer rounded-md border transition-all duration-200 ease-in
-        border-gray-300 border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-gray-200
+          class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
+          border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
           style="min-height: 180px;"
         >
@@ -30,6 +26,9 @@ import { ProjectsAction } from './state/projects.actions';
             <p class="text-sm">Add New Project</p>
           </div>
         </article>
+        <ng-container *ngFor="let project of projects$ | async">
+          <compito-project-card [data]="project"></compito-project-card>
+        </ng-container>
       </div>
     </section>`,
   styles: [
@@ -48,9 +47,16 @@ import { ProjectsAction } from './state/projects.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
+
+  @Select(ProjectsState.getAllProjects)
+  projects$!: Observable<Project[]>;
+
   constructor(private dialog: DialogService, private store: Store) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.store.dispatch(new ProjectsAction.GetAll({}));
+  }
 
   createNew() {
     const ref = this.dialog.open(ProjectsCreateModalComponent);

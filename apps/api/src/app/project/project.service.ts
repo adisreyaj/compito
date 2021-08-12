@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { getUserDetails } from '../core/utils/payload.util';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
@@ -16,12 +17,8 @@ export class ProjectService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: ProjectRequest, user: UserPayload) {
-    const {
-      'https://compito.adi.so/roles': roles,
-      'https://compito.adi.so/org': org,
-      'https://compito.adi.so/userId': userId,
-    } = user;
-    if (roles[0] !== 'super-admin' && data.orgId !== org) {
+    const { org, role, userId } = getUserDetails(user);
+    if (role !== 'super-admin' && data.orgId !== org) {
       throw new UnauthorizedException('No access to create project');
     }
     try {
@@ -69,6 +66,13 @@ export class ProjectService {
       const project = await this.prisma.project.findUnique({
         where: {
           id,
+        },
+        select: {
+          name: true,
+          description: true,
+          createdAt: true,
+          updatedAt: true,
+          boards: true,
         },
       });
       if (project) {

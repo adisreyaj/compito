@@ -5,12 +5,12 @@ import { kebabCase } from 'voca';
 @Component({
   selector: 'compito-projects-create-modal',
   template: `
-    <compito-modal title="Add New Project" [ref]="ref">
+    <compito-modal title="Add New Project" [ref]="ref" cdkTrapFocus>
       <section>
         <form [formGroup]="projectForm" id="projectForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
           <div class="form-group">
             <label for="name">Name</label>
-            <input class="w-full" type="text" id="name" formControlName="name" />
+            <input class="w-full" type="text" id="name" formControlName="name" autofocus />
           </div>
           <div class="form-group">
             <label for="description">Description</label>
@@ -22,7 +22,9 @@ import { kebabCase } from 'voca';
       <ng-template compitoModalActions>
         <div class="flex justify-end space-x-4">
           <button btn type="button" variant="secondary" (click)="ref.close()">Close</button>
-          <button btn type="submit" form="projectForm" variant="primary">Create</button>
+          <button btn type="submit" form="projectForm" variant="primary" [disabled]="projectForm.invalid">
+            Create
+          </button>
         </div>
       </ng-template>
     </compito-modal>
@@ -40,17 +42,18 @@ export class ProjectsCreateModalComponent implements OnInit {
   }
 
   handleFormSubmit() {
-    this.projectForm.get('slug')?.setValue(kebabCase(this.projectForm.get('name')?.value));
     this.ref.close(this.projectForm.value);
   }
 
   private initForm() {
     this.projectForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(20), Validators.minLength(3)]],
-      description: [''],
+      description: ['', [Validators.required, Validators.maxLength(200), Validators.minLength(3)]],
       slug: ['', Validators.required],
-      orgId: ['', Validators.required],
       members: [[]],
+    });
+    this.projectForm.get('name')?.valueChanges.subscribe((data) => {
+      this.projectForm.get('slug')?.setValue(kebabCase(data));
     });
   }
 }

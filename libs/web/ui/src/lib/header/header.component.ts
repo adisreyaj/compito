@@ -7,13 +7,7 @@ import { AuthService } from '@auth0/auth0-angular';
     <header>
       <section class="flex items-stretch space-x-10">
         <div class="flex items-center">
-          <img
-            src="https://avatar.tobi.sh/adi"
-            alt="Compito"
-            width="40"
-            height="40"
-            class="rounded-full"
-          />
+          <img src="https://avatar.tobi.sh/adi" alt="Compito" width="40" height="40" class="rounded-full" />
         </div>
         <nav class="flex-1 flex items-center text-gray-400 font-medium">
           <ol class="list-none flex items-center gap-6">
@@ -27,40 +21,13 @@ import { AuthService } from '@auth0/auth0-angular';
                 <p>Home</p>
               </a>
             </li>
-            <li>
-              <a
-                class="flex items-center space-x-2"
-                routerLink="/tasks"
-                routerLinkActive="text-gray-800"
-              >
-                <p>Tasks</p></a
-              >
-            </li>
-            <li>
-              <a
-                class="flex items-center space-x-2"
-                routerLink="/projects"
-                routerLinkActive="text-gray-800"
-              >
-                <p>Projects</p>
-              </a>
-            </li>
-            <li>
-              <a
-                class="flex items-center space-x-2"
-                routerLink="/orgs"
-                routerLinkActive="text-gray-800"
-                ><p>Orgs</p></a
-              >
-            </li>
-            <li>
-              <a
-                class="flex items-center space-x-2"
-                routerLink="/boards"
-                routerLinkActive="text-gray-800"
-                ><p>Boards</p></a
-              >
-            </li>
+            <ng-container *ngFor="let item of menu">
+              <li>
+                <a class="flex items-center space-x-2" [routerLink]="item.link" routerLinkActive="text-gray-800">
+                  <p>{{ item.label }}</p>
+                </a>
+              </li>
+            </ng-container>
           </ol>
         </nav>
       </section>
@@ -81,32 +48,18 @@ import { AuthService } from '@auth0/auth0-angular';
           variation="menu"
           [offset]="[-10, 10]"
         >
-          <img
-            [src]="user.picture"
-            alt="Adithya"
-            width="40"
-            height="40"
-            class="rounded-full"
-          />
+          <img [src]="user.picture" alt="Adithya" width="40" height="40" class="rounded-full" />
           <div class="flex items-center">
             <p class="text-sm font-medium">{{ user.given_name }}</p>
-            <rmx-icon
-              class="text-gray-400"
-              style="width: 16px;height: 16px;"
-              name="arrow-down-s-line"
-            ></rmx-icon>
+            <rmx-icon class="text-gray-400" style="width: 16px;height: 16px;" name="arrow-down-s-line"></rmx-icon>
           </div>
         </div>
       </section>
     </header>
     <ng-template #userDropdown let-hide>
       <div class="flex flex-col w-48">
-        <div class="dropdown-item" routerLink="/profile" (click)="hide()">
-          Preferences
-        </div>
-        <div class="text-red-600 dropdown-item" (click)="auth.logout(); hide()">
-          Logout
-        </div>
+        <div class="dropdown-item" routerLink="/profile" (click)="hide()">Preferences</div>
+        <div class="text-red-600 dropdown-item" (click)="auth.logout(); hide()">Logout</div>
       </div>
     </ng-template>
   `,
@@ -129,6 +82,24 @@ import { AuthService } from '@auth0/auth0-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit {
+  menu = [
+    {
+      label: 'My Tasks',
+      link: '/tasks',
+    },
+    {
+      label: 'Orgs',
+      link: '/orgs',
+    },
+    {
+      label: 'Projects',
+      link: '/projects',
+    },
+    {
+      label: 'Users',
+      link: '/users',
+    },
+  ];
   constructor(public auth: AuthService) {}
 
   ngOnInit(): void {}

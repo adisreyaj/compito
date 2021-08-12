@@ -8,30 +8,29 @@ generator client {
 }
 
 model User {
-  id                String       @id @default(cuid())
-  email             String       @unique
+  id                String         @id @default(cuid())
+  email             String         @unique
   firstName         String
   lastName          String
   password          String
   image             String?
-  blocked           Boolean      @default(false)
-  verified          Boolean      @default(false)
-  org               Organization @relation(fields: [orgId], references: [id])
-  orgId             String
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  taskAssignedBy    Task[]       @relation("assignedBy")
-  taskAssignee      Task?        @relation("assignees", fields: [taskId], references: [id])
+  blocked           Boolean        @default(false)
+  verified          Boolean        @default(false)
+  org               Organization[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  taskAssignedBy    Task[]         @relation("assignedBy")
+  taskAssignee      Task?          @relation("assignees", fields: [taskId], references: [id])
   taskId            String?
-  subTaskAssignedBy SubTask[]    @relation("subTaskAssignedBy")
-  subTaskAssignee   SubTask?     @relation("subTaskAssignees", fields: [subTaskId], references: [id])
+  subTaskAssignedBy SubTask[]      @relation("subTaskAssignedBy")
+  subTaskAssignee   SubTask?       @relation("subTaskAssignees", fields: [subTaskId], references: [id])
   subTaskId         String?
   projects          Project[]
   tasks             Task[]
   subTasks          SubTask[]
   comments          Comment[]
   boards            Board[]
-  project           Project?     @relation("members", fields: [projectId], references: [id])
+  project           Project?       @relation("members", fields: [projectId], references: [id])
   projectId         String?
 }
 
@@ -67,6 +66,8 @@ model Project {
 model Board {
   id          String       @id @default(cuid())
   name        String
+  description String
+  lists       Json
   org         Organization @relation(fields: [orgId], references: [id])
   orgId       String
   createdBy   User         @relation(fields: [createdById], references: [id])
@@ -82,18 +83,19 @@ model Task {
   id           String       @id @default(cuid())
   title        String
   description  String?
+  list         String
   project      Project      @relation(fields: [projectId], references: [id])
   projectId    String
   board        Board        @relation(fields: [boardId], references: [id])
   boardId      String
   org          Organization @relation(fields: [orgId], references: [id])
   orgId        String
-  assignedBy   User         @relation("assignedBy", fields: [assignedById], references: [id])
-  assignedById String
+  assignedBy   User?        @relation("assignedBy", fields: [assignedById], references: [id])
+  assignedById String?
   assignees    User[]       @relation("assignees")
   tags         Tag[]
   priority     Priority
-  stateDate    DateTime?
+  startDate    DateTime?
   dueDate      DateTime?
   createdBy    User         @relation(fields: [createdById], references: [id])
   createdById  String

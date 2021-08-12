@@ -27,13 +27,13 @@ export class OrgsState {
   constructor(private orgService: OrgService) {}
 
   @Action(OrgsAction.GetAll)
-  add({ getState, patchState }: StateContext<OrgsStateModel>) {
+  getAll({ getState, patchState }: StateContext<OrgsStateModel>) {
     return this.orgService.getAll().pipe(
       tap((result) => {
         patchState({
           orgs: result.payload,
         });
-      })
+      }),
     );
   }
 }

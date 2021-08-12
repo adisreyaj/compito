@@ -1,6 +1,6 @@
 export interface DocDates {
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 

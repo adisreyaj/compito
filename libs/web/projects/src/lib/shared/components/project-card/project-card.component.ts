@@ -1,46 +1,49 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
-import { UserAvatarGroupData } from '@compito/web/ui';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Project } from '@compito/api-interfaces';
 
 @Component({
   selector: 'compito-project-card',
   template: `
     <article
+      *ngIf="data"
       class="p-4 rounded-md border transition-all hover:shadow-lg duration-200 ease-in
       border-gray-100 bg-white shadow-sm hover:border-gray-200"
     >
       <header class="flex items-center justify-between">
         <div>
-          <p class="text-lg font-medium cursor-pointer">Compito Web</p>
-          <p class="text-gray-400 text-sm line-clamp-2">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
+          <div class="flex items-center justify-between">
+            <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/projects', data.id]">
+              {{ data?.name }}
+            </p>
+            <button [tippy]="moreOptions" placement="bottom-start" variation="menu" class="text-gray-500">
+              <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
+            </button>
+          </div>
+          <p class="text-gray-400 text-sm line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
         </div>
-        <button class="text-gray-500">
-          <rmx-icon name="more-2-fill"></rmx-icon>
-        </button>
       </header>
       <div class="my-4">
-        <compito-user-avatar-group [data]="data"></compito-user-avatar-group>
+        <compito-user-avatar-group [data]="users"></compito-user-avatar-group>
       </div>
-      <footer
-        class="flex items-center justify-between text-xs text-gray-400 mt-4"
-      >
+      <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">
         <div>
           <p>
             Updated
-            <span class="text-sm font-medium text-gray-600">10mins</span> ago
+            <span class="font-medium text-gray-600">{{ data?.updatedAt | timeAgo }}</span>
           </p>
         </div>
         <div>
-          <p><span class="text-sm font-medium text-gray-600">19</span> Tasks</p>
+          <p><span class="font-medium text-gray-600">19</span> Tasks</p>
         </div>
       </footer>
     </article>
+
+    <ng-template #moreOptions let-hide>
+      <div class="flex flex-col w-44">
+        <div class="dropdown-item" (click)="hide()">Edit</div>
+        <div class="text-red-600 dropdown-item" (click)="hide()">Delete</div>
+      </div>
+    </ng-template>
   `,
   styles: [
     `
@@ -53,7 +56,9 @@ import { UserAvatarGroupData } from '@compito/web/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectCardComponent implements OnInit {
-  @Input() data: UserAvatarGroupData[] = [
+  @Input() data: Project | null = null;
+
+  users = [
     {
       name: 'John Doe',
       image: 'https://avatar.tobi.sh/john',

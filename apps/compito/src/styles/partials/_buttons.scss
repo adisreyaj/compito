@@ -7,7 +7,7 @@
 
 .btn {
   &:disabled {
-    @apply opacity-40;
+    @apply opacity-60;
     cursor: not-allowed;
   }
   &--primary{

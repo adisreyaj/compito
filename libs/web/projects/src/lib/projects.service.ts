@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { MultiDocPayload, Project, ProjectRequest } from '@compito/api-interfaces';
+import { Board, BoardRequest, MultiDocPayload, Project, ProjectRequest } from '@compito/api-interfaces';
 import { API_TOKEN } from '@compito/web/ui';
 
 @Injectable({
@@ -8,6 +8,7 @@ import { API_TOKEN } from '@compito/web/ui';
 })
 export class ProjectsService {
   api = `${this.baseURL}/projects`;
+  boardsApi = `${this.baseURL}/boards`;
   constructor(private http: HttpClient, @Inject(API_TOKEN) private baseURL: string) {}
 
   create(data: ProjectRequest) {
@@ -20,5 +21,9 @@ export class ProjectsService {
 
   getSingle(id: string) {
     return this.http.get<Project>(`${this.api}/${id}`);
+  }
+
+  createBoard(data: BoardRequest) {
+    return this.http.post<Board>(this.boardsApi, data);
   }
 }

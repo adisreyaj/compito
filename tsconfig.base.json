@@ -6,6 +6,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
@@ -23,7 +24,8 @@
       "@compito/web/projects": ["libs/web/projects/src/index.ts"],
       "@compito/web/settings": ["libs/web/settings/src/index.ts"],
       "@compito/web/tasks": ["libs/web/tasks/src/index.ts"],
-      "@compito/web/ui": ["libs/web/ui/src/index.ts"]
+      "@compito/web/ui": ["libs/web/ui/src/index.ts"],
+      "@compito/web/users": ["libs/web/users/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
