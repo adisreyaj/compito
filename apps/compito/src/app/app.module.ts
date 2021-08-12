@@ -10,6 +10,7 @@ import {
   TippyModule,
   tooltipVariation
 } from '@ngneat/helipopper';
+import { HotToastModule } from '@ngneat/hot-toast';
 import { NgxsModule } from '@ngxs/store';
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -33,6 +34,7 @@ import { AppComponent } from './app.component';
       },
     }),
     DialogModule.forRoot(),
+    HotToastModule.forRoot(),
     TippyModule.forRoot({
       defaultVariation: 'tooltip',
       variations: {

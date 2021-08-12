@@ -1,7 +1,9 @@
 import { moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Injectable } from '@angular/core';
 import { Board, BoardListWithTasks } from '@compito/api-interfaces';
+import { ToastService } from '@compito/web/ui';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { patch, updateItem } from '@ngxs/store/operators';
 import produce from 'immer';
 import sortBy from 'lodash.sortby';
 import { tap } from 'rxjs/operators';
@@ -33,7 +35,7 @@ export class BoardsState {
     return state?.lists ?? [];
   }
 
-  constructor(private boardService: BoardsService, private util: BoardsUtilService) {}
+  constructor(private boardService: BoardsService, private util: BoardsUtilService, private toast: ToastService) {}
   @Action(BoardsAction.Get)
   get({ patchState }: StateContext<BoardsStateModel>, { payload }: BoardsAction.Get) {
     return this.boardService.get(payload).pipe(
@@ -47,8 +49,26 @@ export class BoardsState {
     );
   }
   @Action(BoardsAction.AddTask)
-  addTask({ patchState }: StateContext<BoardsStateModel>, { payload }: BoardsAction.AddTask) {
-    return this.boardService.addTask(payload).pipe(tap((data) => {}));
+  addTask({ setState }: StateContext<BoardsStateModel>, { payload }: BoardsAction.AddTask) {
+    return this.boardService.addTask(payload).pipe(
+      tap((data) => {
+        setState(
+          patch({
+            lists: updateItem<BoardListWithTasks>(
+              (list) => list?.id === payload.list,
+              (list) => {
+                return produce(list, (draft) => {
+                  draft.tasks.push(data);
+                });
+              },
+            ),
+          }),
+        );
+        this.toast.success('Task added successfully!');
+      }, () => {
+        this.toast.error('Failed to creat task!');
+      }),
+    );
   }
 
   @Action(BoardsAction.MoveTaskToOtherList)
@@ -64,10 +84,15 @@ export class BoardsState {
         transferArrayItem(fromList?.tasks, toList?.tasks, prevIndex, currIndex);
       }
     });
+    patchState({ lists: updatedLists });
     return this.boardService.moveTask(taskId, to).pipe(
-      tap(() => {
-        patchState({ lists: updatedLists });
-      }),
+      tap(
+        () => {},
+        () => {
+          patchState({ lists });
+          this.toast.error('Failed to move the task');
+        },
+      ),
     );
   }
 
@@ -99,6 +124,7 @@ export class BoardsState {
         () => {},
         () => {
           patchState({ lists });
+          this.toast.error('Failed to save order!');
         },
       ),
     );

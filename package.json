@@ -46,6 +46,7 @@
     "@nestjs/platform-express": "^7.0.0",
     "@ngneat/dialog": "^1.6.0",
     "@ngneat/helipopper": "^4.1.1",
+    "@ngneat/hot-toast": "^2.0.2",
     "@ngneat/overview": "^1.0.0",
     "@ngxs/store": "^3.7.2",
     "@nrwl/angular": "12.6.5",
