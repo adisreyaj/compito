@@ -11,7 +11,19 @@ import { ProjectsState } from '../../state/projects.state';
 @Component({
   selector: 'compito-projects-detail',
   templateUrl: './projects-detail.component.html',
-  styleUrls: ['./projects-detail.component.scss'],
+  styles: [
+    `
+      .projects {
+        &__container {
+          @apply pb-10;
+        }
+        &__list {
+          @apply pt-8;
+          @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4;
+        }
+      }
+    `,
+  ],
 })
 export class ProjectsDetailComponent implements OnInit {
   @Select(ProjectsState.getProjectDetail)

@@ -1,7 +1,11 @@
 <compito-page-header [title]="(projectDetails$ | async)?.name"></compito-page-header>
 <ng-container *ngIf="(projectDetails$ | async) as details">
+  <section class="projects__container">
+    <div class="px-8 projects__list">
   <ng-container *ngFor="let board of details.boards">
-    <p [routerLink]="['/boards', board.id]">{{board?.name}}</p>
+    <compito-boards-card [data]="board"></compito-boards-card>
   </ng-container>
+  </div>
+  </section>
 </ng-container>
 <button (click)="addNewBoard()">Add Board</button>

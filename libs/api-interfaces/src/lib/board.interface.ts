@@ -1,3 +1,4 @@
+import { DocDates } from './general.interface';
 import { Organization } from './organization.interface';
 import { Project } from './project.interface';
 import { Task } from './task.interface';
@@ -8,7 +9,7 @@ export interface BoardBase {
   lists: BoardList[];
   description: string;
 }
-export interface Board extends BoardBase {
+export interface Board extends BoardBase, DocDates {
   id: string;
   org: Organization;
   project: Project;

@@ -14,10 +14,10 @@ import {
 import { TippyModule } from '@ngneat/helipopper';
 import { NgxsModule } from '@ngxs/store';
 import { ProjectsComponent } from './projects.component';
+import { BoardCreateModalComponent } from './shared/components/board-create-modal/board-create-modal.component';
 import { ProjectCardComponent } from './shared/components/project-card/project-card.component';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
 import { ProjectsState } from './state/projects.state';
-import { BoardCreateModalComponent } from './shared/components/board-create-modal/board-create-modal.component';
 
 @NgModule({
   imports: [
