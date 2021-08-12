@@ -25,6 +25,7 @@ export class BoardsService {
     try {
       const boardData: Prisma.BoardUncheckedCreateInput = {
         ...data,
+        lists: data.lists as any[],
         orgId: org,
         createdById: userId,
       };
@@ -77,13 +78,19 @@ export class BoardsService {
     }
   }
 
-  async update(id: string, data: BoardRequest) {
+  async update(id: string, req: BoardRequest) {
     try {
+      const { lists, name, description } = req;
+      const data: Prisma.BoardUncheckedUpdateInput = {
+        lists: lists as any[],
+        name,
+        description,
+      };
       const board = await this.prisma.board.update({
         where: {
           id,
         },
-        data: {},
+        data,
       });
       this.logger.debug(board);
       if (board) {

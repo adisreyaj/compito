@@ -5,7 +5,7 @@ import { User } from './user.interface';
 
 export interface BoardBase {
   name: string;
-  lists: any[];
+  lists: BoardList[];
   description: string;
 }
 export interface Board extends BoardBase {
@@ -20,4 +20,17 @@ export interface BoardRequest extends BoardBase {
   orgId: string;
   projectId: string;
   createdById: string;
+}
+
+export interface BoardList {
+  id: string;
+  name: string;
+}
+
+export interface BoardListWithTasks extends BoardList {
+  tasks: Task[];
+}
+
+export interface BoardListTasksGrouped {
+  [key: string]: Task[];
 }

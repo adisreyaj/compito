@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DialogRef } from '@ngneat/dialog';
+import { defaultLists } from '../../../config/boards.config';
 
 @Component({
   selector: 'compito-board-create-modal',
@@ -47,7 +48,7 @@ export class BoardCreateModalComponent implements OnInit {
     this.boardForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(20), Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.maxLength(200), Validators.minLength(3)]],
-      lists: [[]],
+      lists: [defaultLists()],
       projectId: ['', Validators.required],
     });
   }

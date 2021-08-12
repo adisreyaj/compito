@@ -8,7 +8,7 @@ export class DropListConnectionPipe implements PipeTransform {
     if (data?.length > 0) {
       return data.reduce((acc, curr) => {
         if (curr.name !== currentId) {
-          return [...acc, curr.name];
+          return [...acc, curr.id];
         }
         return acc;
       }, []);

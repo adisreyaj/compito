@@ -1,10 +1,11 @@
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Board } from '@compito/api-interfaces';
+import { Board, BoardListWithTasks, Task } from '@compito/api-interfaces';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
+import produce from 'immer';
 import { Observable } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
 import { BoardsAction } from './state/boards.actions';
@@ -13,39 +14,41 @@ import { BoardsState } from './state/boards.state';
   selector: 'compito-boards',
   template: `
     <compito-page-header [title]="(board$ | async)?.name"> </compito-page-header>
-    <section
-      class="board__container p-8 flex space-x-2"
-      cdkDropList
-      [cdkDropListData]="list"
-      cdkDropListOrientation="horizontal"
-      (cdkDropListDropped)="drop($event)"
-    >
-      <ng-container *ngFor="let item of list">
-        <compito-task-list
-          cdkDrag
-          [list]="item"
-          [allList]="list"
-          (dropped)="drop($event)"
-          (newTask)="createNewTask($event)"
-        >
-          <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
-            <div
-              cdkDragHandle
-              class="list__drag transition-opacity duration-300 ease-in opacity-0 w-8 h-8 -mt-4 grid cursor-move place-items-center bg-gray-100 rounded-full"
-            >
-              <rmx-icon style="width: 20px; height:20px" name="drag-move-line"></rmx-icon>
+    <ng-container *ngIf="lists$ | async as lists">
+      <section
+        class="board__container p-8 flex space-x-2"
+        cdkDropList
+        [cdkDropListData]="lists"
+        cdkDropListOrientation="horizontal"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <ng-container *ngFor="let item of lists">
+          <compito-task-list
+            cdkDrag
+            [list]="item"
+            [allList]="lists"
+            (dropped)="dropTask($event)"
+            (newTask)="createNewTask($event)"
+          >
+            <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
+              <div
+                cdkDragHandle
+                class="list__drag transition-opacity duration-300 ease-in opacity-0 w-8 h-8 -mt-4 grid cursor-move place-items-center bg-gray-100 rounded-full"
+              >
+                <rmx-icon style="width: 20px; height:20px" name="drag-move-line"></rmx-icon>
+              </div>
             </div>
-          </div>
-        </compito-task-list>
-      </ng-container>
-    </section>
+          </compito-task-list>
+        </ng-container>
+      </section>
+    </ng-container>
   `,
   styles: [
     `
       .board {
         &__container {
           @apply overflow-x-auto;
-          min-height: calc(100vh - var(--header-height) - 64px);
+          min-height: calc(100vh - var(--header-height) - 65px);
         }
       }
 
@@ -59,38 +62,40 @@ import { BoardsState } from './state/boards.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardsComponent implements OnInit {
-  list = [
-    {
-      name: 'To Do',
-      data: ['Test', 'Foo', 'Bar'],
-    },
-    {
-      name: 'In Progress',
-      data: ['Test', 'Foo', 'Bar'],
-    },
-    {
-      name: 'Done',
-      data: ['Test', 'Foo', 'Bar'],
-    },
-    {
-      name: 'Deployed',
-      data: [],
-    },
-  ];
-
   @Select(BoardsState.getBoard)
   board$!: Observable<Board | null>;
+
+  @Select(BoardsState.getBoardLists)
+  lists$!: Observable<BoardListWithTasks[]>;
+
   constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.store.dispatch(new BoardsAction.Get(this.boardId));
   }
 
-  drop(event: CdkDragDrop<any[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+  drop(event: CdkDragDrop<BoardListWithTasks[]>) {
+    const reOrdered = produce(event.container.data, (draft) => {
+      moveItemInArray(draft, event.previousIndex, event.currentIndex);
+    });
+    this.store.dispatch(new BoardsAction.Reorder(this.boardId, reOrdered));
+  }
+
+  dropTask(event: CdkDragDrop<Task[]>) {
+    const { previousContainer, container, previousIndex, currentIndex } = event;
+    if (previousContainer === container) {
+      this.store.dispatch(new BoardsAction.MoveTaskWithList(container.id, previousIndex, currentIndex));
     } else {
-      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
+      const { previousContainer, container, previousIndex, currentIndex } = event;
+      this.store.dispatch(
+        new BoardsAction.MoveTaskToOtherList(
+          previousContainer.id,
+          container.id,
+          previousIndex,
+          currentIndex,
+          previousContainer.data[previousIndex]?.id,
+        ),
+      );
     }
   }
 
