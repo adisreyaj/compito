@@ -3,16 +3,20 @@
   <section class="px-8 projects__container">
     <compito-section-header title="Boards"></compito-section-header>
     <div class="projects__list">
+      <article (click)="addNewBoard()"
+               class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
+               style="min-height: 112px;">
+        <div class="flex items-center space-x-2 text-gray-500">
+          <div class="bg-white border rounded-md shadow-sm ">
+            <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+          </div>
+          <p class="text-sm">New Board</p>
+        </div>
+      </article>
       <ng-container *ngFor="let board of details.boards">
         <compito-boards-card [data]="board"></compito-boards-card>
       </ng-container>
     </div>
-    <footer class="mt-4">
-      <button btn size="sm" (click)="addNewBoard()" class="flex items-center">
-        <rmx-icon class="icon-sm" name="add-line"></rmx-icon>
-        <p class="text-sm">New Board</p>
-      </button>
-    </footer>
   </section>
   <section class="px-8 projects__container">
     <compito-section-header title="Members"></compito-section-header>

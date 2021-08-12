@@ -11,6 +11,20 @@ import { OrgsState } from './state/orgs.state';
   template: ` <compito-page-header title="Orgs" [breadcrumbs]="breadcrumbs"></compito-page-header>
     <section class="orgs__container">
       <div class="orgs__list px-8">
+        <article
+          (click)="({})"
+          class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
+          border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
+          grid place-items-center"
+          style="min-height: 146px;"
+        >
+          <div class="flex items-center space-x-2 text-gray-500">
+            <div class=" border rounded-md shadow-sm bg-white">
+              <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+            </div>
+            <p class="text-sm">Create New Org</p>
+          </div>
+        </article>
         <ng-container *ngFor="let org of orgs$ | async">
           <compito-orgs-card [data]="org"></compito-orgs-card>
         </ng-container>

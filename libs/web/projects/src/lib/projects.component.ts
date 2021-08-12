@@ -12,13 +12,10 @@ import { ProjectsState } from './state/projects.state';
   template: ` <compito-page-header title="Projects" [breadcrumbs]="breadcrumbs"> </compito-page-header>
     <section class="projects__container">
       <div class="projects__list px-8">
-        <ng-container *ngFor="let project of projects$ | async">
-          <compito-project-card [data]="project"></compito-project-card>
-        </ng-container>
         <article
           (click)="createNew()"
-          class="p-4 cursor-pointer rounded-md border transition-all duration-200 ease-in
-        border-gray-300 border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-gray-200
+          class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
+          border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
           style="min-height: 180px;"
         >
@@ -29,6 +26,9 @@ import { ProjectsState } from './state/projects.state';
             <p class="text-sm">Add New Project</p>
           </div>
         </article>
+        <ng-container *ngFor="let project of projects$ | async">
+          <compito-project-card [data]="project"></compito-project-card>
+        </ng-container>
       </div>
     </section>`,
   styles: [
