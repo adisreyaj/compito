@@ -7,7 +7,7 @@ import { AuthService } from '@auth0/auth0-angular';
     <header>
       <section class="flex items-stretch space-x-10">
         <div class="flex items-center">
-          <img src="https://avatar.tobi.sh/adi" alt="Compito" width="40" height="40" class="rounded-full" />
+          <img src="assets/images/logo.svg" alt="Compito" width="55" height="55" class="rounded-full" />
         </div>
         <nav class="flex-1 flex items-center text-gray-400 font-medium">
           <ol class="list-none flex items-center gap-6">
