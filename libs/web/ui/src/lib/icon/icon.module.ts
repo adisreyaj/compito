@@ -8,6 +8,7 @@ import {
   RiAttachment2,
   RiBuildingLine,
   RiCheckboxLine,
+  RiCheckLine,
   RiCloseLine,
   RiDragMoveLine,
   RiFolder4Line,
@@ -32,6 +33,7 @@ const icons = {
   RiCloseLine,
   RiMessage3Line,
   RiAttachment2,
+  RiCheckLine,
 };
 
 @NgModule({

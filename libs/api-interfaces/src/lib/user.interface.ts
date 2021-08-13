@@ -1,3 +1,4 @@
+import { DocDates } from './general.interface';
 import { Organization } from './organization.interface';
 
 export interface UserBase {
@@ -7,7 +8,7 @@ export interface UserBase {
   image: string;
 }
 
-export interface User extends UserBase {
+export interface User extends UserBase, DocDates {
   id: string;
   password: string;
   org: Organization[];
