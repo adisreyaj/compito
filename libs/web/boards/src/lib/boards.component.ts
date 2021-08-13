@@ -9,8 +9,8 @@ import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import produce from 'immer';
 import { TaskDetailModalComponent } from 'libs/web/tasks/src/lib/shared/components/task-detail-modal/task-detail-modal.component';
-import { Observable } from 'rxjs';
-import { filter, map, take, withLatestFrom } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
+import { filter, map, take, tap, withLatestFrom } from 'rxjs/operators';
 import { BoardsAction } from './state/boards.actions';
 import { BoardsState } from './state/boards.state';
 @Component({
@@ -83,8 +83,26 @@ export class BoardsComponent implements OnInit {
   constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.store.dispatch(new BoardsAction.Get(this.boardId));
-    this.store.dispatch(new UsersAction.GetAll({}));
+    if (this.taskId) {
+      forkJoin([
+        this.store.dispatch(new BoardsAction.Get(this.boardId)),
+        this.store.dispatch(new UsersAction.GetAll({})),
+      ])
+        .pipe(
+          withLatestFrom(this.board$, this.lists$),
+          tap(([, board, lists]) => {
+            if (board?.tasks && board?.tasks?.length > 0 && lists) {
+              const task = board?.tasks.find(({ id }) => id === this.taskId);
+              const list = lists.find(({ id }) => id === task?.list);
+              task && list && this.viewTaskDetail(task, list);
+            }
+          }),
+        )
+        .subscribe();
+    } else {
+      this.store.dispatch(new BoardsAction.Get(this.boardId));
+      this.store.dispatch(new UsersAction.GetAll({}));
+    }
     this.board$
       .pipe(
         filter((data) => data != null),
@@ -141,9 +159,13 @@ export class BoardsComponent implements OnInit {
         users: this.users$,
       },
     });
+    return ref;
   }
 
   private get boardId() {
     return this.activatedRoute.snapshot.params?.id ?? null;
+  }
+  private get taskId() {
+    return this.activatedRoute.snapshot.params?.taskId ?? null;
   }
 }

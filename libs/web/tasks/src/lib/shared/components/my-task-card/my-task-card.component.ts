@@ -16,7 +16,9 @@ import { Task } from '@compito/api-interfaces';
       <rmx-icon class="icon-xxs" name="check-line"></rmx-icon>
     </div>
     <header>
-      <p class="cursor-pointer" [routerLink]="['/boards', data.board.id, data.id]">{{ data?.title }}</p>
+      <p class="cursor-pointer hover:text-primary" [routerLink]="['/boards', data.board.id, 'tasks', data.id]">
+        {{ data?.title }}
+      </p>
       <p class="text-sm text-gray-500">
         <span class="cursor-pointer hover:text-primary" [routerLink]="['/projects', data.project.id]">{{
           data?.project?.name

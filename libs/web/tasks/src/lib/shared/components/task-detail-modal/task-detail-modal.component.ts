@@ -101,7 +101,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
     <ng-template #addAssignees let-hide>
       <div class="flex flex-col w-64 p-1" cdkTrapFocus>
-        <div class="form-group">
+        <div class="form-group mb-0">
           <input type="text" class="w-full" autofocus />
         </div>
         <ul class="space-y-2 max-h-60 overflow-y-auto">
@@ -189,7 +189,7 @@ export class TaskDetailModalComponent implements OnInit {
 
   ngOnInit(): void {
     const assignees = this.ref.data?.task?.assignees ?? [];
-    this.description.setValue(this.ref.data.task.description ?? '')
+    this.description.setValue(this.ref.data.task.description ?? '');
     assignees.forEach((assignee) => {
       this.selectedAssignees.set(assignee.id, assignee);
     });

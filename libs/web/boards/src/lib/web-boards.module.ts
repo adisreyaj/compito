@@ -11,6 +11,10 @@ import { BoardsState } from './state/boards.state';
     CommonModule,
     RouterModule.forChild([
       {
+        path: ':id/tasks/:taskId',
+        component: BoardsComponent,
+      },
+      {
         path: ':id',
         component: BoardsComponent,
       },
