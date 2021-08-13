@@ -2,19 +2,9 @@ import {
   ProjectRequest,
   RequestParamsDto,
   RequestWithUser,
+  UpdateProjectMembersRequest,
 } from '@compito/api-interfaces';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
 import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
 import { PermissionsGuard } from 'apps/api/src/app/core/guards/permissions.guard';
@@ -49,6 +39,13 @@ export class ProjectController {
     return this.projectService.findOne(id);
   }
 
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('org-admin')
+  @Permissions(PERMISSIONS.project.update)
+  @Patch(':id/members')
+  updateMembers(@Param('id') id: string, @Body() data: UpdateProjectMembersRequest) {
+    return this.projectService.updateMembers(id, data);
+  }
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.update)

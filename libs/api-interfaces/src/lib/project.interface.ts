@@ -21,3 +21,8 @@ export interface ProjectRequest extends ProjectBase {
   createdById?: string;
   members?: string[];
 }
+
+export type UpdateProjectMembersRequestType = 'modify' | 'set';
+type ModifyProjectMembers = { type: 'modify'; add?: string[]; remove?: string[] };
+type SetProjectMembers = { type: 'set'; set: string[] };
+export type UpdateProjectMembersRequest = ModifyProjectMembers | SetProjectMembers; 
