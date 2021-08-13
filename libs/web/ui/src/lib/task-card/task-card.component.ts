@@ -18,7 +18,7 @@ import { UserAvatarGroupData } from '../user-avatar-group';
           Lorem ipsum dolor, sit amet consectetur adipisicing elit.sit amet consectetur adipisicing elit.
         </p>
       </div>
-      <footer class="flex items-center justify-between mt-4 text-gray-500">
+      <footer class="flex items-center justify-between mt-4 text-gray-500" [style.minHeight.px]="33">
         <div>
           <compito-user-avatar-group [data]="assignees" [size]="25"></compito-user-avatar-group>
         </div>
@@ -40,28 +40,7 @@ import { UserAvatarGroupData } from '../user-avatar-group';
 })
 export class TaskCardComponent implements OnInit {
   @Input() task: Task | null = null;
-  @Input() assignees: UserAvatarGroupData[] = [
-    {
-      name: 'John Doe',
-      image: 'https://avatar.tobi.sh/john',
-    },
-    {
-      name: 'Jane Doe',
-      image: 'https://avatar.tobi.sh/jane',
-    },
-    {
-      name: 'Maicy Williams',
-      image: 'https://avatar.tobi.sh/maicy',
-    },
-    {
-      name: 'Patrick Jane',
-      image: 'https://avatar.tobi.sh/patrick',
-    },
-    {
-      name: 'Robert Jr',
-      image: 'https://avatar.tobi.sh/robert',
-    },
-  ];
+  @Input() assignees: UserAvatarGroupData[] = [];
 
   @Output() clicked = new EventEmitter<Task>();
   constructor() {}

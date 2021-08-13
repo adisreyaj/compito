@@ -4,6 +4,7 @@ import { Priority, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
 import { PrismaService } from '../prisma.service';
+import { GET_SINGLE_TASK_SELECT } from './task.config';
 
 @Injectable()
 export class TaskService {
@@ -42,6 +43,7 @@ export class TaskService {
       const orgs$ = this.prisma.task.findMany({
         skip,
         take: limit,
+        select: GET_SINGLE_TASK_SELECT,
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -62,6 +64,7 @@ export class TaskService {
         where: {
           id,
         },
+        select: GET_SINGLE_TASK_SELECT,
       });
       if (task) {
         return task;

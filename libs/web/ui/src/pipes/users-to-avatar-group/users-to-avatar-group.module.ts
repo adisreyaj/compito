@@ -3,9 +3,8 @@ import { NgModule } from '@angular/core';
 import { UsersToAvatarGroupPipe } from './users-to-avatar-group.pipe';
 
 @NgModule({
+  declarations: [UsersToAvatarGroupPipe],
   imports: [CommonModule],
-  declarations: [
-    UsersToAvatarGroupPipe
-  ],
+  exports: [UsersToAvatarGroupPipe],
 })
-export class WebUiModule {}
+export class UsersToAvatarGroupModule {}

@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { GET_SINGLE_TASK_SELECT } from '../task/task.config';
 
 export const GET_SINGLE_BOARD_SELECT: Prisma.BoardSelect = {
   id: true,
@@ -7,7 +8,9 @@ export const GET_SINGLE_BOARD_SELECT: Prisma.BoardSelect = {
   updatedAt: true,
   createdAt: true,
   createdBy: true,
-  tasks: true,
+  tasks: {
+    select: GET_SINGLE_TASK_SELECT,
+  },
   org: true,
   project: true,
 };

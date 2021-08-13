@@ -51,23 +51,40 @@ export class BoardsState {
   @Action(BoardsAction.AddTask)
   addTask({ setState }: StateContext<BoardsStateModel>, { payload }: BoardsAction.AddTask) {
     return this.boardService.addTask(payload).pipe(
-      tap((data) => {
-        setState(
-          patch({
-            lists: updateItem<BoardListWithTasks>(
-              (list) => list?.id === payload.list,
-              (list) => {
-                return produce(list, (draft) => {
-                  draft.tasks.push(data);
-                });
-              },
-            ),
-          }),
-        );
-        this.toast.success('Task added successfully!');
-      }, () => {
-        this.toast.error('Failed to creat task!');
-      }),
+      tap(
+        (data) => {
+          setState(
+            patch({
+              lists: updateItem<BoardListWithTasks>(
+                (list) => list?.id === payload.list,
+                (list) => {
+                  return produce(list, (draft) => {
+                    draft.tasks.push(data);
+                  });
+                },
+              ),
+            }),
+          );
+          this.toast.success('Task added successfully!');
+        },
+        () => {
+          this.toast.error('Failed to creat task!');
+        },
+      ),
+    );
+  }
+  @Action(BoardsAction.UpdateAssignees)
+  updateAssignees({ setState }: StateContext<BoardsStateModel>, { assignees, taskId }: BoardsAction.UpdateAssignees) {
+    return this.boardService.updateAssignees(taskId, assignees).pipe(
+      tap(
+        (data) => {
+         
+          this.toast.success('Task added successfully!');
+        },
+        () => {
+          this.toast.error('Failed to creat task!');
+        },
+      ),
     );
   }
 

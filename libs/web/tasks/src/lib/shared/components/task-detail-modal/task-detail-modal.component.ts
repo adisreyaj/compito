@@ -1,10 +1,13 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { BoardList, Task, User } from '@compito/api-interfaces';
+import { BoardsAction } from '@compito/web/boards/state';
 import { UserAvatarGroupData } from '@compito/web/ui';
 import { DialogRef } from '@ngneat/dialog';
+import { Store } from '@ngxs/store';
 import produce from 'immer';
 import { BehaviorSubject, Observable } from 'rxjs';
-
 @Component({
   selector: 'compito-task-detail-modal',
   template: `
@@ -29,9 +32,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
         <section class="task-detail__section">
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
           <div class="form-group">
-            <textarea class="w-3/4" type="text" id="description" rows="3"></textarea>
+            <textarea class="w-3/4" type="text" id="description" rows="3" [formControl]="description"></textarea>
             <footer class="mt-4 flex items-center space-x-2">
-              <button btn size="sm">Save</button>
+              <button btn size="sm" [disabled]="!description.dirty">Save</button>
               <button btn size="sm" variant="secondary">Cancel</button>
             </footer>
           </div>
@@ -67,9 +70,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
                   <img [src]="" [alt]="" width="30" height="30" class="rounded-full" />
                 </div>
                 <div class="form-group">
-                  <textarea class="w-3/4" type="text" id="description" rows="2"></textarea>
+                  <textarea class="w-3/4" type="text" id="comment" [formControl]="comment" rows="2"></textarea>
                   <footer class="mt-4 flex items-center space-x-2">
-                    <button btn size="sm">Save</button>
+                    <button btn size="sm" [disabled]="!comment.dirty">Save</button>
                     <button btn size="sm" variant="secondary">Cancel</button>
                   </footer>
                 </div>
@@ -156,6 +159,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
       }
     `,
   ],
+  animations: [
+    trigger('fadeSlideInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-10px)' }),
+        animate('200ms', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition(':leave', [animate('100ms', style({ opacity: 0, transform: 'translateY(-10px)' }))]),
+    ]),
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskDetailModalComponent implements OnInit {
@@ -163,11 +175,29 @@ export class TaskDetailModalComponent implements OnInit {
   assignedUsersSubject = new BehaviorSubject<UserAvatarGroupData[]>([]);
   assignedUsers$ = this.assignedUsersSubject.asObservable();
 
-  constructor(public ref: DialogRef<{ task: Task; list: BoardList; users: Observable<User[]> }>) {}
+  description = new FormControl('Default description');
+  comment = new FormControl('');
 
-  ngOnInit(): void {}
+  constructor(
+    public ref: DialogRef<{
+      task: Task;
+      list: BoardList;
+      users: Observable<User[]>;
+    }>,
+    private store: Store,
+  ) {}
+
+  ngOnInit(): void {
+    const assignees = this.ref.data?.task?.assignees ?? [];
+    assignees.forEach((assignee) => {
+      this.selectedAssignees.set(assignee.id, assignee);
+    });
+    this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
+  }
 
   updateAssignees() {
+    const assignees = [...this.selectedAssignees.keys()];
+    this.store.dispatch(new BoardsAction.UpdateAssignees(this.ref.data.task.id, assignees));
     this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
   }
 
