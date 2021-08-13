@@ -15,12 +15,20 @@ export class TaskService {
     try {
       const { org, userId } = getUserDetails(user);
 
-      const { assignees, priority, tags, ...rest } = data;
-      let taskData: Prisma.TaskUncheckedCreateInput = {
+      const { assignees, priority, tags, boardId, projectId, ...rest } = data;
+      let taskData: Prisma.TaskCreateInput = {
         ...rest,
+        board: { connect: { id: boardId } },
+        project: { connect: { id: projectId } },
         priority: priority ?? Priority.Medium,
-        createdById: userId,
-        orgId: org,
+        createdBy: {
+          connect: { id: userId },
+        },
+        org: {
+          connect: {
+            id: org,
+          },
+        },
         assignees: {
           connect: assignees.map((id) => ({ id })),
         },
@@ -78,14 +86,20 @@ export class TaskService {
 
   async update(id: string, data: TaskRequest) {
     try {
-      const { assignees, priority, tags, ...rest } = data;
-      let taskData: Prisma.TaskUncheckedUpdateInput = {
+      const { assignees, priority, tags,assignedById, boardId,projectId, orgId,createdById, ...rest } = data;
+      let taskData: Prisma.TaskUpdateInput = {
         ...rest,
       };
+      if (assignedById) {
+        taskData = {
+          ...taskData,
+          assignedBy: { connect: { id: assignedById } },
+        };
+      }
       if (priority) {
         taskData = {
           ...taskData,
-          priority: priority as any,
+          priority: priority ?? Priority.Medium,
         };
       }
       if (assignees) {
@@ -109,6 +123,7 @@ export class TaskService {
           id,
         },
         data: taskData,
+        select: GET_SINGLE_TASK_SELECT,
       });
       if (task) {
         return task;

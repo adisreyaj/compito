@@ -20,17 +20,15 @@ model User {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   taskAssignedBy    Task[]         @relation("assignedBy")
-  taskAssignee      Task?          @relation("assignees", fields: [taskId], references: [id])
-  taskId            String?
+  taskAssignee      Task[]         @relation("assignees")
   subTaskAssignedBy SubTask[]      @relation("subTaskAssignedBy")
-  subTaskAssignee   SubTask?       @relation("subTaskAssignees", fields: [subTaskId], references: [id])
-  subTaskId         String?
+  subTaskAssignee   SubTask[]      @relation("subTaskAssignees")
   projects          Project[]
   tasks             Task[]
   subTasks          SubTask[]
   comments          Comment[]
   boards            Board[]
-  project           Project?       @relation("members", fields: [projectId], references: [id])
+  Project           Project?       @relation("members", fields: [projectId], references: [id])
   projectId         String?
 }
 
