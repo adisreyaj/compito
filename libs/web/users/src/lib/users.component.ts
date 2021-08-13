@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { User } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
+import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { UsersCreateModalComponent } from './shared/components/users-create-modal/users-create-modal.component';
 import { UsersAction } from './state/users.actions';
 import { UsersState } from './state/users.state';
 
@@ -17,7 +19,7 @@ import { UsersState } from './state/users.state';
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
-          style="min-height: 180px;"
+          style="min-height: 226px;"
         >
           <div class="flex items-center space-x-2 text-gray-500">
             <div class=" border rounded-md shadow-sm bg-white">
@@ -52,11 +54,18 @@ export class UsersComponent implements OnInit {
 
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
-  constructor(private store: Store) {}
+  constructor(private dialog: DialogService, private store: Store) {}
 
   ngOnInit(): void {
     this.store.dispatch(new UsersAction.GetAll({}));
   }
 
-  createNew() {}
+  createNew() {
+    const ref = this.dialog.open(UsersCreateModalComponent);
+    ref.afterClosed$.subscribe((data) => {
+      if (data) {
+        this.store.dispatch(new UsersAction.Add(data));
+      }
+    });
+  }
 }
