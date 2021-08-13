@@ -1,11 +1,29 @@
 :root {
   --primary-1: hsl(219, 70%, 38%);
   --primary: hsl(248, 92%, 64%);
-  --primary-gradient: linear-gradient(135deg, #7A65FD 0%, #1D6FA3 100%);
+  --primary-gradient: linear-gradient(135deg, #7a65fd 0%, #1d6fa3 100%);
   --primary-dark: hsla(160, 84%, 28%);
-  --primary-translucent: hsla(219, 70%, 38%, 0.20);
+  --primary-translucent: hsla(219, 70%, 38%, 0.2);
   --primary-disabled: hsl(150, 34%, 70%);
   --secondary: hsl(0, 0%, 88%);
   --secondary-dark: hsl(0, 0%, 82%);
   --secondary-disabled: hsl(0, 0%, 90%);
+}
+
+.priority {
+  &.lowest {
+    color: hsl(213, 94%, 68%);
+  }
+  &.low {
+    color: hsl(160, 84%, 39%);
+  }
+  &.medium {
+    color: hsl(45, 93%, 47%)
+  }
+  &.high {
+    color: hsl(25, 95%, 53%);
+  }
+  &.highest {
+    color: hsl(0, 84%, 60%);
+  }
 }

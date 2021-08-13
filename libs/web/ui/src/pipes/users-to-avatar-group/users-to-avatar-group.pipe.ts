@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { User } from '@compito/api-interfaces';
-import { UserAvatarGroupData } from '../../lib/user-avatar-group';
+import { UserAvatarGroupData } from '../../components/user-avatar-group';
 
 @Pipe({
   name: 'usersToAvatarGroup',

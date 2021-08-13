@@ -1,12 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ContentChild,
-  Input,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, Input, OnInit } from '@angular/core';
 import { DialogRef } from '@ngneat/dialog';
-import { ModalActionsDirective } from 'libs/web/ui/src/lib/modal/modal-actions/modal-actions.directive';
+import { ModalActionsDirective } from 'libs/web/ui/src/components/modal/modal-actions/modal-actions.directive';
 @Component({
   selector: 'compito-modal',
   template: `<div class="p-4 flex flex-col">
@@ -19,9 +13,7 @@ import { ModalActionsDirective } from 'libs/web/ui/src/lib/modal/modal-actions/m
       <ng-content></ng-content>
     </section>
     <footer>
-      <ng-container
-        *ngTemplateOutlet="modalActions?.tpl || defaultFooterAction"
-      ></ng-container>
+      <ng-container *ngTemplateOutlet="modalActions?.tpl || defaultFooterAction"></ng-container>
     </footer>
 
     <ng-template #defaultFooterAction>

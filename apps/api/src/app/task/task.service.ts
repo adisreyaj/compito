@@ -44,11 +44,12 @@ export class TaskService {
     }
   }
 
-  async findAll(query: RequestParamsDto) {
+  async findAll(query: RequestParamsDto, where: Prisma.TaskWhereInput = {}) {
     const { skip, limit } = query;
     try {
-      const count$ = this.prisma.task.count();
+      const count$ = this.prisma.task.count({ where });
       const orgs$ = this.prisma.task.findMany({
+        where,
         skip,
         take: limit,
         select: GET_SINGLE_TASK_SELECT,
@@ -86,7 +87,7 @@ export class TaskService {
 
   async update(id: string, data: TaskRequest) {
     try {
-      const { assignees, priority, tags,assignedById, boardId,projectId, orgId,createdById, ...rest } = data;
+      const { assignees, priority, tags, assignedById, boardId, projectId, orgId, createdById, ...rest } = data;
       let taskData: Prisma.TaskUpdateInput = {
         ...rest,
       };
