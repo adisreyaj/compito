@@ -10,6 +10,7 @@ export const USER_BASIC_DETAILS: Prisma.UserSelect = {
 export const GET_SINGLE_TASK_SELECT: Prisma.TaskSelect = {
   id: true,
   title: true,
+  description: true,
   assignees: {
     select: USER_BASIC_DETAILS,
   },

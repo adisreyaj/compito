@@ -78,11 +78,24 @@ export class BoardsState {
     return this.boardService.updateAssignees(taskId, assignees).pipe(
       tap(
         (data) => {
-         
           this.toast.success('Task added successfully!');
         },
         () => {
           this.toast.error('Failed to creat task!');
+        },
+      ),
+    );
+  }
+  @Action(BoardsAction.UpdateTaskDescription)
+  updateTaskDescription(
+    { setState }: StateContext<BoardsStateModel>,
+    { description, taskId }: BoardsAction.UpdateTaskDescription,
+  ) {
+    return this.boardService.updateDescription(taskId, description).pipe(
+      tap(
+        (data) => {},
+        () => {
+          this.toast.error('Failed to update task description!');
         },
       ),
     );

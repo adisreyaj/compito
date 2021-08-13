@@ -34,7 +34,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
           <div class="form-group">
             <textarea class="w-3/4" type="text" id="description" rows="3" [formControl]="description"></textarea>
             <footer class="mt-4 flex items-center space-x-2">
-              <button btn size="sm" [disabled]="!description.dirty">Save</button>
+              <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
               <button btn size="sm" variant="secondary">Cancel</button>
             </footer>
           </div>
@@ -189,6 +189,7 @@ export class TaskDetailModalComponent implements OnInit {
 
   ngOnInit(): void {
     const assignees = this.ref.data?.task?.assignees ?? [];
+    this.description.setValue(this.ref.data.task.description ?? '')
     assignees.forEach((assignee) => {
       this.selectedAssignees.set(assignee.id, assignee);
     });
@@ -197,8 +198,14 @@ export class TaskDetailModalComponent implements OnInit {
 
   updateAssignees() {
     const assignees = [...this.selectedAssignees.keys()];
-    this.store.dispatch(new BoardsAction.UpdateAssignees(this.ref.data.task.id, assignees));
+    this.store.dispatch(new BoardsAction.UpdateAssignees(this.taskId, assignees));
     this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
+  }
+
+  updateDescription() {
+    if (this.description.valid) {
+      this.store.dispatch(new BoardsAction.UpdateTaskDescription(this.taskId, this.description.value));
+    }
   }
 
   mapToArray(map: Map<any, User>) {
@@ -220,5 +227,9 @@ export class TaskDetailModalComponent implements OnInit {
         draft.set(user.id, user);
       });
     }
+  }
+
+  private get taskId() {
+    return this.ref.data.task.id;
   }
 }

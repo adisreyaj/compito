@@ -14,8 +14,8 @@ import { UserAvatarGroupData } from '../user-avatar-group';
         <p class="font-medium text-sm line-clamp-1">{{ task?.title }}</p>
       </header>
       <div>
-        <p class="text-xs text-gray-500 line-clamp-2">
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit.sit amet consectetur adipisicing elit.
+        <p class="text-xs text-gray-500 line-clamp-2" [style.minHeight.px]="32">
+          {{ task?.description }}
         </p>
       </div>
       <footer class="flex items-center justify-between mt-4 text-gray-500" [style.minHeight.px]="33">
