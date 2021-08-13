@@ -1,3 +1,4 @@
+import { Comment } from './comment.interface';
 import { DocDates } from './general.interface';
 import { Organization } from './organization.interface';
 import { Priority } from './priority.interface';
@@ -22,7 +23,7 @@ export interface Task extends TaskBase, DocDates {
   assignees: User[];
   tags: Tag[];
   createdBy: User;
-  comments: any[];
+  comments: Comment[];
   subTasks: any[];
 }
 

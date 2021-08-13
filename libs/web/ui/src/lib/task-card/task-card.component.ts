@@ -1,11 +1,15 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Task } from '@compito/api-interfaces';
 import { UserAvatarGroupData } from '../user-avatar-group';
 
 @Component({
   selector: 'compito-task-card',
   template: `
-    <div class="bg-white rounded-md px-4 py-2 shadow-sm border hover:shadow-md" *ngIf="task">
+    <div
+      class="bg-white rounded-md px-4 py-2 shadow-sm border hover:shadow-md"
+      *ngIf="task"
+      (click)="clicked.emit(task)"
+    >
       <header>
         <p class="font-medium text-sm line-clamp-1">{{ task?.title }}</p>
       </header>
@@ -58,6 +62,8 @@ export class TaskCardComponent implements OnInit {
       image: 'https://avatar.tobi.sh/robert',
     },
   ];
+
+  @Output() clicked = new EventEmitter<Task>();
   constructor() {}
 
   ngOnInit(): void {}

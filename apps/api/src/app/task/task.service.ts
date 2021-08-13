@@ -107,7 +107,6 @@ export class TaskService {
         },
         data: taskData,
       });
-      this.logger.debug(task);
       if (task) {
         return task;
       }

@@ -17,7 +17,7 @@ import { ProjectsState } from './state/projects.state';
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
-          style="min-height: 180px;"
+          style="min-height: 194px;"
         >
           <div class="flex items-center space-x-2 text-gray-500">
             <div class=" border rounded-md shadow-sm bg-white">

@@ -25,7 +25,12 @@
       "@compito/web/settings": ["libs/web/settings/src/index.ts"],
       "@compito/web/tasks": ["libs/web/tasks/src/index.ts"],
       "@compito/web/ui": ["libs/web/ui/src/index.ts"],
-      "@compito/web/users": ["libs/web/users/src/index.ts"]
+      "@compito/web/users": [
+        "libs/web/users/src/index.ts"
+      ],
+      "@compito/web/users/*": [
+        "libs/web/users/src/lib/*"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

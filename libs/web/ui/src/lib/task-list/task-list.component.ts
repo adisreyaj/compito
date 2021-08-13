@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { BoardListWithTasks } from '@compito/api-interfaces';
+import { BoardListWithTasks, Task } from '@compito/api-interfaces';
 @Component({
   selector: 'compito-task-list',
   template: `<div
@@ -24,7 +24,7 @@ import { BoardListWithTasks } from '@compito/api-interfaces';
     <ul *ngIf="list.tasks.length > 0; else noTask" class="task-list__container space-y-4 -mx-4 px-4 pb-2">
       <ng-container *ngFor="let task of list.tasks">
         <article cdkDrag class="task-card cursor-pointer">
-          <compito-task-card [task]="task"></compito-task-card>
+          <compito-task-card [task]="task" (clicked)="taskClicked.emit($event)"></compito-task-card>
         </article>
       </ng-container>
     </ul>
@@ -70,4 +70,5 @@ export class TaskListComponent {
 
   @Output() dropped = new EventEmitter();
   @Output() newTask = new EventEmitter<string>();
+  @Output() taskClicked = new EventEmitter<Task>();
 }

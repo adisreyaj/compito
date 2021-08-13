@@ -1,12 +1,14 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Board, BoardListWithTasks, Task } from '@compito/api-interfaces';
+import { Board, BoardList, BoardListWithTasks, Task, User } from '@compito/api-interfaces';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
 import { Breadcrumb } from '@compito/web/ui';
+import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import produce from 'immer';
+import { TaskDetailModalComponent } from 'libs/web/tasks/src/lib/shared/components/task-detail-modal/task-detail-modal.component';
 import { Observable } from 'rxjs';
 import { filter, map, take, withLatestFrom } from 'rxjs/operators';
 import { BoardsAction } from './state/boards.actions';
@@ -30,6 +32,7 @@ import { BoardsState } from './state/boards.state';
             [allList]="lists"
             (dropped)="dropTask($event)"
             (newTask)="createNewTask($event)"
+            (taskClicked)="viewTaskDetail($event, item)"
           >
             <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
               <div
@@ -74,11 +77,14 @@ export class BoardsComponent implements OnInit {
   @Select(BoardsState.getBoardLists)
   lists$!: Observable<BoardListWithTasks[]>;
 
+  @Select(UsersState.getAllUsers)
+  users$!: Observable<User[]>;
+
   constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.store.dispatch(new BoardsAction.Get(this.boardId));
-
+    this.store.dispatch(new UsersAction.GetAll({}));
     this.board$
       .pipe(
         filter((data) => data != null),
@@ -123,6 +129,17 @@ export class BoardsComponent implements OnInit {
           new BoardsAction.AddTask({ ...data, list: listId, boardId: board?.id, projectId: board?.project.id }),
         );
       }
+    });
+  }
+
+  viewTaskDetail(task: Task, list: BoardList) {
+    const ref = this.dialog.open(TaskDetailModalComponent, {
+      size: 'lg',
+      data: {
+        task,
+        list,
+        users: this.users$,
+      },
     });
   }
 

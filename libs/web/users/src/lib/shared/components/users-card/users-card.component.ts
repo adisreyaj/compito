@@ -28,6 +28,7 @@ import { User } from '@compito/api-interfaces';
               class="rounded-full mb-4"
             />
             <div
+              *ngIf="data?.verified"
               class="bg-primary text-white absolute bottom-0 left-0 rounded-full border-4 border-white"
               [style.padding.px]="2"
               tippy="Verified"
