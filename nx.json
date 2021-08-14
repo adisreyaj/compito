@@ -46,6 +46,9 @@
     "web-home": {
       "tags": []
     },
+    "web-auth": {
+      "tags": []
+    },
     "web-orgs": {
       "tags": []
     },

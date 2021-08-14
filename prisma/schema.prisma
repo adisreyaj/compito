@@ -23,13 +23,12 @@ model User {
   taskAssignee      Task[]         @relation("assignees")
   subTaskAssignedBy SubTask[]      @relation("subTaskAssignedBy")
   subTaskAssignee   SubTask[]      @relation("subTaskAssignees")
-  projects          Project[]
+  projects          Project[]      @relation("members")
   tasks             Task[]
   subTasks          SubTask[]
   comments          Comment[]
   boards            Board[]
-  Project           Project?       @relation("members", fields: [projectId], references: [id])
-  projectId         String?
+  projectsCreated   Project[]      @relation("projectCreatedBy")
 }
 
 model Organization {
@@ -53,7 +52,7 @@ model Project {
   org         Organization @relation(fields: [orgId], references: [id])
   orgId       String
   members     User[]       @relation("members")
-  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdBy   User         @relation("projectCreatedBy", fields: [createdById], references: [id])
   createdById String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt

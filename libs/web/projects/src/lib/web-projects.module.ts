@@ -8,13 +8,13 @@ import {
   IconModule,
   ModalModule,
   PageHeaderModule,
+  ProjectCardModule,
   TimeAgoModule,
   UserAvatarGroupModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
 import { ProjectsComponent } from './projects.component';
 import { BoardCreateModalComponent } from './shared/components/board-create-modal/board-create-modal.component';
-import { ProjectCardComponent } from './shared/components/project-card/project-card.component';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
 
 @NgModule({
@@ -39,7 +39,8 @@ import { ProjectsCreateModalComponent } from './shared/components/projects-creat
     A11yModule,
     TippyModule,
     TimeAgoModule,
+    ProjectCardModule,
   ],
-  declarations: [ProjectsComponent, ProjectCardComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
+  declarations: [ProjectsComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
 })
 export class WebProjectsModule {}

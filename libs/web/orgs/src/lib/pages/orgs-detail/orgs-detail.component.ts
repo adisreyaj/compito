@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Organization, User } from '@compito/api-interfaces';
+import { ProjectsCreateModalComponent } from '@compito/web/projects';
+import { ProjectsAction } from '@compito/web/projects/state';
 import { Breadcrumb } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
@@ -8,7 +10,6 @@ import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { OrgsAction } from '../../state/orgs.actions';
 import { OrgsState } from '../../state/orgs.state';
-
 @Component({
   selector: 'compito-orgs-detail',
   templateUrl: './orgs-detail.component.html',
@@ -80,7 +81,12 @@ export class OrgsDetailComponent implements OnInit {
   }
 
   addNewProject() {
-    this.router.navigate(['/projects/add']);
+    const ref = this.dialog.open(ProjectsCreateModalComponent);
+    ref.afterClosed$.subscribe((data) => {
+      if (data) {
+        this.store.dispatch(new ProjectsAction.Add(data));
+      }
+    });
   }
   private get orgId() {
     return this.activatedRoute.snapshot.params?.id || null;

@@ -18,7 +18,9 @@ async function main() {
       firstName: 'Adithya',
       lastName: 'Sreyaj',
       password: '$2a$12$0.g5pAEI55Fl57yd8zpxne61oxPEkL79z5Uwu7zKRKeIWphfV//NW',
-      orgId: org.id,
+      org: {
+        connect: { id: org.id },
+      },
     },
   });
   console.log({ admin });

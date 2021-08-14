@@ -6,7 +6,7 @@ export interface Breadcrumb {
 @Component({
   selector: 'compito-page-header',
   template: `
-    <header class="py-2 px-8 bg-gray-100 shadow-inner">
+    <header class="py-2 px-8 bg-gray-100 shadow-inner h-16">
       <nav aria-label="Breadcrumb" class="text-gray-600" *ngIf="breadcrumbs.length > 0">
         <ol class="list-none flex items-center space-x-6 text-sm">
           <ng-container *ngFor="let item of breadcrumbs">

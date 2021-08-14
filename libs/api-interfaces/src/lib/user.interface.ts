@@ -16,6 +16,11 @@ export interface User extends UserBase, DocDates {
   verified: boolean;
 }
 
+export interface UserSignupRequest extends UserBase {
+  org: string;
+  password: string;
+}
+
 export interface UserRequest extends UserBase {
   orgId: string;
   password: string;

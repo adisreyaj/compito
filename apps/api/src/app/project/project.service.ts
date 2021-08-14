@@ -24,10 +24,18 @@ export class ProjectService {
       throw new UnauthorizedException('No access to create project');
     }
     try {
-      const projectData: Prisma.ProjectUncheckedCreateInput = {
+      const projectData: Prisma.ProjectCreateInput = {
         ...data,
-        orgId: org,
-        createdById: userId,
+        org: {
+          connect: {
+            id: org,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: userId,
+          },
+        },
         members: {
           connect: data.members.map((id) => ({ id })),
         },
@@ -50,8 +58,17 @@ export class ProjectService {
         skip,
         take: limit,
         orderBy: {
-          [sort]:order
-        }
+          [sort]: order,
+        },
+        select: {
+          id:true,
+          name: true,
+          description: true,
+          createdAt: true,
+          updatedAt: true,
+          boards: true,
+          members: { select: USER_BASIC_DETAILS },
+        },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -73,6 +90,7 @@ export class ProjectService {
           id,
         },
         select: {
+          id: true,
           name: true,
           description: true,
           createdAt: true,

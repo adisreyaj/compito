@@ -25,8 +25,8 @@ import { Project } from '@compito/api-interfaces';
           <p class="text-gray-400 text-sm line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
         </div>
       </header>
-      <div class="my-4">
-        <compito-user-avatar-group [data]="users"></compito-user-avatar-group>
+      <div class="my-4" [style.minHeight.px]="48">
+        <compito-user-avatar-group [data]="data.members | usersToAvatarGroup"></compito-user-avatar-group>
       </div>
       <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">
         <div>
@@ -60,29 +60,6 @@ import { Project } from '@compito/api-interfaces';
 })
 export class ProjectCardComponent implements OnInit {
   @Input() data: Project | null = null;
-
-  users = [
-    {
-      name: 'John Doe',
-      image: 'https://avatar.tobi.sh/john',
-    },
-    {
-      name: 'Jane Doe',
-      image: 'https://avatar.tobi.sh/jane',
-    },
-    {
-      name: 'Maicy Williams',
-      image: 'https://avatar.tobi.sh/maicy',
-    },
-    {
-      name: 'Patrick Jane',
-      image: 'https://avatar.tobi.sh/patrick',
-    },
-    {
-      name: 'Robert Jr',
-      image: 'https://avatar.tobi.sh/robert',
-    },
-  ];
   constructor() {}
 
   ngOnInit(): void {}

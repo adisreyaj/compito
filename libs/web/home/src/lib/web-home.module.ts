@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
   IconModule,
+  PageHeaderModule,
   PriorityColorDirectiveModule,
   ProjectCardModule,
   SectionHeaderModule,
@@ -23,6 +24,7 @@ import { HomeState } from './state/home.state';
     PriorityColorDirectiveModule,
     ProjectCardModule,
     SectionHeaderModule,
+    PageHeaderModule,
   ],
   declarations: [HomeComponent, TaskListComponent],
 })
