@@ -30,16 +30,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
       </header>
       <div>
         <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
-          <div class="form-group">
-            <textarea class="w-3/4" type="text" id="description" rows="3" [formControl]="description"></textarea>
-            <footer class="mt-4 flex items-center space-x-2">
-              <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
-              <button btn size="sm" variant="secondary">Cancel</button>
-            </footer>
-          </div>
-        </section>
-        <section class="task-detail__section">
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Assignees' }"></ng-container>
           <div class="flex items-center">
             <compito-user-avatar-group [data]="assignedUsers$ | async"></compito-user-avatar-group>
@@ -55,6 +45,16 @@ import { BehaviorSubject, Observable } from 'rxjs';
                 <rmx-icon name="add-line"></rmx-icon>
               </div>
             </div>
+          </div>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
+          <div class="form-group">
+            <textarea class="w-3/4" type="text" id="description" rows="3" [formControl]="description"></textarea>
+            <footer class="mt-4 flex items-center space-x-2">
+              <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
+              <button btn size="sm" variant="secondary">Cancel</button>
+            </footer>
           </div>
         </section>
         <section class="task-detail__section">
