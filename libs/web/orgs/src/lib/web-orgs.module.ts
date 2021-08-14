@@ -1,12 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { IconModule, PageHeaderModule, TimeAgoModule, UserAvatarGroupModule } from '@compito/web/ui';
+import {
+  ButtonModule,
+  IconModule,
+  ModalModule,
+  PageHeaderModule,
+  TimeAgoModule,
+  UserAvatarGroupModule,
+} from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
-import { NgxsModule } from '@ngxs/store';
 import { OrgsComponent } from './orgs.component';
 import { OrgsCardComponent } from './shared/components/orgs-card/orgs-card.component';
-import { OrgsState } from './state/orgs.state';
+import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/orgs-create-modal.component';
 
 @NgModule({
   imports: [
@@ -18,13 +25,16 @@ import { OrgsState } from './state/orgs.state';
         loadChildren: () => import('./pages/orgs-detail/orgs-detail.module').then((m) => m.OrgsDetailModule),
       },
     ]),
+    FormsModule,
+    ReactiveFormsModule,
     PageHeaderModule,
-    NgxsModule.forFeature([OrgsState]),
     TippyModule,
     IconModule,
     TimeAgoModule,
+    ButtonModule,
     UserAvatarGroupModule,
+    ModalModule,
   ],
-  declarations: [OrgsComponent, OrgsCardComponent],
+  declarations: [OrgsComponent, OrgsCardComponent, OrgsCreateModalComponent],
 })
 export class WebOrgsModule {}

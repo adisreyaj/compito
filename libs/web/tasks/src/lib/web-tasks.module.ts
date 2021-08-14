@@ -13,11 +13,9 @@ import {
   UserAvatarGroupModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
-import { NgxsModule } from '@ngxs/store';
 import { MyTaskCardComponent } from './shared/components/my-task-card/my-task-card.component';
 import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
 import { TasksCreateModalComponent } from './shared/components/tasks-create-modal/tasks-create-modal.component';
-import { TasksState } from './state/tasks.state';
 import { TasksComponent } from './tasks.component';
 @NgModule({
   declarations: [TasksComponent, TasksCreateModalComponent, TaskDetailModalComponent, MyTaskCardComponent],
@@ -31,7 +29,6 @@ import { TasksComponent } from './tasks.component';
     ]),
     FormsModule,
     ReactiveFormsModule,
-    NgxsModule.forFeature([TasksState]),
     ModalModule,
     ButtonModule,
     PageHeaderModule,

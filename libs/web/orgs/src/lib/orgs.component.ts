@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Organization } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
+import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/orgs-create-modal.component';
 import { OrgsAction } from './state/orgs.actions';
 import { OrgsState } from './state/orgs.state';
 
@@ -12,11 +14,11 @@ import { OrgsState } from './state/orgs.state';
     <section class="orgs__container">
       <div class="orgs__list px-8">
         <article
-          (click)="({})"
+          (click)="createNew()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
-          style="min-height: 146px;"
+          style="min-height: 106px;"
         >
           <div class="flex items-center space-x-2 text-gray-500">
             <div class=" border rounded-md shadow-sm bg-white">
@@ -49,9 +51,18 @@ export class OrgsComponent implements OnInit {
   breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
   @Select(OrgsState.getAllOrgs)
   orgs$!: Observable<Organization[]>;
-  constructor(private store: Store) {}
+  constructor(private store: Store, private dialog: DialogService) {}
 
   ngOnInit(): void {
     this.store.dispatch(new OrgsAction.GetAll());
+  }
+
+  createNew() {
+    const ref = this.dialog.open(OrgsCreateModalComponent);
+    ref.afterClosed$.subscribe((data) => {
+      if (data) {
+        this.store.dispatch(new OrgsAction.Add(data));
+      }
+    });
   }
 }

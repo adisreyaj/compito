@@ -12,12 +12,10 @@ import {
   UserAvatarGroupModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
-import { NgxsModule } from '@ngxs/store';
 import { ProjectsComponent } from './projects.component';
 import { BoardCreateModalComponent } from './shared/components/board-create-modal/board-create-modal.component';
 import { ProjectCardComponent } from './shared/components/project-card/project-card.component';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
-import { ProjectsState } from './state/projects.state';
 
 @NgModule({
   imports: [
@@ -34,7 +32,6 @@ import { ProjectsState } from './state/projects.state';
     ReactiveFormsModule,
     FormsModule,
     PageHeaderModule,
-    NgxsModule.forFeature([ProjectsState]),
     IconModule,
     UserAvatarGroupModule,
     ModalModule,

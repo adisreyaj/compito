@@ -1,6 +1,10 @@
-import { UpdateMembersRequest } from '@compito/api-interfaces';
+import { OrganizationRequest, UpdateMembersRequest } from '@compito/api-interfaces';
 
 export namespace OrgsAction {
+  export class Add {
+    static readonly type = '[Orgs] Add org';
+    constructor(public payload: OrganizationRequest) {}
+  }
   export class GetAll {
     static readonly type = '[Orgs] Get All';
     constructor() {}
