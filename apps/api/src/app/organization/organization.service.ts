@@ -1,12 +1,9 @@
-import { OrganizationRequest, RequestParamsDto } from '@compito/api-interfaces';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { OrganizationRequest, RequestParamsDto, UpdateMembersRequest } from '@compito/api-interfaces';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from '../prisma.service';
+import { USER_BASIC_DETAILS } from '../task/task.config';
 
 @Injectable()
 export class OrganizationService {
@@ -52,6 +49,20 @@ export class OrganizationService {
         where: {
           id,
         },
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          members: {
+            select: USER_BASIC_DETAILS,
+          },
+          boards: true,
+          name: true,
+          projects: true,
+          slug: true,
+          tags: true,
+          tasks: true,
+        },
       });
       if (org) {
         return org;
@@ -83,6 +94,68 @@ export class OrganizationService {
         }
       }
       this.logger.error('Failed to update org', error);
+      return new InternalServerErrorException();
+    }
+  }
+
+  async updateMembers(id: string, data: UpdateMembersRequest) {
+    try {
+      let updateData: Prisma.OrganizationUpdateInput = {};
+      switch (data.type) {
+        case 'modify':
+          {
+            const itemsToRemove = data?.remove?.length > 0 ? data.remove.map((id) => ({ id })) : [];
+            const itemsToAdd = data?.add?.length > 0 ? data.add.map((id) => ({ id })) : [];
+            updateData = {
+              members: {
+                disconnect: itemsToRemove,
+                connect: itemsToAdd,
+              },
+            };
+          }
+          break;
+        case 'set':
+          {
+            const itemsToSet = data?.set.length > 0 ? data.set.map((id) => ({ id })) : [];
+            updateData = {
+              members: {
+                set: itemsToSet,
+              },
+            };
+          }
+          break;
+      }
+      const project = await this.prisma.organization.update({
+        where: {
+          id,
+        },
+        data: updateData,
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          members: {
+            select: USER_BASIC_DETAILS,
+          },
+          boards: true,
+          name: true,
+          projects: true,
+          slug: true,
+          tags: true,
+          tasks: true,
+        },
+      });
+      if (project) {
+        return project;
+      }
+      return new NotFoundException();
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          return new NotFoundException();
+        }
+      }
+      this.logger.error('Failed to update members', error);
       return new InternalServerErrorException();
     }
   }

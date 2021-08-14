@@ -1,15 +1,5 @@
-import { OrganizationRequest, RequestParamsDto } from '@compito/api-interfaces';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { OrganizationRequest, RequestParamsDto, UpdateMembersRequest } from '@compito/api-interfaces';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
 import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
 import { PermissionsGuard } from 'apps/api/src/app/core/guards/permissions.guard';
@@ -42,6 +32,14 @@ export class OrganizationController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.organizationService.findOne(id);
+  }
+
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('super-admin')
+  @Permissions(PERMISSIONS.org.update)
+  @Patch(':id/members')
+  updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest) {
+    return this.organizationService.updateMembers(id, data);
   }
 
   @UseGuards(PermissionsGuard)

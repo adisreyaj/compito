@@ -20,3 +20,8 @@ export interface UserRequest extends UserBase {
   orgId: string;
   password: string;
 }
+
+export type UpdateMembersRequestType = 'modify' | 'set';
+type ModifyMembers = { type: 'modify'; add?: string[]; remove?: string[] };
+type SetMembers = { type: 'set'; set: string[] };
+export type UpdateMembersRequest = ModifyMembers | SetMembers; 

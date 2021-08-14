@@ -1,4 +1,4 @@
-import { ProjectRequest, RequestParamsDto, UpdateProjectMembersRequest, UserPayload } from '@compito/api-interfaces';
+import { ProjectRequest, RequestParamsDto, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
 import {
   Injectable,
   InternalServerErrorException,
@@ -129,7 +129,7 @@ export class ProjectService {
     }
   }
 
-  async updateMembers(id: string, data: UpdateProjectMembersRequest) {
+  async updateMembers(id: string, data: UpdateMembersRequest) {
     try {
       let updateData: Prisma.ProjectUpdateInput = {};
       switch (data.type) {
@@ -180,7 +180,7 @@ export class ProjectService {
           return new NotFoundException();
         }
       }
-      this.logger.error('Failed to update project', error);
+      this.logger.error('Failed to update members', error);
       return new InternalServerErrorException();
     }
   }
