@@ -11,7 +11,13 @@ import { OrgsState } from './state/orgs.state';
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild([{ path: '', component: OrgsComponent }]),
+    RouterModule.forChild([
+      { path: '', component: OrgsComponent },
+      {
+        path: ':id',
+        loadChildren: () => import('./pages/orgs-detail/orgs-detail.module').then((m) => m.OrgsDetailModule),
+      },
+    ]),
     PageHeaderModule,
     NgxsModule.forFeature([OrgsState]),
     TippyModule,

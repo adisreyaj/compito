@@ -10,7 +10,7 @@ import { Organization } from '@compito/api-interfaces';
       <header class="flex items-center justify-between">
         <div>
           <div class="flex items-center justify-between">
-            <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/projects', data.id]">
+            <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/orgs', data.id]">
               {{ data?.name }}
             </p>
             <button [tippy]="moreOptions" placement="bottom-start" variation="menu" class="text-gray-500">

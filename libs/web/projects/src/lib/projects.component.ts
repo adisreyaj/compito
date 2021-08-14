@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Project } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
@@ -52,10 +53,13 @@ export class ProjectsComponent implements OnInit {
   @Select(ProjectsState.getAllProjects)
   projects$!: Observable<Project[]>;
 
-  constructor(private dialog: DialogService, private store: Store) {}
+  constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.store.dispatch(new ProjectsAction.GetAll({}));
+    if (this.isAddNewRoute) {
+      this.createNew();
+    }
   }
 
   createNew() {
@@ -65,5 +69,9 @@ export class ProjectsComponent implements OnInit {
         this.store.dispatch(new ProjectsAction.Add(data));
       }
     });
+  }
+
+  private get isAddNewRoute() {
+    return this.activatedRoute.snapshot.url[0]?.path === 'add';
   }
 }

@@ -24,6 +24,7 @@ import { ProjectsState } from './state/projects.state';
     CommonModule,
     RouterModule.forChild([
       { path: '', pathMatch: 'full', component: ProjectsComponent },
+      { path: 'add', component: ProjectsComponent },
       {
         path: ':id',
         loadChildren: () =>

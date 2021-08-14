@@ -7,10 +7,12 @@ import { OrgsAction } from './orgs.actions';
 
 export class OrgsStateModel {
   public orgs: Organization[] = [];
+  public orgDetail: Organization | null = null;
 }
 
-const defaults = {
+const defaults: OrgsStateModel = {
   orgs: [],
+  orgDetail: null,
 };
 
 @State<OrgsStateModel>({
@@ -23,6 +25,10 @@ export class OrgsState {
   static getAllOrgs(state: OrgsStateModel) {
     return state.orgs;
   }
+  @Selector()
+  static getOrgDetail(state: OrgsStateModel) {
+    return state.orgDetail;
+  }
 
   constructor(private orgService: OrgService) {}
 
@@ -33,6 +39,24 @@ export class OrgsState {
         patchState({
           orgs: result.payload,
         });
+      }),
+    );
+  }
+
+  @Action(OrgsAction.Get)
+  get({ patchState }: StateContext<OrgsStateModel>, { id }: OrgsAction.Get) {
+    return this.orgService.getSingle(id).pipe(
+      tap((data) => {
+        patchState({ orgDetail: data });
+      }),
+    );
+  }
+
+  @Action(OrgsAction.UpdateMembers)
+  updateMembers({ patchState }: StateContext<OrgsStateModel>, { id, payload }: OrgsAction.UpdateMembers) {
+    return this.orgService.updateMembers(id, payload).pipe(
+      tap((data) => {
+        patchState({ orgDetail: data });
       }),
     );
   }

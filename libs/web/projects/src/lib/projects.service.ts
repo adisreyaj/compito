@@ -6,7 +6,7 @@ import {
   MultiDocPayload,
   Project,
   ProjectRequest,
-  UpdateProjectMembersRequest,
+  UpdateMembersRequest,
 } from '@compito/api-interfaces';
 import { API_TOKEN } from '@compito/web/ui';
 
@@ -29,7 +29,7 @@ export class ProjectsService {
   getSingle(id: string) {
     return this.http.get<Project>(`${this.api}/${id}`);
   }
-  updateMembers(id: string, data: UpdateProjectMembersRequest) {
+  updateMembers(id: string, data: UpdateMembersRequest) {
     return this.http.patch<Project>(`${this.api}/${id}/members`, data);
   }
 

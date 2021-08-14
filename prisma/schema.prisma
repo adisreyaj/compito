@@ -38,7 +38,7 @@ model Organization {
   slug      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  users     User[]
+  members   User[]
   projects  Project[]
   tasks     Task[]
   tags      Tag[]
