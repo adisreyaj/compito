@@ -4,7 +4,7 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
 }
 
 model User {
@@ -16,7 +16,7 @@ model User {
   image             String?
   blocked           Boolean        @default(false)
   verified          Boolean        @default(false)
-  org               Organization[]
+  orgs              Organization[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   taskAssignedBy    Task[]         @relation("assignedBy")
@@ -29,19 +29,22 @@ model User {
   comments          Comment[]
   boards            Board[]
   projectsCreated   Project[]      @relation("projectCreatedBy")
+  orgsCreated       Organization[] @relation("orgCreatedBy")
 }
 
 model Organization {
-  id        String    @id @default(cuid())
-  name      String
-  slug      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  members   User[]
-  projects  Project[]
-  tasks     Task[]
-  tags      Tag[]
-  boards    Board[]
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   User      @relation("orgCreatedBy", fields: [createdById], references: [id])
+  createdById String
+  members     User[]
+  projects    Project[]
+  tasks       Task[]
+  tags        Tag[]
+  boards      Board[]
 }
 
 model Project {
