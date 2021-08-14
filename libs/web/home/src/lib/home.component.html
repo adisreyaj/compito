@@ -1,0 +1,8 @@
+<section class="grid px-8 mt-10 cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+  <div>
+    <compito-task-list [data]="recentTasks$ | async" title="Recently Added Tasks"></compito-task-list>
+  </div>
+  <div>
+    <compito-task-list [data]="hightPriorityTasks$ | async" title="Higher Priority Tasks"></compito-task-list>
+  </div>
+</section>
