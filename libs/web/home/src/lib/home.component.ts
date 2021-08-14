@@ -8,7 +8,18 @@ import { HomeState } from './state/home.state';
 @Component({
   selector: 'compito-home',
   templateUrl: './home.component.html',
-  styles: [],
+  styles: [
+    `
+      .projects {
+        &__container {
+          @apply pb-10;
+        }
+        &__list {
+          @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4;
+        }
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {

@@ -5,15 +5,15 @@ import { Task } from '@compito/api-interfaces';
   selector: 'compito-task-list',
   template: `
     <div>
-      <h3 class="mb-4 text-lg font-medium">{{ title }}</h3>
+      <compito-section-header [title]="title"></compito-section-header>
       <ul *ngIf="data && data.length > 0" class="shadow-md rounded-md border">
         <li
           *ngFor="let task of data"
-          class="border-b p-2 last:border-b-0 cursor-pointer hover:bg-gray-50 transition-all duration-200"
+          class="border-b p-2 group last:border-b-0 cursor-pointer hover:bg-gray-50 transition-all duration-200"
           [routerLink]="['/boards', task.board.id, 'tasks', task.id]"
         >
           <header>
-            <p class="">
+            <p class="group-hover:text-primary">
               {{ task?.title }}
             </p>
           </header>
