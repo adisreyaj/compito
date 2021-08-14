@@ -1,4 +1,4 @@
-import { OrganizationRequest, RequestParamsDto, UpdateMembersRequest } from '@compito/api-interfaces';
+import { OrganizationRequest, RequestParams, UpdateMembersRequest } from '@compito/api-interfaces';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
 import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
@@ -23,7 +23,7 @@ export class OrganizationController {
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.read)
   @Get()
-  findAll(@Query() query: RequestParamsDto) {
+  findAll(@Query() query: RequestParams) {
     return this.organizationService.findAll(query);
   }
 

@@ -1,4 +1,4 @@
-import { BoardRequest, RequestParamsDto, RequestWithUser } from '@compito/api-interfaces';
+import { BoardRequest, RequestParams, RequestWithUser } from '@compito/api-interfaces';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
@@ -23,7 +23,7 @@ export class BoardsController {
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.read)
   @Get()
-  findAll(@Query() query: RequestParamsDto) {
+  findAll(@Query() query: RequestParams) {
     return this.boardService.findAll(query);
   }
 

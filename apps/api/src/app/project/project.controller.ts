@@ -1,4 +1,4 @@
-import { ProjectRequest, RequestParamsDto, RequestWithUser, UpdateMembersRequest } from '@compito/api-interfaces';
+import { ProjectRequest, RequestParams, RequestWithUser, UpdateMembersRequest } from '@compito/api-interfaces';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
 import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
@@ -23,7 +23,7 @@ export class ProjectController {
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.read)
   @Get()
-  findAll(@Query() query: RequestParamsDto) {
+  findAll(@Query() query: RequestParams) {
     return this.projectService.findAll(query);
   }
 

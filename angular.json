@@ -205,6 +205,28 @@
         }
       }
     },
+    "web-home": {
+      "projectType": "library",
+      "root": "libs/web/home",
+      "sourceRoot": "libs/web/home/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/home"],
+          "options": {
+            "jestConfig": "libs/web/home/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/home/src/**/*.ts", "libs/web/home/src/**/*.html"]
+          }
+        }
+      }
+    },
     "web-orgs": {
       "projectType": "library",
       "root": "libs/web/orgs",

@@ -1,4 +1,4 @@
-import { RequestParamsDto, RequestWithUser, TaskRequest } from '@compito/api-interfaces';
+import { RequestParams, RequestWithUser, TaskRequest } from '@compito/api-interfaces';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PERMISSIONS } from '../core/config/permissions.config';
@@ -25,16 +25,16 @@ export class TaskController {
   @Role('user')
   @Permissions(PERMISSIONS.task.read)
   @Get()
-  findAll(@Query() query: RequestParamsDto) {
+  findAll(@Query() query: RequestParams) {
     return this.taskService.findAll(query);
   }
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('user')
   @Permissions(PERMISSIONS.task.read)
   @Get('my')
-  findMyTasks(@Query() query: RequestParamsDto, @Req() req: RequestWithUser) {
+  findMyTasks(@Query() query: RequestParams & { [key: string]: string }, @Req() req: RequestWithUser) {
     const { userId } = getUserDetails(req.user);
-    const where: Prisma.TaskWhereInput = {
+    let where: Prisma.TaskWhereInput = {
       assignees: {
         some: {
           id: userId,

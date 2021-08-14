@@ -1,7 +1,8 @@
-import { OrganizationRequest, RequestParamsDto, UpdateMembersRequest } from '@compito/api-interfaces';
+import { OrganizationRequest, RequestParams, UpdateMembersRequest } from '@compito/api-interfaces';
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
 
@@ -22,8 +23,8 @@ export class OrganizationService {
     }
   }
 
-  async findAll(query: RequestParamsDto) {
-    const { skip, limit, search = null } = query;
+  async findAll(query: RequestParams) {
+    const { skip, limit, search = null } = parseQuery(query);
     try {
       const count$ = this.prisma.organization.count();
       const orgs$ = this.prisma.organization.findMany({

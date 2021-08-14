@@ -1,14 +1,15 @@
-import { ProjectRequest, RequestParamsDto, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
+import { ProjectRequest, RequestParams, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
 import {
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
+import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
 
@@ -41,13 +42,16 @@ export class ProjectService {
     }
   }
 
-  async findAll(query: RequestParamsDto) {
-    const { skip, limit } = query;
+  async findAll(query: RequestParams) {
+    const { skip, limit, sort = 'updatedAt', order = 'desc' } = parseQuery(query);
     try {
       const count$ = this.prisma.project.count();
       const orgs$ = this.prisma.project.findMany({
         skip,
         take: limit,
+        orderBy: {
+          [sort]:order
+        }
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -58,7 +62,7 @@ export class ProjectService {
       };
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -80,10 +84,10 @@ export class ProjectService {
       if (project) {
         return project;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to fetch project', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -117,15 +121,15 @@ export class ProjectService {
       if (project) {
         return project;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update project', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -173,15 +177,15 @@ export class ProjectService {
       if (project) {
         return project;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update members', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -195,10 +199,10 @@ export class ProjectService {
       if (project) {
         return project;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to delete project', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 }

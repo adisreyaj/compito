@@ -1,4 +1,4 @@
-import { BoardRequest, RequestParamsDto, UserPayload } from '@compito/api-interfaces';
+import { BoardRequest, RequestParams, UserPayload } from '@compito/api-interfaces';
 import {
   Injectable,
   InternalServerErrorException,
@@ -9,6 +9,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
+import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { GET_SINGLE_BOARD_SELECT } from './boards.config';
 
@@ -39,8 +40,8 @@ export class BoardsService {
     }
   }
 
-  async findAll(query: RequestParamsDto) {
-    const { skip, limit } = query;
+  async findAll(query: RequestParams) {
+    const { skip, limit } = parseQuery(query);
     try {
       const count$ = this.prisma.board.count();
       const orgs$ = this.prisma.board.findMany({

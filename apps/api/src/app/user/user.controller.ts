@@ -1,4 +1,4 @@
-import { RequestParamsDto, RequestWithUser, UserRequest } from '@compito/api-interfaces';
+import { RequestParams, RequestWithUser, UserRequest } from '@compito/api-interfaces';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
@@ -23,7 +23,7 @@ export class UserController {
   @Permissions(PERMISSIONS.user.read)
   @Role('project-admin')
   @Get('')
-  findAll(@Query() query: RequestParamsDto & { projectId?: string }, @Req() req: RequestWithUser) {
+  findAll(@Query() query: RequestParams & { projectId?: string }, @Req() req: RequestWithUser) {
     return this.userService.findAll(query, req.user);
   }
 

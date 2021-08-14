@@ -22,6 +22,9 @@
       "@compito/web/boards/*": [
         "libs/web/boards/src/lib/*"
       ],
+      "@compito/web/home": [
+        "libs/web/home/src/index.ts"
+      ],
       "@compito/web/orgs": ["libs/web/orgs/src/index.ts"],
       "@compito/web/profile": ["libs/web/profile/src/index.ts"],
       "@compito/web/projects": ["libs/web/projects/src/index.ts"],

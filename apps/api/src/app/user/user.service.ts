@@ -1,9 +1,10 @@
-import { RequestParamsDto, User, UserPayload, UserRequest } from '@compito/api-interfaces';
+import { RequestParams, User, UserPayload, UserRequest } from '@compito/api-interfaces';
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { AppMetadata, ManagementClient, UserMetadata } from 'auth0';
 import { getUserDetails } from '../core/utils/payload.util';
+import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { GET_SINGLE_USER_SELECT } from './user.config';
 @Injectable()
@@ -82,7 +83,7 @@ export class UserService {
     });
   }
 
-  async findAll(query: RequestParamsDto & { projectId?: string }, user: UserPayload) {
+  async findAll(query: RequestParams & { projectId?: string }, user: UserPayload) {
     const { org, role } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {};
     switch (role) {
@@ -116,7 +117,7 @@ export class UserService {
         };
       }
     }
-    const { skip, limit } = query;
+    const { skip, limit } = parseQuery(query);
     try {
       const count$ = this.prisma.user.count({ where: whereCondition });
       const orgs$ = this.prisma.user.findMany({

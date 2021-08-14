@@ -56,6 +56,8 @@
     "@types/lodash.groupby": "^4.6.6",
     "angular-remix-icon": "^2.0.0",
     "auth0": "^2.36.1",
+    "class-transformer": "^0.4.0",
+    "class-validator": "^0.13.1",
     "compression": "^1.7.4",
     "cuid": "^2.1.8",
     "express-rate-limit": "^5.3.0",

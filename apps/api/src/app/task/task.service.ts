@@ -1,8 +1,9 @@
-import { RequestParamsDto, TaskRequest, UserPayload } from '@compito/api-interfaces';
+import { RequestParams, TaskRequest, UserPayload } from '@compito/api-interfaces';
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Priority, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
+import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { GET_SINGLE_TASK_SELECT } from './task.config';
 
@@ -44,13 +45,24 @@ export class TaskService {
     }
   }
 
-  async findAll(query: RequestParamsDto, where: Prisma.TaskWhereInput = {}) {
-    const { skip, limit } = query;
+  async findAll(query: RequestParams, where: Prisma.TaskWhereInput = {}) {
+    const { skip, limit, sort = 'updatedAt', order = 'asc' } = parseQuery(query);
+    if (Object.prototype.hasOwnProperty.call(query, 'priority')) {
+      where = {
+        ...where,
+        priority: {
+          in: query.priority.split(',') as any[],
+        },
+      };
+    }
     try {
       const count$ = this.prisma.task.count({ where });
       const orgs$ = this.prisma.task.findMany({
         where,
         skip,
+        orderBy: {
+          [sort]: order,
+        },
         take: limit,
         select: GET_SINGLE_TASK_SELECT,
       });
