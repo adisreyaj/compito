@@ -12,7 +12,7 @@ import { ModalActionsDirective } from 'libs/web/ui/src/components/modal/modal-ac
     <section class="flex-1 mt-6">
       <ng-content></ng-content>
     </section>
-    <footer>
+    <footer class="mt-4">
       <ng-container *ngTemplateOutlet="modalActions?.tpl || defaultFooterAction"></ng-container>
     </footer>
 

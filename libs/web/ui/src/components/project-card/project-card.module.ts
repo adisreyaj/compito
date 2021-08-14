@@ -6,10 +6,11 @@ import { TimeAgoModule } from '../../pipes/time-ago/time-ago.module';
 import { IconModule } from '../icon/icon.module';
 import { UserAvatarGroupModule } from '../user-avatar-group';
 import { ProjectCardComponent } from './project-card.component';
+import { ProjectMiniCardComponent } from './project-mini-card.component';
 
 @NgModule({
-  declarations: [ProjectCardComponent],
+  declarations: [ProjectCardComponent, ProjectMiniCardComponent],
   imports: [CommonModule, IconModule, TippyModule, UserAvatarGroupModule, TimeAgoModule, RouterModule],
-  exports: [ProjectCardComponent],
+  exports: [ProjectCardComponent, ProjectMiniCardComponent],
 })
 export class ProjectCardModule {}
