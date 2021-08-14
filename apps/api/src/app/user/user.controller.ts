@@ -2,6 +2,7 @@ import { RequestParams, RequestWithUser, UserRequest, UserSignupRequest } from '
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
+import { Public } from '../core/decorators/public.decorator';
 import { Role } from '../core/decorators/roles.decorator';
 import { PermissionsGuard } from '../core/guards/permissions.guard';
 import { RolesGuard } from '../core/guards/roles.guard';
@@ -30,11 +31,11 @@ export class UserController {
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {}
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.userService.find(id, req.user);
+  }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
-  @Permissions(PERMISSIONS.user.create)
-  @Role('org-admin')
+  @Public()
   @Post('signup')
   signup(@Body() user: UserSignupRequest) {
     return this.userService.signup(user);
@@ -43,10 +44,14 @@ export class UserController {
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() user: UserRequest) {}
+  update(@Param('id') id: string, @Body() user: UserRequest, @Req() req: RequestWithUser) {
+    return this.userService.updateUser(id, user, req.user);
+  }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {}
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.userService.deleteUser(id, req.user);
+  }
 }
