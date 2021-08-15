@@ -1,10 +1,10 @@
-import { BoardRequest, RequestParams, UserPayload } from '@compito/api-interfaces';
+import { BoardRequest, RequestParams, Role, Roles, UserPayload } from '@compito/api-interfaces';
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -18,16 +18,47 @@ export class BoardsService {
   private logger = new Logger('BOARD');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: BoardRequest, user: UserPayload) {
-    const { org, role, userId } = getUserDetails(user);
-    if (role.name !== 'super-admin' && data.orgId !== org) {
-      throw new UnauthorizedException('No access to create board');
+  async create(data: BoardRequest, user: UserPayload, currentOrg: string) {
+    const { orgs, role, userId } = getUserDetails(user);
+    switch (role.name as Roles) {
+      case 'user':
+        throw new ForbiddenException('No permission to create board');
+      case 'project-admin': {
+        try {
+          const projectData = await this.prisma.project.findUnique({
+            where: {
+              id: data.projectId,
+            },
+            select: {
+              members: {
+                where: {
+                  id: userId,
+                },
+              },
+            },
+            rejectOnNotFound: true,
+          });
+          const userPartOfProject = projectData?.members.length > 0;
+          if (!userPartOfProject) {
+            throw new ForbiddenException('No permission to create board');
+          }
+        } catch (error) {
+          if (error?.name === 'NotFoundError') {
+            throw new NotFoundException('Project not found');
+          }
+        }
+      }
+
+      default:
+        if (!orgs.includes(currentOrg)) {
+          throw new ForbiddenException('No permission to create board');
+        }
     }
     try {
       const boardData: Prisma.BoardUncheckedCreateInput = {
         ...data,
         lists: data.lists as any[],
-        orgId: org,
+        orgId: currentOrg,
         createdById: userId,
       };
       const board = await this.prisma.board.create({
@@ -40,11 +71,51 @@ export class BoardsService {
     }
   }
 
-  async findAll(query: RequestParams) {
+  async findAll(query: RequestParams, user: UserPayload, currentOrg: string) {
+    const { role, userId } = getUserDetails(user);
+    let where: Prisma.BoardWhereInput = {
+      orgId: currentOrg,
+    };
+
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin':
+        {
+          try {
+            const projectData = await this.prisma.project.findMany({
+              where: {
+                members: {
+                  some: {
+                    id: userId,
+                  },
+                },
+              },
+              select: {
+                id: true,
+              },
+            });
+            const projectsAccessibleByUser = projectData.map(({ id }) => id);
+            where = {
+              ...where,
+              projectId: {
+                in: projectsAccessibleByUser,
+              },
+            };
+          } catch (error) {
+            if (error?.name === 'NotFoundError') {
+              throw new NotFoundException('Project not found');
+            }
+          }
+        }
+        break;
+      default:
+        break;
+    }
     const { skip, limit } = parseQuery(query);
     try {
-      const count$ = this.prisma.board.count();
+      const count$ = this.prisma.board.count({ where });
       const orgs$ = this.prisma.board.findMany({
+        where,
         skip,
         take: limit,
       });
@@ -61,15 +132,43 @@ export class BoardsService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user: UserPayload, currentOrg: string) {
+    const { role, userId } = getUserDetails(user);
     try {
       const board = await this.prisma.board.findUnique({
         where: {
           id,
         },
-        select: GET_SINGLE_BOARD_SELECT,
+        select: {
+          ...GET_SINGLE_BOARD_SELECT,
+          project: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              members: {
+                where: {
+                  id: userId,
+                },
+              },
+            },
+          },
+        },
       });
       if (board) {
+        switch (role.name as Roles) {
+          case 'user':
+          case 'project-admin': {
+            const userHasAccessToBoard = board.project.members.length > 0;
+            if (!userHasAccessToBoard) {
+              throw new ForbiddenException('No access to project');
+            }
+            break;
+          }
+          default:
+            break;
+        }
+        delete board.project.members;
         return board;
       }
       return new NotFoundException();
@@ -79,7 +178,9 @@ export class BoardsService {
     }
   }
 
-  async update(id: string, req: BoardRequest) {
+  async update(id: string, req: BoardRequest, user: UserPayload, currentOrg: string) {
+    const { role, userId, orgs } = getUserDetails(user);
+    await canUpdateBoard(role, id, userId, orgs, currentOrg, 'update');
     try {
       const { lists, name, description } = req;
       const data: Prisma.BoardUncheckedUpdateInput = {
@@ -93,7 +194,6 @@ export class BoardsService {
         },
         data,
       });
-      this.logger.debug(board);
       if (board) {
         return board;
       }
@@ -109,7 +209,9 @@ export class BoardsService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: UserPayload, currentOrg: string) {
+    const { role, userId, orgs } = getUserDetails(user);
+    await canUpdateBoard(role, id, userId, orgs, currentOrg, 'delete');
     try {
       const board = await this.prisma.board.delete({
         where: {
@@ -124,5 +226,50 @@ export class BoardsService {
       this.logger.error('Failed to delete board', error);
       return new InternalServerErrorException();
     }
+  }
+}
+async function canUpdateBoard(
+  role: Role,
+  id: string,
+  userId: string,
+  orgs: string[],
+  currentOrg: string,
+  operation: string,
+) {
+  switch (role.name as Roles) {
+    case 'user':
+      throw new ForbiddenException(`No permission to ${operation} board`);
+    case 'project-admin': {
+      try {
+        const boardData = await this.prisma.board.findUnique({
+          where: { id },
+          select: {
+            project: {
+              select: {
+                members: {
+                  where: {
+                    id: userId,
+                  },
+                },
+              },
+            },
+          },
+        });
+        const userPartOfProject = boardData?.project?.members?.length > 0;
+        if (!userPartOfProject) {
+          throw new ForbiddenException(`No permission to ${operation} board`);
+        }
+      } catch (error) {
+        if (error?.name === 'NotFoundError') {
+          throw new NotFoundException('Board not found');
+        }
+      }
+      break;
+    }
+    default:
+      if (!orgs.includes(currentOrg)) {
+        throw new ForbiddenException(`No permission to ${operation} board`);
+      }
+      break;
   }
 }

@@ -16,37 +16,42 @@ export class BoardsController {
   @Permissions(PERMISSIONS.board.create)
   @Post()
   create(@Body() board: BoardRequest, @Req() req: RequestWithUser) {
-    return this.boardService.create(board, req.user);
+    const currentOrg = req.headers['x-org'] as string;
+    return this.boardService.create(board, req.user, currentOrg);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.read)
   @Get()
-  findAll(@Query() query: RequestParams) {
-    return this.boardService.findAll(query);
+  findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
+    const currentOrg = req.headers['x-org'] as string;
+    return this.boardService.findAll(query, req.user, currentOrg);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.board.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.boardService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const currentOrg = req.headers['x-org'] as string;
+    return this.boardService.findOne(id, req.user, currentOrg);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() board: BoardRequest) {
-    return this.boardService.update(id, board);
+  update(@Param('id') id: string, @Body() board: BoardRequest, @Req() req: RequestWithUser) {
+    const currentOrg = req.headers['x-org'] as string;
+    return this.boardService.update(id, board, req.user, currentOrg);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.boardService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const currentOrg = req.headers['x-org'] as string;
+    return this.boardService.remove(id, req.user, currentOrg);
   }
 }

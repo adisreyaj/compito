@@ -33,6 +33,7 @@ export class ProjectController {
   @Permissions(PERMISSIONS.project.read)
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const currentOrg = req.headers['x-org'] as string;
     return this.projectService.findOne(id, req.user);
   }
 
@@ -40,23 +41,23 @@ export class ProjectController {
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.update)
   @Patch(':id/members')
-  updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest) {
-    return this.projectService.updateMembers(id, data);
+  updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest, @Req() req: RequestWithUser) {
+    return this.projectService.updateMembers(id, data, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() project: ProjectRequest) {
-    return this.projectService.update(id, project);
+  update(@Param('id') id: string, @Body() project: ProjectRequest, @Req() req: RequestWithUser) {
+    return this.projectService.update(id, project, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.projectService.remove(id, req.user);
   }
 }
