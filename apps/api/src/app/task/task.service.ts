@@ -14,7 +14,7 @@ export class TaskService {
 
   async create(data: TaskRequest, user: UserPayload) {
     try {
-      const { orgs, userId } = getUserDetails(user);
+      const { org, userId } = getUserDetails(user);
       const { assignees, priority, tags, boardId, projectId, ...rest } = data;
       let taskData: Prisma.TaskCreateInput = {
         ...rest,

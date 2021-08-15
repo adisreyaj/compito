@@ -30,31 +30,31 @@ export class OrganizationController {
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.org.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.organizationService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.organizationService.findOne(id, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id/members')
-  updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest) {
-    return this.organizationService.updateMembers(id, data);
+  updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest, @Req() req: RequestWithUser) {
+    return this.organizationService.updateMembers(id, data, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() organization: OrganizationRequest) {
-    return this.organizationService.update(id, organization);
+  update(@Param('id') id: string, @Body() organization: OrganizationRequest, @Req() req: RequestWithUser) {
+    return this.organizationService.update(id, organization, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.organizationService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.organizationService.remove(id, req.user);
   }
 }

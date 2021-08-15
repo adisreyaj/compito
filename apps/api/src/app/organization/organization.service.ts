@@ -84,7 +84,7 @@ export class OrganizationService {
   }
 
   async findOne(id: string, user: UserPayload) {
-    const { userId, role, orgs } = getUserDetails(user);
+    const { userId, role, org } = getUserDetails(user);
     let findOptions: Prisma.OrganizationFindFirstArgs = {
       where: {
         id,

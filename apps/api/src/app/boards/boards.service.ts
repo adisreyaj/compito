@@ -18,8 +18,8 @@ export class BoardsService {
   private logger = new Logger('BOARD');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: BoardRequest, user: UserPayload, currentOrg: string) {
-    const { orgs, role, userId } = getUserDetails(user);
+  async create(data: BoardRequest, user: UserPayload) {
+    const { org, role, userId } = getUserDetails(user);
     switch (role.name as Roles) {
       case 'user':
         throw new ForbiddenException('No permission to create board');
@@ -50,7 +50,7 @@ export class BoardsService {
       }
 
       default:
-        if (!orgs.includes(currentOrg)) {
+        if (data.orgId !== org) {
           throw new ForbiddenException('No permission to create board');
         }
     }
@@ -58,7 +58,7 @@ export class BoardsService {
       const boardData: Prisma.BoardUncheckedCreateInput = {
         ...data,
         lists: data.lists as any[],
-        orgId: currentOrg,
+        orgId: data.orgId,
         createdById: userId,
       };
       const board = await this.prisma.board.create({
@@ -71,10 +71,10 @@ export class BoardsService {
     }
   }
 
-  async findAll(query: RequestParams, user: UserPayload, currentOrg: string) {
-    const { role, userId } = getUserDetails(user);
+  async findAll(query: RequestParams, user: UserPayload) {
+    const { role, org, userId } = getUserDetails(user);
     let where: Prisma.BoardWhereInput = {
-      orgId: currentOrg,
+      orgId: org,
     };
 
     switch (role.name as Roles) {
@@ -132,7 +132,7 @@ export class BoardsService {
     }
   }
 
-  async findOne(id: string, user: UserPayload, currentOrg: string) {
+  async findOne(id: string, user: UserPayload) {
     const { role, userId } = getUserDetails(user);
     try {
       const board = await this.prisma.board.findUnique({
@@ -178,9 +178,9 @@ export class BoardsService {
     }
   }
 
-  async update(id: string, req: BoardRequest, user: UserPayload, currentOrg: string) {
-    const { role, userId, orgs } = getUserDetails(user);
-    await canUpdateBoard(role, id, userId, orgs, currentOrg, 'update');
+  update = async (id: string, req: BoardRequest, user: UserPayload) => {
+    const { role, userId, org } = getUserDetails(user);
+    await canUpdateBoard(this.prisma, role, id, userId, org, 'update');
     try {
       const { lists, name, description } = req;
       const data: Prisma.BoardUncheckedUpdateInput = {
@@ -207,11 +207,11 @@ export class BoardsService {
       this.logger.error('Failed to update board', error);
       return new InternalServerErrorException();
     }
-  }
+  };
 
-  async remove(id: string, user: UserPayload, currentOrg: string) {
-    const { role, userId, orgs } = getUserDetails(user);
-    await canUpdateBoard(role, id, userId, orgs, currentOrg, 'delete');
+  remove = async (id: string, user: UserPayload) => {
+    const { role, userId, org } = getUserDetails(user);
+    await canUpdateBoard(this.prisma, role, id, userId, org, 'delete');
     try {
       const board = await this.prisma.board.delete({
         where: {
@@ -226,22 +226,23 @@ export class BoardsService {
       this.logger.error('Failed to delete board', error);
       return new InternalServerErrorException();
     }
-  }
+  };
 }
-async function canUpdateBoard(
+
+const canUpdateBoard = async (
+  prisma: PrismaService,
   role: Role,
   id: string,
   userId: string,
-  orgs: string[],
-  currentOrg: string,
+  org: string,
   operation: string,
-) {
+) => {
   switch (role.name as Roles) {
     case 'user':
       throw new ForbiddenException(`No permission to ${operation} board`);
     case 'project-admin': {
       try {
-        const boardData = await this.prisma.board.findUnique({
+        const boardData = await prisma.board.findUnique({
           where: { id },
           select: {
             project: {
@@ -266,10 +267,23 @@ async function canUpdateBoard(
       }
       break;
     }
-    default:
-      if (!orgs.includes(currentOrg)) {
-        throw new ForbiddenException(`No permission to ${operation} board`);
+    default: {
+      try {
+        const boardData = await prisma.board.findUnique({
+          where: { id },
+          select: {
+            orgId: true,
+          },
+        });
+        if (boardData.orgId !== org) {
+          throw new ForbiddenException(`No permission to ${operation} board`);
+        }
+      } catch (error) {
+        if (error?.name === 'NotFoundError') {
+          throw new NotFoundException('Board not found');
+        }
       }
       break;
+    }
   }
-}
+};

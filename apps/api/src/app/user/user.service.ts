@@ -86,7 +86,7 @@ export class UserService {
       throw new InternalServerErrorException('Failed to fetch user orgs');
     }
   }
-  async getUserProjects(userId: string, sessionToken: string) {
+  async getUserProjects(userId: string, orgId: string, sessionToken: string) {
     try {
       const secret = this.config.get('SESSION_TOKEN_SECRET');
       if (!secret) {
@@ -105,6 +105,9 @@ export class UserService {
             select: {
               id: true,
             },
+            where: {
+              orgId,
+            },
           },
         },
       });
@@ -113,6 +116,7 @@ export class UserService {
       }
       return user;
     } catch (error) {
+      this.logger.error(error);
       throw new InternalServerErrorException('Failed to fetch user orgs');
     }
   }
@@ -274,7 +278,7 @@ export class UserService {
   }
 
   async findAll(query: RequestParams, user: UserPayload) {
-    const { orgs, role, userId } = getUserDetails(user);
+    const { org, role, userId, projects } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {};
     switch (role.name) {
       /**
@@ -282,27 +286,13 @@ export class UserService {
        */
       case 'user':
         {
-          const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-              projects: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          });
-          if (!user) {
-            throw new InternalServerErrorException('Something went wrong');
-          }
-          const projectIds = user.projects.map(({ id }) => id) ?? [];
           whereCondition = {
             ...whereCondition,
             AND: [
               {
                 orgs: {
                   some: {
-                    id: { in: orgs },
+                    id: org,
                   },
                 },
               },
@@ -310,7 +300,7 @@ export class UserService {
                 projects: {
                   some: {
                     id: {
-                      in: projectIds,
+                      in: projects ?? [],
                     },
                   },
                 },
@@ -327,7 +317,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: { in: orgs },
+              id: org,
             },
           },
         };
@@ -355,7 +345,7 @@ export class UserService {
     }
   }
   async find(id: string, user: UserPayload) {
-    const { orgs, role, userId } = getUserDetails(user);
+    const { org, role, projects } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {
       id,
     };
@@ -365,27 +355,13 @@ export class UserService {
        */
       case 'user':
         {
-          const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-              projects: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          });
-          if (!user) {
-            throw new InternalServerErrorException('Something went wrong');
-          }
-          const projectIds = user.projects.map(({ id }) => id) ?? [];
           whereCondition = {
             ...whereCondition,
             AND: [
               {
                 orgs: {
                   some: {
-                    id: { in: orgs },
+                    id: org,
                   },
                 },
               },
@@ -393,7 +369,7 @@ export class UserService {
                 projects: {
                   some: {
                     id: {
-                      in: projectIds,
+                      in: projects ?? [],
                     },
                   },
                 },
@@ -410,7 +386,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: { in: orgs },
+              id: org,
             },
           },
         };
@@ -432,7 +408,7 @@ export class UserService {
   }
 
   async updateUser(id: string, data: Partial<UserRequest>, user: UserPayload) {
-    const { userId, role } = getUserDetails(user);
+    const { userId, role, org } = getUserDetails(user);
     const updateUser = async () => {
       try {
         return await this.prisma.user.update({
@@ -451,6 +427,22 @@ export class UserService {
         case 'super-admin': {
           updateUser();
         }
+        case 'admin':
+          try {
+            const userData = await this.prisma.user.findUnique({
+              where: {
+                id,
+              },
+              select: {
+                id: true,
+                orgs: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            });
+          } catch (error) {}
         default: {
           throw new ForbiddenException('Not enough permissions to update the user details');
         }
@@ -461,7 +453,7 @@ export class UserService {
   }
 
   async deleteUser(id: string, user: UserPayload) {
-    const { userId, role, orgs } = getUserDetails(user);
+    const { userId, role, org } = getUserDetails(user);
     let userData;
     try {
       userData = await this.prisma.user.findUnique({
@@ -497,7 +489,7 @@ export class UserService {
       }
       case 'admin': {
         try {
-          const userInAdminOrg = userData.orgs.some(({ id }) => orgs.includes(id));
+          const userInAdminOrg = userData.orgs.findIndex(({ id }) => org === id) >= 0;
           if (!userInAdminOrg) {
             throw new ForbiddenException('Not enough permissions');
           }

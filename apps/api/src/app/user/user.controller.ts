@@ -45,13 +45,13 @@ export class UserController {
 
   // For Auth0 to access
   @Public()
-  @Get(':id/projects')
-  getUserProjects(@Param('id') userId: string, @Req() req: RequestWithUser) {
+  @Get(':id/orgs/:orgId/projects')
+  getUserProjects(@Param('id') userId: string, @Param('orgId') orgId: string, @Req() req: RequestWithUser) {
     const sessionToken = req.headers['x-session-token'] as string;
     if (!sessionToken) {
       throw new ForbiddenException('Not enough permissions');
     }
-    return this.userService.getUserProjects(userId, sessionToken);
+    return this.userService.getUserProjects(userId, orgId, sessionToken);
   }
 
   // For Auth0 to access

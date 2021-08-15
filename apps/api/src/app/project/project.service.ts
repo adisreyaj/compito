@@ -18,14 +18,14 @@ export class ProjectService {
   private logger = new Logger('PROJECT');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: ProjectRequest, user: UserPayload, currentOrg: string) {
-    const { orgs, role, userId } = getUserDetails(user);
+  async create(data: ProjectRequest, user: UserPayload) {
+    const { org, role, userId } = getUserDetails(user);
     switch (role.name) {
       case 'super-admin':
         break;
       case 'admin':
       case 'org-admin':
-        if (!orgs.includes(currentOrg)) {
+        if (data.orgId !== org) {
           throw new ForbiddenException('No permissions to create project');
         }
       default:
@@ -36,7 +36,7 @@ export class ProjectService {
         ...data,
         org: {
           connect: {
-            id: currentOrg,
+            id: data.orgId,
           },
         },
         createdBy: {
@@ -58,11 +58,11 @@ export class ProjectService {
     }
   }
 
-  async findAll(query: RequestParams, user: UserPayload, currentOrg: string) {
+  async findAll(query: RequestParams, user: UserPayload) {
     const { skip, limit, sort = 'updatedAt', order = 'desc' } = parseQuery(query);
-    const { orgs, role, userId } = getUserDetails(user);
+    const { org, role, userId } = getUserDetails(user);
     let where: Prisma.ProjectWhereInput = {
-      orgId: currentOrg,
+      orgId: org,
     };
     let select: Prisma.ProjectSelect = {
       id: true,
@@ -255,7 +255,7 @@ export class ProjectService {
   }
 
   async remove(id: string, user: UserPayload) {
-    const { role, userId, orgs } = getUserDetails(user);
+    const { role, userId, projects } = getUserDetails(user);
     switch (role.name as Roles) {
       case 'user':
       case 'project-admin':
@@ -263,7 +263,7 @@ export class ProjectService {
       case 'super-admin':
         break;
       default:
-        if (!orgs.includes(id)) {
+        if (!projects.includes(id)) {
           throw new ForbiddenException('No permission to delete the project');
         }
         break;

@@ -16,8 +16,7 @@ export class ProjectController {
   @Permissions(PERMISSIONS.project.create)
   @Post()
   create(@Body() project: ProjectRequest, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
-    return this.projectService.create(project, req.user, currentOrg);
+    return this.projectService.create(project, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
@@ -25,15 +24,13 @@ export class ProjectController {
   @Permissions(PERMISSIONS.project.read)
   @Get()
   findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
-    return this.projectService.findAll(query, req.user, currentOrg);
+    return this.projectService.findAll(query, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.read)
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
     return this.projectService.findOne(id, req.user);
   }
 

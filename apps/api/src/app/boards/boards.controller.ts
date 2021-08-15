@@ -16,8 +16,7 @@ export class BoardsController {
   @Permissions(PERMISSIONS.board.create)
   @Post()
   create(@Body() board: BoardRequest, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
-    return this.boardService.create(board, req.user, currentOrg);
+    return this.boardService.create(board, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
@@ -25,16 +24,14 @@ export class BoardsController {
   @Permissions(PERMISSIONS.board.read)
   @Get()
   findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
-    return this.boardService.findAll(query, req.user, currentOrg);
+    return this.boardService.findAll(query, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.board.read)
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
-    return this.boardService.findOne(id, req.user, currentOrg);
+    return this.boardService.findOne(id, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
@@ -42,8 +39,7 @@ export class BoardsController {
   @Permissions(PERMISSIONS.board.update)
   @Patch(':id')
   update(@Param('id') id: string, @Body() board: BoardRequest, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
-    return this.boardService.update(id, board, req.user, currentOrg);
+    return this.boardService.update(id, board, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
@@ -51,7 +47,6 @@ export class BoardsController {
   @Permissions(PERMISSIONS.board.delete)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: RequestWithUser) {
-    const currentOrg = req.headers['x-org'] as string;
-    return this.boardService.remove(id, req.user, currentOrg);
+    return this.boardService.remove(id, req.user);
   }
 }
