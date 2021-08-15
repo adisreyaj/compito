@@ -29,6 +29,7 @@ export class UserService {
     this.authClient = this.auth.auth;
   }
 
+  // TODO: add jwt based validation
   async getUserPermissions(userId: string, orgId: string) {
     try {
       const userRole = this.prisma.userRoleOrg.findFirst({
@@ -73,6 +74,36 @@ export class UserService {
             select: {
               id: true,
               name: true,
+            },
+          },
+        },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch user orgs');
+    }
+  }
+  async getUserProjects(userId: string, sessionToken: string) {
+    try {
+      const secret = this.config.get('SESSION_TOKEN_SECRET');
+      if (!secret) {
+        throw new Error('Please provide the Session Token Secret');
+      }
+      const token = verify(sessionToken, secret);
+      if (!token) {
+        throw new ForbiddenException('Session not valid. Please login again!');
+      }
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          projects: {
+            select: {
+              id: true,
             },
           },
         },
