@@ -1,0 +1,15 @@
+ngneat-dialog {
+  .ngneat-dialog-backdrop {
+    .ngneat-dialog-content {
+      @apply rounded-md shadow-xl;
+      .ngneat-drag-marker {
+      }
+      .ngneat-close-dialog {
+        @apply top-4 bg-gray-100 rounded-md hover:text-gray-800 hover:bg-gray-200;
+      }
+      .ngneat-dialog-primary-btn,
+      .ngneat-dialog-secondary-btn {
+      }
+    }
+  }
+}

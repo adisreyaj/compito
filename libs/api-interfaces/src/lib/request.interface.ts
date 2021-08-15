@@ -1,0 +1,34 @@
+export interface PaginationParams {
+  page: string;
+  limit: string;
+}
+
+export interface SearchParams {
+  search: string;
+}
+
+export interface RequestParams extends PaginationParams, SearchParams {}
+
+export class RequestParamsDto {
+  page!: number;
+  limit!: number;
+  skip!: number;
+  search!: string | null;
+  constructor(pageValue: string, limit: string, search: string) {
+    this.page = +pageValue;
+    this.limit = +limit;
+    this.skip = this.page * this.limit;
+    if (this.search != null && this.search != '') {
+      this.search = search;
+    }
+  }
+}
+
+export interface UserPayload {
+  'https://compito.adi.so/roles': string[];
+  'https://compito.adi.so/org': string;
+  'https://compito.adi.so/userId': string;
+  email: string;
+}
+
+export type RequestWithUser = Request & { user: UserPayload };

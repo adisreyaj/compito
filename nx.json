@@ -39,6 +39,30 @@
     "compito-e2e": {
       "tags": [],
       "implicitDependencies": ["compito"]
+    },
+    "web-boards": {
+      "tags": []
+    },
+    "web-orgs": {
+      "tags": []
+    },
+    "web-profile": {
+      "tags": []
+    },
+    "web-projects": {
+      "tags": []
+    },
+    "web-settings": {
+      "tags": []
+    },
+    "web-tasks": {
+      "tags": []
+    },
+    "web-ui": {
+      "tags": []
+    },
+    "web-users": {
+      "tags": []
     }
   }
 }

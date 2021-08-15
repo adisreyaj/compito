@@ -1,0 +1,50 @@
+/*-----------------------------------------
+ Custom Scrollbar Styles
+ -----------------------------------------*/
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 5px rgb(192, 192, 192);
+    box-shadow: inset 0 0 5px rgb(192, 192, 192);
+    border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-400;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* width */
+::scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+/* Track */
+::scrollbar-track {
+    -webkit-box-shadow: inset 0 0 5px rgb(192, 192, 192);
+    box-shadow: inset 0 0 5px rgb(192, 192, 192);
+    border-radius: 10px;
+}
+
+/* Handle */
+::scrollbar-thumb {
+    @apply bg-gray-400;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::scrollbar-thumb:hover {
+    background: var(--primary);
+}

@@ -80,16 +80,10 @@
             "polyfills": "apps/compito/src/polyfills.ts",
             "tsConfig": "apps/compito/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "apps/compito/src/favicon.ico",
-              "apps/compito/src/assets"
-            ],
+            "assets": ["apps/compito/src/favicon.ico", "apps/compito/src/assets"],
             "styles": ["apps/compito/src/styles.scss"],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "apps/compito/src/styles",
-                "apps/compito/src/styles/partials"
-              ]
+              "includePaths": ["apps/compito/src/styles", "apps/compito/src/styles/partials"]
             },
             "scripts": []
           },
@@ -150,10 +144,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/compito/src/**/*.ts",
-              "apps/compito/src/**/*.html"
-            ]
+            "lintFilePatterns": ["apps/compito/src/**/*.ts", "apps/compito/src/**/*.html"]
           }
         },
         "test": {
@@ -188,6 +179,182 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/compito-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
+    },
+    "web-boards": {
+      "projectType": "library",
+      "root": "libs/web/boards",
+      "sourceRoot": "libs/web/boards/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/boards"],
+          "options": {
+            "jestConfig": "libs/web/boards/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/boards/src/**/*.ts", "libs/web/boards/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-orgs": {
+      "projectType": "library",
+      "root": "libs/web/orgs",
+      "sourceRoot": "libs/web/orgs/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/orgs"],
+          "options": {
+            "jestConfig": "libs/web/orgs/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/orgs/src/**/*.ts", "libs/web/orgs/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-profile": {
+      "projectType": "library",
+      "root": "libs/web/profile",
+      "sourceRoot": "libs/web/profile/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/profile"],
+          "options": {
+            "jestConfig": "libs/web/profile/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/profile/src/**/*.ts", "libs/web/profile/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-projects": {
+      "projectType": "library",
+      "root": "libs/web/projects",
+      "sourceRoot": "libs/web/projects/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/projects"],
+          "options": {
+            "jestConfig": "libs/web/projects/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/projects/src/**/*.ts", "libs/web/projects/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-settings": {
+      "projectType": "library",
+      "root": "libs/web/settings",
+      "sourceRoot": "libs/web/settings/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/settings"],
+          "options": {
+            "jestConfig": "libs/web/settings/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/settings/src/**/*.ts", "libs/web/settings/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-tasks": {
+      "projectType": "library",
+      "root": "libs/web/tasks",
+      "sourceRoot": "libs/web/tasks/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/tasks"],
+          "options": {
+            "jestConfig": "libs/web/tasks/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/tasks/src/**/*.ts", "libs/web/tasks/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-ui": {
+      "projectType": "library",
+      "root": "libs/web/ui",
+      "sourceRoot": "libs/web/ui/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/ui"],
+          "options": {
+            "jestConfig": "libs/web/ui/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/ui/src/**/*.ts", "libs/web/ui/src/**/*.html"]
+          }
+        }
+      }
+    },
+    "web-users": {
+      "projectType": "library",
+      "root": "libs/web/users",
+      "sourceRoot": "libs/web/users/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/users"],
+          "options": {
+            "jestConfig": "libs/web/users/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/users/src/**/*.ts", "libs/web/users/src/**/*.html"]
           }
         }
       }

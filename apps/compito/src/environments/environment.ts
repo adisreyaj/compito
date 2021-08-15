@@ -4,6 +4,13 @@
 
 export const environment = {
   production: false,
+  api: 'http://localhost:3333/api',
+  auth: {
+    audience: 'compito-api',
+    domain: 'dev-2nisamv9.us.auth0.com',
+    clientId: 'Vo9QfkcZjyuldepohhcvgLzu7uGUa6C9',
+    redirectUri: window.location.origin,
+  },
 };
 
 /*
@@ -13,4 +20,5 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
+import 'zone.js/plugins/zone-error'; // Included with Angular CLI.
+

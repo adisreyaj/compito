@@ -1,5 +1,5 @@
 module.exports = {
-  purge: ['src/**/*.{ts,html}', 'projects/**/*.{ts,html}'],
+  purge: ['apps/**/*.{ts,html}', 'libs/web/**/*.{ts,html}'],
   mode: 'jit',
   darkMode: false,
   theme: {
@@ -12,5 +12,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/line-clamp')],
 };
