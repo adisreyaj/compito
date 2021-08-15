@@ -92,7 +92,6 @@ export class UserService {
       throw new Error('Please provide the auth DB name');
     }
     let role: Role;
-
     try {
       role = await this.prisma.role.findFirst({
         where: {
@@ -214,7 +213,7 @@ export class UserService {
           email,
           connection,
           user_metadata: {
-            org: orgId,
+            orgs: JSON.stringify([orgId]),
             userId: userId,
             roles: JSON.stringify(roles),
           },
@@ -244,7 +243,7 @@ export class UserService {
   }
 
   async findAll(query: RequestParams, user: UserPayload) {
-    const { org, role, userId } = getUserDetails(user);
+    const { orgs, role, userId } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {};
     switch (role.name) {
       /**
@@ -272,7 +271,7 @@ export class UserService {
               {
                 orgs: {
                   some: {
-                    id: org,
+                    id: { in: orgs },
                   },
                 },
               },
@@ -297,7 +296,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: org,
+              id: { in: orgs },
             },
           },
         };
@@ -325,7 +324,7 @@ export class UserService {
     }
   }
   async find(id: string, user: UserPayload) {
-    const { org, role, userId } = getUserDetails(user);
+    const { orgs, role, userId } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {
       id,
     };
@@ -355,7 +354,7 @@ export class UserService {
               {
                 orgs: {
                   some: {
-                    id: org,
+                    id: { in: orgs },
                   },
                 },
               },
@@ -380,7 +379,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: org,
+              id: { in: orgs },
             },
           },
         };
@@ -431,7 +430,7 @@ export class UserService {
   }
 
   async deleteUser(id: string, user: UserPayload) {
-    const { userId, role, org } = getUserDetails(user);
+    const { userId, role, orgs } = getUserDetails(user);
     let userData;
     try {
       userData = await this.prisma.user.findUnique({
@@ -467,7 +466,7 @@ export class UserService {
       }
       case 'admin': {
         try {
-          const userInAdminOrg = userData.orgs.some(({ id }) => id === org);
+          const userInAdminOrg = userData.orgs.some(({ id }) => orgs.includes(id));
           if (!userInAdminOrg) {
             throw new ForbiddenException('Not enough permissions');
           }

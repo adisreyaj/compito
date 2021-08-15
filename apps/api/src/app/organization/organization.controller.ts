@@ -12,7 +12,7 @@ export class OrganizationController {
   constructor(private organizationService: OrganizationService) {}
 
   @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('super-admin')
+  @Role('admin')
   @Permissions(PERMISSIONS.org.create)
   @Post()
   create(@Body() organization: OrganizationRequest) {
@@ -20,7 +20,7 @@ export class OrganizationController {
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('super-admin')
+  @Role('admin')
   @Permissions(PERMISSIONS.org.read)
   @Get()
   findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
