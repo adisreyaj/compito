@@ -16,22 +16,24 @@ export class ProjectController {
   @Permissions(PERMISSIONS.project.create)
   @Post()
   create(@Body() project: ProjectRequest, @Req() req: RequestWithUser) {
-    return this.projectService.create(project, req.user);
+    const currentOrg = req.headers['x-org'] as string;
+    return this.projectService.create(project, req.user, currentOrg);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.read)
   @Get()
-  findAll(@Query() query: RequestParams) {
-    return this.projectService.findAll(query);
+  findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
+    const currentOrg = req.headers['x-org'] as string;
+    return this.projectService.findAll(query, req.user, currentOrg);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.projectService.findOne(id, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)

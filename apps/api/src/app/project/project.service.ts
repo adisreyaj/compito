@@ -1,10 +1,10 @@
-import { ProjectRequest, RequestParams, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
+import { ProjectRequest, RequestParams, Role, Roles, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -18,17 +18,25 @@ export class ProjectService {
   private logger = new Logger('PROJECT');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: ProjectRequest, user: UserPayload) {
-    const { org, role, userId } = getUserDetails(user);
-    if (role.name !== 'super-admin' && data.orgId !== org) {
-      throw new UnauthorizedException('No access to create project');
+  async create(data: ProjectRequest, user: UserPayload, currentOrg: string) {
+    const { orgs, role, userId } = getUserDetails(user);
+    switch (role.name) {
+      case 'super-admin':
+        break;
+      case 'admin':
+      case 'org-admin':
+        if (!orgs.includes(currentOrg)) {
+          throw new ForbiddenException('No permissions to create project');
+        }
+      default:
+        throw new ForbiddenException('No permissions to create project');
     }
     try {
       const projectData: Prisma.ProjectCreateInput = {
         ...data,
         org: {
           connect: {
-            id: org,
+            id: currentOrg,
           },
         },
         createdBy: {
@@ -50,25 +58,47 @@ export class ProjectService {
     }
   }
 
-  async findAll(query: RequestParams) {
+  async findAll(query: RequestParams, user: UserPayload, currentOrg: string) {
     const { skip, limit, sort = 'updatedAt', order = 'desc' } = parseQuery(query);
+    const { orgs, role, userId } = getUserDetails(user);
+    let where: Prisma.ProjectWhereInput = {
+      orgId: currentOrg,
+    };
+    let select: Prisma.ProjectSelect = {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      boards: true,
+      members: { select: USER_BASIC_DETAILS },
+    };
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin': {
+        where = {
+          ...where,
+          members: {
+            some: {
+              id: userId,
+            },
+          },
+        };
+        break;
+      }
+      default:
+        break;
+    }
     try {
-      const count$ = this.prisma.project.count();
+      const count$ = this.prisma.project.count({ where });
       const orgs$ = this.prisma.project.findMany({
+        where,
         skip,
         take: limit,
         orderBy: {
           [sort]: order,
         },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          createdAt: true,
-          updatedAt: true,
-          boards: true,
-          members: { select: USER_BASIC_DETAILS },
-        },
+        select,
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -83,7 +113,8 @@ export class ProjectService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user: UserPayload) {
+    const { role, userId } = getUserDetails(user);
     try {
       const project = await this.prisma.project.findUnique({
         where: {
@@ -100,6 +131,18 @@ export class ProjectService {
         },
       });
       if (project) {
+        switch (role.name as Roles) {
+          case 'user':
+          case 'project-admin': {
+            const isUserPartOfProject = (project.members as any[]).findIndex(({ id }) => id === userId) >= 0;
+            if (!isUserPartOfProject) {
+              throw new ForbiddenException('No access to project');
+            }
+            break;
+          }
+          default:
+            break;
+        }
         return project;
       }
       throw new NotFoundException();
@@ -109,7 +152,9 @@ export class ProjectService {
     }
   }
 
-  async update(id: string, req: ProjectRequest) {
+  async update(id: string, req: ProjectRequest, user: UserPayload) {
+    const { role, userId } = getUserDetails(user);
+    await this.canUpdateProject(role, id, userId);
     const { members, orgId, createdById, ...rest } = req;
     let data: Prisma.ProjectUpdateInput = { ...rest };
     if (members) {
@@ -151,7 +196,9 @@ export class ProjectService {
     }
   }
 
-  async updateMembers(id: string, data: UpdateMembersRequest) {
+  async updateMembers(id: string, data: UpdateMembersRequest, user: UserPayload) {
+    const { role, userId } = getUserDetails(user);
+    await this.canUpdateProject(role, id, userId);
     try {
       let updateData: Prisma.ProjectUpdateInput = {};
       switch (data.type) {
@@ -207,7 +254,20 @@ export class ProjectService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: UserPayload) {
+    const { role, userId, orgs } = getUserDetails(user);
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin':
+        throw new ForbiddenException('No permission to delete the project');
+      case 'super-admin':
+        break;
+      default:
+        if (!orgs.includes(id)) {
+          throw new ForbiddenException('No permission to delete the project');
+        }
+        break;
+    }
     try {
       const project = await this.prisma.project.delete({
         where: {
@@ -221,6 +281,39 @@ export class ProjectService {
     } catch (error) {
       this.logger.error('Failed to delete project', error);
       throw new InternalServerErrorException();
+    }
+  }
+
+  private async canUpdateProject(role: Role, id: string, userId: string) {
+    switch (role.name as Roles) {
+      case 'user':
+        throw new ForbiddenException('Cannot update project');
+      case 'project-admin':
+        try {
+          const projectData = await this.prisma.project.findUnique({
+            where: {
+              id,
+            },
+            select: {
+              members: {
+                where: {
+                  id: userId,
+                },
+              },
+            },
+            rejectOnNotFound: true,
+          });
+          const userPartOfProject = projectData?.members.length > 0;
+          if (!userPartOfProject) {
+            throw new ForbiddenException('No permission to update the project');
+          }
+        } catch (error) {
+          if (error?.name === 'NotFoundError') {
+            throw new NotFoundException('Project not found');
+          }
+        }
+      default:
+        break;
     }
   }
 }
