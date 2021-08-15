@@ -183,6 +183,28 @@
         }
       }
     },
+    "web-auth": {
+      "projectType": "library",
+      "root": "libs/web/auth",
+      "sourceRoot": "libs/web/auth/src",
+      "prefix": "compito",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/web/auth"],
+          "options": {
+            "jestConfig": "libs/web/auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/web/auth/src/**/*.ts", "libs/web/auth/src/**/*.html"]
+          }
+        }
+      }
+    },
     "web-boards": {
       "projectType": "library",
       "root": "libs/web/boards",
@@ -355,33 +377,6 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/web/ui/src/**/*.ts", "libs/web/ui/src/**/*.html"]
-          }
-        }
-      }
-    },
-    "web-auth": {
-      "projectType": "library",
-      "root": "libs/web/auth",
-      "sourceRoot": "libs/web/auth/src",
-      "prefix": "compito",
-      "architect": {
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/auth"
-          ],
-          "options": {
-            "jestConfig": "libs/web/auth/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "libs/web/auth/src/**/*.ts",
-              "libs/web/auth/src/**/*.html"
-            ]
           }
         }
       }

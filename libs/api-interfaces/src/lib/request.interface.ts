@@ -1,3 +1,5 @@
+import { Request } from 'express';
+import { Role } from './role.interface';
 export interface PaginationParams {
   page: string;
   limit: string;
@@ -22,7 +24,7 @@ export type RequestParamsParsed = {
 };
 
 export interface UserPayload {
-  'https://compito.adi.so/roles': string[];
+  'https://compito.adi.so/roles': Role;
   'https://compito.adi.so/org': string;
   'https://compito.adi.so/userId': string;
   email: string;

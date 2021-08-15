@@ -20,7 +20,7 @@ export class BoardsService {
 
   async create(data: BoardRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
-    if (role !== 'super-admin' && data.orgId !== org) {
+    if (role.name !== 'super-admin' && data.orgId !== org) {
       throw new UnauthorizedException('No access to create board');
     }
     try {

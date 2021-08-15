@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  UnauthorizedException
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -20,7 +20,7 @@ export class ProjectService {
 
   async create(data: ProjectRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
-    if (role !== 'super-admin' && data.orgId !== org) {
+    if (role.name !== 'super-admin' && data.orgId !== org) {
       throw new UnauthorizedException('No access to create project');
     }
     try {
@@ -61,7 +61,7 @@ export class ProjectService {
           [sort]: order,
         },
         select: {
-          id:true,
+          id: true,
           name: true,
           description: true,
           createdAt: true,

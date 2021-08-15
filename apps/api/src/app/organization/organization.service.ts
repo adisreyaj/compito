@@ -1,7 +1,8 @@
-import { OrganizationRequest, RequestParams, UpdateMembersRequest } from '@compito/api-interfaces';
+import { OrganizationRequest, RequestParams, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
@@ -23,11 +24,45 @@ export class OrganizationService {
     }
   }
 
-  async findAll(query: RequestParams) {
+  async findAll(query: RequestParams, user: UserPayload) {
+    const { org, userId } = getUserDetails(user);
     const { skip, limit, search = null } = parseQuery(query);
     try {
-      const count$ = this.prisma.organization.count();
+      const count$ = this.prisma.organization.count({
+        where: {
+          OR: [
+            {
+              id: {
+                in: [org],
+              },
+            },
+            {
+              members: {
+                some: {
+                  id: userId,
+                },
+              },
+            },
+          ],
+        },
+      });
       const orgs$ = this.prisma.organization.findMany({
+        where: {
+          OR: [
+            {
+              id: {
+                in: [org],
+              },
+            },
+            {
+              members: {
+                some: {
+                  id: userId,
+                },
+              },
+            },
+          ],
+        },
         skip,
         take: limit,
       });

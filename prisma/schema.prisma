@@ -4,7 +4,7 @@ datasource db {
 }
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 model User {
@@ -30,21 +30,23 @@ model User {
   boards            Board[]
   projectsCreated   Project[]      @relation("projectCreatedBy")
   orgsCreated       Organization[] @relation("orgCreatedBy")
+  roles             UserRoleOrg[]
 }
 
 model Organization {
-  id          String    @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
-  slug        String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  createdBy   User      @relation("orgCreatedBy", fields: [createdById], references: [id])
+  slug        String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdBy   User          @relation("orgCreatedBy", fields: [createdById], references: [id])
   createdById String
   members     User[]
   projects    Project[]
   tasks       Task[]
   tags        Tag[]
   boards      Board[]
+  userRoleOrg UserRoleOrg[]
 }
 
 model Project {
@@ -148,6 +150,25 @@ model Comment {
   updatedAt   DateTime @updatedAt
   Task        Task?    @relation(fields: [taskId], references: [id])
   taskId      String?
+}
+
+model Role {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  permissions Json
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userRoleOrg UserRoleOrg[]
+}
+
+model UserRoleOrg {
+  id     String       @id @default(cuid())
+  org    Organization @relation(fields: [orgId], references: [id])
+  orgId  String
+  user   User         @relation(fields: [userId], references: [id])
+  userId String
+  role   Role         @relation(fields: [roleId], references: [id])
+  roleId String
 }
 
 enum Priority {

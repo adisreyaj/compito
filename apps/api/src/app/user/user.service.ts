@@ -1,4 +1,4 @@
-import { RequestParams, User, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
+import { RequestParams, Role, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
 import {
   ForbiddenException,
   Injectable,
@@ -11,13 +11,13 @@ import { Prisma } from '@prisma/client';
 import { AppMetadata, AuthenticationClient, ManagementClient, SignUpUserData, UserMetadata } from 'auth0';
 import { hashSync } from 'bcrypt';
 import * as cuid from 'cuid';
+import { verify } from 'jsonwebtoken';
 import { kebabCase } from 'voca';
 import { AuthService } from '../auth/auth.service';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
-import { GET_SINGLE_USER_SELECT } from './user.config';
 @Injectable()
 export class UserService {
   private logger = new Logger('USER');
@@ -29,44 +29,148 @@ export class UserService {
     this.authClient = this.auth.auth;
   }
 
+  async getUserPermissions(userId: string, orgId: string) {
+    try {
+      const userRole = this.prisma.userRoleOrg.findFirst({
+        where: {
+          userId,
+          orgId,
+        },
+        select: {
+          role: {
+            select: {
+              id: true,
+              name: true,
+              permissions: true,
+            },
+          },
+        },
+      });
+      this.logger.debug('Fetched user role');
+      return userRole;
+    } catch (error) {
+      this.logger.error('Failed to retrieve user permissions');
+      throw new InternalServerErrorException('Failed to retrieve permissions');
+    }
+  }
+
+  async getUserOrgs(userId: string, sessionToken: string) {
+    try {
+      const secret = this.config.get('SESSION_TOKEN_SECRET');
+      if (!secret) {
+        throw new Error('Please provide the Session Token Secret');
+      }
+      const token = verify(sessionToken, secret);
+      if (!token) {
+        throw new ForbiddenException('Session not valid. Please login again!');
+      }
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          orgs: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch user orgs');
+    }
+  }
+
   async signup(data: UserSignupRequest) {
     const connection = this.config.get('AUTH0_DB');
     if (!connection) {
       throw new Error('Please provide the auth DB name');
     }
+    let role: Role;
+
+    try {
+      role = await this.prisma.role.findFirst({
+        where: {
+          name: 'admin',
+        },
+        rejectOnNotFound: true,
+      });
+      this.logger.debug('Admin role found', role.id);
+    } catch (error) {
+      this.logger.error('Failed to fetch the roles');
+      throw new InternalServerErrorException('Failed to create user!');
+    }
     const { email, firstName, lastName, org, password } = data;
     const createUserAndOrg = async () => {
       try {
         const userId = cuid();
-        const user = await this.prisma.user.create({
-          data: {
-            id: userId,
-            firstName,
-            lastName,
-            email,
-            password: hashSync(password, 10),
-            verified: false,
-            blocked: false,
-            orgs: {
-              create: {
-                name: org,
-                slug: `${kebabCase(org)}-${cuid()}`,
-                createdBy: {
-                  connect: { id: userId },
+        const orgId = cuid();
+        const [, user] = await this.prisma.$transaction([
+          this.prisma.user.create({
+            data: {
+              id: userId,
+              firstName,
+              lastName,
+              email,
+              password: hashSync(password, 10),
+              verified: false,
+              blocked: false,
+              orgs: {
+                create: {
+                  id: orgId,
+                  name: org,
+                  slug: `${kebabCase(org)}-${cuid()}`,
+                  createdBy: {
+                    connect: { id: userId },
+                  },
                 },
               },
             },
-          },
-          select: {
-            id: true,
-            orgs: {
-              select: {
-                id: true,
+            select: {
+              id: true,
+            },
+          }),
+          this.prisma.user.update({
+            where: {
+              id: userId,
+            },
+            data: {
+              roles: {
+                create: {
+                  orgId: orgId,
+                  roleId: role.id,
+                },
               },
             },
-          },
-        });
-        return { userId: user.id, orgId: user.orgs[0].id };
+            select: {
+              id: true,
+              orgs: {
+                select: {
+                  id: true,
+                },
+              },
+              roles: {
+                select: {
+                  id: true,
+                  orgId: true,
+                  role: {
+                    select: {
+                      name: true,
+                      id: true,
+                    },
+                  },
+                },
+              },
+            },
+          }),
+        ]);
+        this.logger.debug('User created locally', user.id);
+        return { user, orgId: user.orgs[0].id };
       } catch (error) {
         this.logger.error('Failed to create user in DB', error);
         throw new InternalServerErrorException('Failed to create user');
@@ -75,25 +179,33 @@ export class UserService {
 
     const deleteUserFromLocal = async (userId: string, orgId: string) => {
       try {
-        await Promise.all([
-          this.prisma.organization.delete({
-            where: {
-              id: orgId,
-            },
-          }),
-          this.prisma.user.delete({
-            where: {
-              id: userId,
-            },
-          }),
-        ]);
+        // await Promise.all([
+        //   this.prisma.userRoleOrg.delete({
+        //     where: {
+        //     }
+        //   })
+        //   this.prisma.organization.delete({
+        //     where: {
+        //       id: orgId,
+        //     },
+        //   }),
+        //   this.prisma.user.delete({
+        //     where: {
+        //       id: userId,
+        //     },
+        //   }),
+        // ]);
       } catch (error) {
         this.logger.error('Failed to remove user from DB', error);
         throw new InternalServerErrorException('Something went wrong');
       }
     };
 
-    const createUserInAuth0 = async (userId: string, orgId: string) => {
+    const createUserInAuth0 = async (
+      userId: string,
+      orgId: string,
+      roles: Record<string, { name: string; id: string }>,
+    ) => {
       try {
         const data: SignUpUserData = {
           family_name: lastName,
@@ -104,6 +216,7 @@ export class UserService {
           user_metadata: {
             org: orgId,
             userId: userId,
+            roles: JSON.stringify(roles),
           },
         };
         return await this.authClient.database.signUp(data);
@@ -113,101 +226,27 @@ export class UserService {
         throw new InternalServerErrorException('Failed to signup');
       }
     };
-
-    const assignRoleToUser = async (userId: string, roles: string[], localUserId: string, orgId: string) => {
-      try {
-        this.logger.verbose(`Assigning role to user: auth0|${userId}`);
-        await this.managementClient.assignRolestoUser(
-          { id: `auth0|${userId}` },
-          {
-            roles,
-          },
-        );
-      } catch (error) {
-        await deleteUserFromLocal(localUserId, orgId);
-        await this.managementClient.deleteUser({ id: `auth0|${userId}` });
-        this.logger.error('Failed to assign role to the user', error);
-        throw new InternalServerErrorException('Failed to signup user');
-      }
-    };
     try {
       const userSaved = await createUserAndOrg();
-      const userInAuth0 = await createUserInAuth0(userSaved.userId, userSaved.orgId);
-      await assignRoleToUser(userInAuth0._id, ['rol_lyVxmUX8UdHk3856'], userSaved.userId, userSaved.orgId);
-      return { message: 'User signed up successfully' };
+      const roles = userSaved.user.roles.reduce((acc, curr) => {
+        return {
+          ...acc,
+          [curr.orgId]: curr.role,
+        };
+      }, {});
+      const userInAuth0 = await createUserInAuth0(userSaved.user.id, userSaved.orgId, roles);
+      this.logger.debug('User created locally', userInAuth0._id);
+      return userInAuth0;
     } catch (error) {
       this.logger.error('Failed to create user in Auth0', error);
       throw new InternalServerErrorException('Failed to signup user!');
     }
   }
 
-  async create(data: UserRequest) {
-    let user: User | null = null;
-    const connection = this.config.get('AUTH0_DB');
-    if (!connection) {
-      throw new Error('Please provide the auth DB name');
-    }
-    user = await this.creatUserLocally(data);
-    try {
-      if (user) {
-        await this.createUserInAuth0(data, connection, user);
-      }
-      return user;
-    } catch (error) {
-      this.logger.error(error);
-      await this.prisma.user.delete({
-        where: {
-          id: user.id,
-        },
-      });
-      this.logger.debug('User delete successfully');
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async creatUserLocally(data: UserRequest) {
-    try {
-      const { orgId, ...rest } = data;
-      const user = (await this.prisma.user.create({
-        data: {
-          ...rest,
-          orgs: {
-            connect: { id: orgId },
-          },
-        },
-        select: GET_SINGLE_USER_SELECT,
-      })) as User;
-      this.logger.debug('User created successfully!' + user.id);
-      return user;
-    } catch (error) {
-      Logger.error(error);
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async createUserInAuth0(data: UserRequest, connection: any, user: User) {
-    const { email, firstName, lastName, password } = data;
-    const { org } = user;
-    const orgIds = org.map(({ id }) => id);
-    await this.managementClient.createUser({
-      connection,
-      email,
-      user_metadata: {
-        org: orgIds,
-        userId: user.id,
-      },
-      blocked: false,
-      app_metadata: {},
-      given_name: firstName,
-      family_name: lastName,
-      password,
-    });
-  }
-
   async findAll(query: RequestParams, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {};
-    switch (role) {
+    switch (role.name) {
       /**
        * 1. Users of the specified Org that are part of projects he/she is a member of
        */
@@ -290,7 +329,7 @@ export class UserService {
     let whereCondition: Prisma.UserWhereInput = {
       id,
     };
-    switch (role) {
+    switch (role.name) {
       /**
        * 1. Users of the specified Org that are part of projects he/she is a member of
        */
@@ -378,7 +417,7 @@ export class UserService {
       }
     };
     if (id !== userId) {
-      switch (role) {
+      switch (role.name) {
         case 'super-admin': {
           updateUser();
         }
@@ -392,18 +431,58 @@ export class UserService {
   }
 
   async deleteUser(id: string, user: UserPayload) {
-    const { userId, role } = getUserDetails(user);
-    if (role === 'super-admin') {
-      try {
-        return await this.prisma.user.delete({
-          where: {
-            id,
+    const { userId, role, org } = getUserDetails(user);
+    let userData;
+    try {
+      userData = await this.prisma.user.findUnique({
+        where: { id },
+        select: {
+          orgs: {
+            select: {
+              id: true,
+            },
           },
-          select: USER_BASIC_DETAILS,
-        });
-      } catch (error) {
-        throw new InternalServerErrorException('Failed to update user');
+        },
+        rejectOnNotFound: true,
+      });
+    } catch (error) {
+      this.logger.error(error);
+      if (error?.name === 'NotFoundError') {
+        return new NotFoundException();
       }
+      throw new InternalServerErrorException('Failed to delete user');
+    }
+    switch (role.name) {
+      case 'super-admin': {
+        try {
+          return await this.prisma.user.delete({
+            where: {
+              id,
+            },
+            select: USER_BASIC_DETAILS,
+          });
+        } catch (error) {
+          throw new InternalServerErrorException('Failed to update user');
+        }
+      }
+      case 'admin': {
+        try {
+          const userInAdminOrg = userData.orgs.some(({ id }) => id === org);
+          if (!userInAdminOrg) {
+            throw new ForbiddenException('Not enough permissions');
+          }
+          return await this.prisma.user.delete({
+            where: {
+              id,
+            },
+            select: USER_BASIC_DETAILS,
+          });
+        } catch (error) {
+          throw new InternalServerErrorException('Failed to update user');
+        }
+      }
+      default:
+        throw new ForbiddenException('Not enough permissions');
     }
   }
 }

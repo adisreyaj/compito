@@ -12,4 +12,6 @@ export interface Organization extends OrganizationBase, DocDates {
   members: User[];
   projects: Project[];
 }
-export interface OrganizationRequest extends OrganizationBase {}
+export interface OrganizationRequest extends OrganizationBase {
+  createdById: string;
+}

@@ -11,5 +11,5 @@ export const GET_SINGLE_USER_SELECT: Prisma.UserSelect = {
   updatedAt: true,
   createdAt: true,
   tasks: true,
-  org: true,
+  orgs: true,
 };

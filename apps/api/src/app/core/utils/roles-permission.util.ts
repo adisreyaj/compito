@@ -1,3 +1,4 @@
+import { Role } from '@compito/api-interfaces';
 import { Roles, ROLE_LEVEL } from '../config/roles.config';
 
 export const hasPermission = (requiredPermission: string, userPermissions: string[]) => {
@@ -7,10 +8,9 @@ export const hasPermission = (requiredPermission: string, userPermissions: strin
   return false;
 };
 
-export const isOperationAllowed = (requiredRole: Roles, userRoles: string[]) => {
-  if (requiredRole != null && userRoles?.length > 0) {
-    const userRole = userRoles[0];
-    const userRoleLevel = ROLE_LEVEL[userRole];
+export const isOperationAllowed = (requiredRole: Roles, userRole: Role) => {
+  if (requiredRole != null && userRole != null) {
+    const userRoleLevel = ROLE_LEVEL[userRole.name];
     const requiredRoleLevel = ROLE_LEVEL[requiredRole];
     return userRoleLevel >= requiredRoleLevel;
   }

@@ -11,7 +11,7 @@ export interface UserBase {
 export interface User extends UserBase, DocDates {
   id: string;
   password: string;
-  org: Organization[];
+  orgs: Organization[];
   blocked: boolean;
   verified: boolean;
 }
@@ -29,4 +29,4 @@ export interface UserRequest extends UserBase {
 export type UpdateMembersRequestType = 'modify' | 'set';
 type ModifyMembers = { type: 'modify'; add?: string[]; remove?: string[] };
 type SetMembers = { type: 'set'; set: string[] };
-export type UpdateMembersRequest = ModifyMembers | SetMembers; 
+export type UpdateMembersRequest = ModifyMembers | SetMembers;

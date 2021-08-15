@@ -1,5 +1,17 @@
 import { RequestParams, RequestWithUser, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
 import { Public } from '../core/decorators/public.decorator';
@@ -13,19 +25,27 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @UseGuards(RolesGuard, PermissionsGuard)
-  @Permissions(PERMISSIONS.user.create)
-  @Role('org-admin')
-  @Post('')
-  create(@Body() user: UserRequest) {
-    return this.userService.create(user);
-  }
-
-  @UseGuards(RolesGuard, PermissionsGuard)
   @Permissions(PERMISSIONS.user.read)
   @Role('project-admin')
   @Get('')
   findAll(@Query() query: RequestParams & { projectId?: string }, @Req() req: RequestWithUser) {
     return this.userService.findAll(query, req.user);
+  }
+
+  @Public()
+  @Get(':id/orgs')
+  getUserOrgs(@Param('id') userId: string, @Req() req: RequestWithUser) {
+    const sessionToken = req.headers['x-session-token'] as string;
+    if (!sessionToken) {
+      throw new ForbiddenException('Not enough permissions');
+    }
+    return this.userService.getUserOrgs(userId, sessionToken);
+  }
+
+  @Public()
+  @Get(':id/orgs/:orgId/permissions')
+  getUserPermissionsForOrg(@Param('id') userId: string, @Param('orgId') orgId: string) {
+    return this.userService.getUserPermissions(userId, orgId);
   }
 
   @UseGuards(PermissionsGuard)
@@ -48,8 +68,8 @@ export class UserController {
     return this.userService.updateUser(id, user, req.user);
   }
 
-  @UseGuards(PermissionsGuard)
-  @Permissions(PERMISSIONS.user.delete)
+  // @UseGuards(PermissionsGuard)
+  // @Permissions(PERMISSIONS.user.delete)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.userService.deleteUser(id, req.user);
