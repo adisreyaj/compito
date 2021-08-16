@@ -41,7 +41,7 @@ jobs:
           envs: REMOTE_SERVER_USER
           script: |
             cd /home/$REMOTE_SERVER_USER/compito
-            unzip build.zip
+            unzip -o build.zip
             rm -rf build.zip
             npm install
             npm prisma migrate deploy
