@@ -6,7 +6,7 @@
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js",
     "nx": "nx",
-    "start": "NG_PERSISTENT_BUILD_CACHE=1 ng serve",
+    "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
