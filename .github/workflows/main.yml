@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Environment
+        run: sudo apt-get install tree
+
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -20,8 +23,8 @@ jobs:
       - name: Build API
         run: |
           npm install
-          npm run build api
-          ls
+          npm run build api --configuration=production
+          tree dist
 
       - name: Zip and Send artifacts
         env:
@@ -30,6 +33,7 @@ jobs:
         run: |
           zip build.zip package.json package-lock.json prisma/**/* dist/**/*
           rsync -azIv ./build.zip $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.zip
+
       - name: Deploy API to server
         uses: appleboy/ssh-action@master
         env:
