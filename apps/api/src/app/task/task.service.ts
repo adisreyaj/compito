@@ -72,22 +72,31 @@ export class TaskService {
   }
 
   async findAll(query: RequestParams, where: Prisma.TaskWhereInput = {}, user: UserPayload) {
-    const { userId, org } = getUserDetails(user);
+    const { org, role, projects } = getUserDetails(user);
     const { skip, limit, sort = 'updatedAt', order = 'asc' } = parseQuery(query);
+    where.orgId = org;
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin':
+        where.projectId = { in: projects };
+        break;
+      default:
+        break;
+    }
     if (Object.prototype.hasOwnProperty.call(query, 'priority')) {
-      where = {
-        ...where,
-        priority: {
-          in: query.priority.split(',') as any[],
-        },
-        orgId: org,
-      };
+      Object.assign(where.priority, {
+        in: query.priority.split(',') as any[],
+      });
     }
     try {
-      const count$ = this.prisma.task.count();
+      const count$ = this.prisma.task.count({ where });
       const orgs$ = this.prisma.task.findMany({
+        where,
         skip,
         take: limit,
+        orderBy: {
+          [sort]: order,
+        },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -103,7 +112,7 @@ export class TaskService {
   }
 
   async findOne(id: string, user: UserPayload) {
-    const { userId, org, projects } = getUserDetails(user);
+    const { org, projects, role } = getUserDetails(user);
     try {
       const task = await this.prisma.task.findUnique({
         where: {
@@ -111,6 +120,22 @@ export class TaskService {
         },
       });
       if (task) {
+        switch (role.name as Roles) {
+          case 'user':
+          case 'project-admin':
+            const taskBelongsToAccessibleProject = projects.findIndex((id) => id === task.projectId) >= 0;
+            if (!taskBelongsToAccessibleProject) {
+              throw new ForbiddenException('No access to view task!');
+            }
+            break;
+
+          default:
+            const taskBelongsToAccessibleOrg = org === task.orgId;
+            if (!taskBelongsToAccessibleOrg) {
+              throw new ForbiddenException('No access to view task!');
+            }
+            break;
+        }
         return task;
       }
       return new NotFoundException();
