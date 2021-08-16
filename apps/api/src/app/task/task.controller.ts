@@ -25,9 +25,10 @@ export class TaskController {
   @Role('user')
   @Permissions(PERMISSIONS.task.read)
   @Get()
-  findAll(@Query() query: RequestParams) {
-    return this.taskService.findAll(query);
+  findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
+    return this.taskService.findAll(query, {}, req.user);
   }
+
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('user')
   @Permissions(PERMISSIONS.task.read)
@@ -41,29 +42,29 @@ export class TaskController {
         },
       },
     };
-    return this.taskService.findAll(query, where);
+    return this.taskService.findAll(query, where, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.task.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.taskService.findOne(id, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('user')
   @Permissions(PERMISSIONS.task.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() task: TaskRequest) {
-    return this.taskService.update(id, task);
+  update(@Param('id') id: string, @Body() task: TaskRequest, @Req() req: RequestWithUser) {
+    return this.taskService.update(id, task, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('user')
   @Permissions(PERMISSIONS.task.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.taskService.remove(id, req.user);
   }
 }
