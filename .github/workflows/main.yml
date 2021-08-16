@@ -22,15 +22,18 @@ jobs:
           npm install
           npm run build api --configuration=production
 
-      - name: Zip and Send artifacts
+      - name: Zip artifacts
+        run: |
+          tar -czvf build.tar.gz dist/ prisma/ package*
+
+      - name: Send artifacts to remote
         env:
           REMOTE_SERVER_USER: ${{ secrets.REMOTE_SERVER_USER }}
           REMOTE_SERVER_ADDRESS: ${{ secrets.REMOTE_SERVER_ADDRESS }}
         run: |
-          tar -czvf build.tar.gz dist/ prisma/ package*
           rsync -azIv ./build.tar.gz $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.tar.gz
 
-      - name: Deploy API to server
+      - name: Start API
         uses: appleboy/ssh-action@master
         env:
           REMOTE_SERVER_USER: ${{ secrets.REMOTE_SERVER_USER }}
@@ -42,8 +45,9 @@ jobs:
           script: |
             cd /home/$REMOTE_SERVER_USER/compito
             tar -xzvf build.tar.gz
-            rm -rf build.tar.gz
             npm install
             npx prisma migrate deploy
+            npx prisma generate
             pm2 stop compito
             pm2 start dist/apps/api/main.js --name compito
+            rm -rf build.tar.gz
