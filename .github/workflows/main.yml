@@ -28,7 +28,7 @@ jobs:
           REMOTE_SERVER_USER: ${{ secrets.REMOTE_SERVER_USER }}
           REMOTE_SERVER_ADDRESS: ${{ secrets.REMOTE_SERVER_ADDRESS }}
         run: |
-          zip build.zip package.json package-lock.json prisma/**/* dist/apps/api/**/*
+          zip build.zip package.json package-lock.json prisma/**/* dist/**/*
           rsync -azIv ./build.zip $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.zip
       - name: Deploy API to server
         uses: appleboy/ssh-action@master
