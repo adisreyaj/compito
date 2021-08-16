@@ -6,7 +6,7 @@
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
     "nx": "nx",
-    "start": "ng serve",
+    "start": "NG_PERSISTENT_BUILD_CACHE=1 ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
@@ -25,7 +25,17 @@
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:dev:create": "prisma migrate dev --create-only",
+    "migrate:reset": "prisma migrate reset",
+    "migrate:deploy": "npx prisma migrate deploy",
+    "migrate:status": "npx prisma migrate status",
+    "migrate:resolve": "npx prisma migrate resolve",
+    "prisma:studio": "npx prisma studio",
+    "prisma:generate": "npx prisma generate",
+    "prisma:generate:watch": "npx prisma generate --watch",
+    "prisma:format": "npx prisma format"
   },
   "private": true,
   "dependencies": {

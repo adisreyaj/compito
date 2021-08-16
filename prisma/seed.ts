@@ -147,8 +147,19 @@ async function main() {
     name: item.name,
     permissions: item.permissions,
   }));
-  const roles = await prisma.role.createMany({ data: rolesData });
-  console.log(`Roles Created Successfully!`, roles.count);
+  const roles = await Promise.all(
+    rolesData.map((data) => {
+      return prisma.role.upsert({
+        where: { name: data.name },
+        update: {},
+        create: {
+          name: data.name,
+          permissions: data.permissions,
+        },
+      });
+    }),
+  );
+  console.log(`Roles Created Successfully!`, roles.length);
 }
 
 main()

@@ -171,6 +171,22 @@ model UserRoleOrg {
   roleId String
 }
 
+// model LogTrail {
+//   id     String       @id @default(cuid())
+//   org    Organization @relation(fields: [orgId], references: [id])
+//   orgId  String
+//   user   User         @relation(fields: [userId], references: [id])
+//   userId String
+//   project      Project      @relation(fields: [projectId], references: [id])
+//   projectId    String
+//   board        Board        @relation(fields: [boardId], references: [id])
+//   boardId      String
+//   action   Json
+//   content  Json
+//   createdAt   DateTime      @default(now())
+//   updatedAt   DateTime      @updatedAt
+// }
+
 enum Priority {
   Lowest
   Low
