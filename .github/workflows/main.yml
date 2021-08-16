@@ -27,7 +27,7 @@ jobs:
           REMOTE_SERVER_USER: ${{ secrets.REMOTE_SERVER_USER }}
           REMOTE_SERVER_ADDRESS: ${{ secrets.REMOTE_SERVER_ADDRESS }}
         run: |
-          zip build.zip package.json package-lock.json dist/apps/api/main.js prisma/**/*
+          zip build.zip package.json package-lock.json dist/**/*.* prisma/**/*.*
           rsync -azIv ./build.zip $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.zip
 
       - name: Deploy API to server
@@ -44,6 +44,6 @@ jobs:
             unzip -o build.zip
             rm -rf build.zip
             npm install
-            npm prisma migrate deploy
+            npx prisma migrate deploy
             pm2 stop compito
             pm2 start dist/apps/api/main.js --name compito
