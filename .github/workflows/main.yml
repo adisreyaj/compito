@@ -28,7 +28,7 @@ jobs:
           REMOTE_SERVER_ADDRESS: ${{ secrets.REMOTE_SERVER_ADDRESS }}
         run: |
           tar -czvf build.tar.gz dist/ prisma/ package*
-          rsync -azIv ./build.tar $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.zip
+          rsync -azIv ./build.tar $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.tar.gz
 
       - name: Deploy API to server
         uses: appleboy/ssh-action@master
