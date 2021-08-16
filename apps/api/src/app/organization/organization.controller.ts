@@ -1,15 +1,5 @@
-import { OrganizationRequest, RequestParamsDto } from '@compito/api-interfaces';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { OrganizationRequest, RequestParams, RequestWithUser, UpdateMembersRequest } from '@compito/api-interfaces';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
 import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
 import { PermissionsGuard } from 'apps/api/src/app/core/guards/permissions.guard';
@@ -22,7 +12,7 @@ export class OrganizationController {
   constructor(private organizationService: OrganizationService) {}
 
   @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('super-admin')
+  @Role('admin')
   @Permissions(PERMISSIONS.org.create)
   @Post()
   create(@Body() organization: OrganizationRequest) {
@@ -30,33 +20,41 @@ export class OrganizationController {
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('super-admin')
+  @Role('admin')
   @Permissions(PERMISSIONS.org.read)
   @Get()
-  findAll(@Query() query: RequestParamsDto) {
-    return this.organizationService.findAll(query);
+  findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
+    return this.organizationService.findAll(query, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.org.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.organizationService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.organizationService.findOne(id, req.user);
+  }
+
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('super-admin')
+  @Permissions(PERMISSIONS.org.update)
+  @Patch(':id/members')
+  updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest, @Req() req: RequestWithUser) {
+    return this.organizationService.updateMembers(id, data, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() organization: OrganizationRequest) {
-    return this.organizationService.update(id, organization);
+  update(@Param('id') id: string, @Body() organization: OrganizationRequest, @Req() req: RequestWithUser) {
+    return this.organizationService.update(id, organization, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.organizationService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.organizationService.remove(id, req.user);
   }
 }

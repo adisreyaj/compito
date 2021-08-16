@@ -1,0 +1,16 @@
+<section class="grid px-8 py-10 border-b cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+  <div>
+    <compito-task-list [data]="recentTasks$ | async" title="Recently Added Tasks"></compito-task-list>
+  </div>
+  <div>
+    <compito-task-list [data]="hightPriorityTasks$ | async" title="Higher Priority Tasks"></compito-task-list>
+  </div>
+</section>
+<section class="px-8 mt-4 projects__container">
+  <compito-section-header title="Projects"></compito-section-header>
+  <div class="projects__list">
+    <ng-container *ngFor="let project of projects$ | async">
+      <compito-project-mini-card [data]="project"></compito-project-mini-card>
+    </ng-container>
+  </div>
+</section>

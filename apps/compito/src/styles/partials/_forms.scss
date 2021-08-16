@@ -1,8 +1,10 @@
 .form-group {
   @apply flex flex-col;
   @apply items-start;
-  @apply pb-4;
   @apply relative;
+  &:not(:last-child){
+    @apply pb-4;
+  }
   label {
     @apply text-gray-500;
     @apply mb-1;

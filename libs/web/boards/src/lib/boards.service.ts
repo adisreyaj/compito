@@ -19,6 +19,19 @@ export class BoardsService {
     return this.http.post<Task>(`${this.tasksApi}`, task);
   }
 
+  updateAssignees(taskId: string, assignees: string[]) {
+    const data: Pick<TaskRequest, 'assignees'> = {
+      assignees,
+    };
+    return this.http.patch<Task>(`${this.tasksApi}/${taskId}`, data);
+  }
+  updateDescription(taskId: string, description: string) {
+    const data: Pick<TaskRequest, 'description'> = {
+      description,
+    };
+    return this.http.patch<Task>(`${this.tasksApi}/${taskId}`, data);
+  }
+
   moveTask(taskId: string, newListId: string) {
     const data: Partial<TaskRequest> = {
       list: newListId,

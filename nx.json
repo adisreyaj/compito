@@ -40,7 +40,13 @@
       "tags": [],
       "implicitDependencies": ["compito"]
     },
+    "web-auth": {
+      "tags": []
+    },
     "web-boards": {
+      "tags": []
+    },
+    "web-home": {
       "tags": []
     },
     "web-orgs": {

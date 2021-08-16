@@ -7,5 +7,6 @@ import { TaskService } from './task.service';
   providers: [TaskService],
   controllers: [TaskController],
   imports: [PrismaModule],
+  exports: [TaskService],
 })
 export class TaskModule {}

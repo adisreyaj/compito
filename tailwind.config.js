@@ -6,6 +6,11 @@ module.exports = {
     extend: {
       colors: {
         primary: 'var(--primary)',
+        'primary-1': 'var(--primary-1)',
+        'primary-translucent': 'var(--primary-translucent)',
+      },
+      backgroundImage: {
+        'primary-gradient': 'var(--primary-gradient)',
       },
     },
   },

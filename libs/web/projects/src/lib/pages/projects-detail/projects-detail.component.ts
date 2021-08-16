@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Project } from '@compito/api-interfaces';
+import { Project, User } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
+import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { BoardCreateModalComponent } from '../../shared/components/board-create-modal/board-create-modal.component';
 import { ProjectsAction } from '../../state/projects.actions';
 import { ProjectsState } from '../../state/projects.state';
-
 @Component({
   selector: 'compito-projects-detail',
   templateUrl: './projects-detail.component.html',
@@ -34,6 +34,9 @@ export class ProjectsDetailComponent implements OnInit {
     { label: 'Home', link: '/' },
     { label: 'Projects', link: '/projects' },
   ];
+  selectedMembers = new Map<string, User>();
+  @Select(UsersState.getAllUsers)
+  users$!: Observable<User[]>;
 
   @Select(ProjectsState.getProjectDetail)
   projectDetails$!: Observable<Project | null>;
@@ -43,6 +46,14 @@ export class ProjectsDetailComponent implements OnInit {
   ngOnInit(): void {
     if (this.projectId) {
       this.store.dispatch(new ProjectsAction.Get(this.projectId));
+      this.store.dispatch(new UsersAction.GetAll({}));
+      this.projectDetails$.pipe().subscribe((project) => {
+        if (project && project?.members?.length > 0) {
+          project?.members.forEach((member) => {
+            this.selectedMembers.set(member.id, member);
+          });
+        }
+      });
     }
   }
 
@@ -59,6 +70,23 @@ export class ProjectsDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  toggleMembers(user: User) {
+    if (this.selectedMembers.has(user.id)) {
+      this.selectedMembers.delete(user.id);
+    } else {
+      this.selectedMembers.set(user.id, user);
+    }
+  }
+
+  removeMember(memberId: string) {
+    this.store.dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'modify', remove: [memberId] }));
+  }
+
+  updateMembers() {
+    const members = [...this.selectedMembers.keys()];
+    this.store.dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'set', set: members }));
   }
 
   private get projectId() {

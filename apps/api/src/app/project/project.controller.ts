@@ -1,20 +1,5 @@
-import {
-  ProjectRequest,
-  RequestParamsDto,
-  RequestWithUser,
-} from '@compito/api-interfaces';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { ProjectRequest, RequestParams, RequestWithUser, UpdateMembersRequest } from '@compito/api-interfaces';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
 import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
 import { PermissionsGuard } from 'apps/api/src/app/core/guards/permissions.guard';
@@ -38,30 +23,38 @@ export class ProjectController {
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.read)
   @Get()
-  findAll(@Query() query: RequestParamsDto) {
-    return this.projectService.findAll(query);
+  findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
+    return this.projectService.findAll(query, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.projectService.findOne(id, req.user);
+  }
+
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('org-admin')
+  @Permissions(PERMISSIONS.project.update)
+  @Patch(':id/members')
+  updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest, @Req() req: RequestWithUser) {
+    return this.projectService.updateMembers(id, data, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() project: ProjectRequest) {
-    return this.projectService.update(id, project);
+  update(@Param('id') id: string, @Body() project: ProjectRequest, @Req() req: RequestWithUser) {
+    return this.projectService.update(id, project, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('org-admin')
   @Permissions(PERMISSIONS.project.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.projectService.remove(id, req.user);
   }
 }
