@@ -32,7 +32,11 @@ enableMapSet();
       clientId: environment.auth.clientId,
       redirectUri: window.location.origin,
       httpInterceptor: {
-        allowedList: ['http://localhost:3333/api/*'],
+        allowedList: [
+          {
+            uriMatcher: (uri: string) => uri.includes(environment.api) && !uri.includes('/ping'),
+          },
+        ],
       },
     }),
     DialogModule.forRoot(),

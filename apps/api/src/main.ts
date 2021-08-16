@@ -11,8 +11,15 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+  const allowList = ['http://localhost:4200', 'https://compito.adi.so'];
   app.enableCors({
-    origin: '*',
+    origin: (origin, callback) => {
+      if (!origin || allowList.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS: Not allowed'), false);
+      }
+    },
   });
   app.use(compression());
   app.use(helmet());

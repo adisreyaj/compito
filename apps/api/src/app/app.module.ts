@@ -21,7 +21,6 @@ import { UserModule } from './user/user.module';
     UserModule,
     BoardsModule,
     TaskModule,
-    // TagModule,
   ],
   controllers: [AppController],
   providers: [

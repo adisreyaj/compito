@@ -1,9 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
+import { Public } from './core/decorators/public.decorator';
 
 @Controller()
 export class AppController {
-  @Get('status')
+  @Public()
+  @Get('ping')
   getData() {
-    return { status: 'UP' };
+    return { status: 'OK' };
   }
 }
