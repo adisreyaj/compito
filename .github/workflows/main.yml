@@ -1,10 +1,9 @@
-
 name: Deploy API
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 jobs:
   build:
@@ -18,14 +17,13 @@ jobs:
 
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.REMOTE_SERVER_ADDRESS }} >> ~/.ssh/known_hosts
-        
-      - name: Checkout repository
-      - uses: actions/checkout@v2
+
       - name: Build API
+        uses: actions/checkout@v2
         run: |
           npm install
           npm run build api
-          
+
       - name: Zip artifacts
         env:
           REMOTE_SERVER_USER: ${{ secrets.REMOTE_SERVER_USER }}
@@ -33,6 +31,7 @@ jobs:
         run: |
           zip build.zip package.json package-lock.json prisma/**/* dist/apps/api/**/*
           rsync -azIve ssh ./build.zip $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.zip
+
       - name: Deploy API to server
         uses: appleboy/ssh-action@master
         env:
@@ -50,5 +49,3 @@ jobs:
             npm prisma migrate deploy
             pm2 stop compito
             pm2 start dist/apps/api/main.js --name compito
-            
-            
