@@ -1,4 +1,4 @@
-import { BoardRequest, RequestParamsDto, RequestWithUser } from '@compito/api-interfaces';
+import { BoardRequest, RequestParams, RequestWithUser } from '@compito/api-interfaces';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
@@ -23,30 +23,30 @@ export class BoardsController {
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.read)
   @Get()
-  findAll(@Query() query: RequestParamsDto) {
-    return this.boardService.findAll(query);
+  findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
+    return this.boardService.findAll(query, req.user);
   }
 
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.board.read)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.boardService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.boardService.findOne(id, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.update)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() board: BoardRequest) {
-    return this.boardService.update(id, board);
+  update(@Param('id') id: string, @Body() board: BoardRequest, @Req() req: RequestWithUser) {
+    return this.boardService.update(id, board, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.delete)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.boardService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.boardService.remove(id, req.user);
   }
 }

@@ -1,14 +1,16 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Board, BoardListWithTasks, Task } from '@compito/api-interfaces';
+import { Board, BoardList, BoardListWithTasks, Task, User } from '@compito/api-interfaces';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
 import { Breadcrumb } from '@compito/web/ui';
+import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import produce from 'immer';
-import { Observable } from 'rxjs';
-import { filter, map, take, withLatestFrom } from 'rxjs/operators';
+import { TaskDetailModalComponent } from 'libs/web/tasks/src/lib/shared/components/task-detail-modal/task-detail-modal.component';
+import { forkJoin, Observable } from 'rxjs';
+import { filter, map, take, tap, withLatestFrom } from 'rxjs/operators';
 import { BoardsAction } from './state/boards.actions';
 import { BoardsState } from './state/boards.state';
 @Component({
@@ -30,6 +32,7 @@ import { BoardsState } from './state/boards.state';
             [allList]="lists"
             (dropped)="dropTask($event)"
             (newTask)="createNewTask($event)"
+            (taskClicked)="viewTaskDetail($event, item)"
           >
             <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
               <div
@@ -74,11 +77,32 @@ export class BoardsComponent implements OnInit {
   @Select(BoardsState.getBoardLists)
   lists$!: Observable<BoardListWithTasks[]>;
 
+  @Select(UsersState.getAllUsers)
+  users$!: Observable<User[]>;
+
   constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.store.dispatch(new BoardsAction.Get(this.boardId));
-
+    if (this.taskId) {
+      forkJoin([
+        this.store.dispatch(new BoardsAction.Get(this.boardId)),
+        this.store.dispatch(new UsersAction.GetAll({})),
+      ])
+        .pipe(
+          withLatestFrom(this.board$, this.lists$),
+          tap(([, board, lists]) => {
+            if (board?.tasks && board?.tasks?.length > 0 && lists) {
+              const task = board?.tasks.find(({ id }) => id === this.taskId);
+              const list = lists.find(({ id }) => id === task?.list);
+              task && list && this.viewTaskDetail(task, list);
+            }
+          }),
+        )
+        .subscribe();
+    } else {
+      this.store.dispatch(new BoardsAction.Get(this.boardId));
+      this.store.dispatch(new UsersAction.GetAll({}));
+    }
     this.board$
       .pipe(
         filter((data) => data != null),
@@ -126,7 +150,22 @@ export class BoardsComponent implements OnInit {
     });
   }
 
+  viewTaskDetail(task: Task, list: BoardList) {
+    const ref = this.dialog.open(TaskDetailModalComponent, {
+      size: 'lg',
+      data: {
+        task,
+        list,
+        users: this.users$,
+      },
+    });
+    return ref;
+  }
+
   private get boardId() {
     return this.activatedRoute.snapshot.params?.id ?? null;
+  }
+  private get taskId() {
+    return this.activatedRoute.snapshot.params?.taskId ?? null;
   }
 }

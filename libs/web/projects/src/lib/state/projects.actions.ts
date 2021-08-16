@@ -1,4 +1,4 @@
-import { BoardRequest, ProjectRequest } from '@compito/api-interfaces';
+import { BoardRequest, ProjectRequest, UpdateMembersRequest } from '@compito/api-interfaces';
 
 export namespace ProjectsAction {
   export class Add {
@@ -8,6 +8,10 @@ export namespace ProjectsAction {
   export class AddBoard {
     static readonly type = '[Projects] Add board to project';
     constructor(public payload: BoardRequest) {}
+  }
+  export class UpdateMembers {
+    static readonly type = '[Projects] Update members';
+    constructor(public id: string, public payload: UpdateMembersRequest) {}
   }
   export class GetAll {
     static readonly type = '[Projects] Get projects';

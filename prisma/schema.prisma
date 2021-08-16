@@ -16,35 +16,37 @@ model User {
   image             String?
   blocked           Boolean        @default(false)
   verified          Boolean        @default(false)
-  org               Organization[]
+  orgs              Organization[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   taskAssignedBy    Task[]         @relation("assignedBy")
-  taskAssignee      Task?          @relation("assignees", fields: [taskId], references: [id])
-  taskId            String?
+  taskAssignee      Task[]         @relation("assignees")
   subTaskAssignedBy SubTask[]      @relation("subTaskAssignedBy")
-  subTaskAssignee   SubTask?       @relation("subTaskAssignees", fields: [subTaskId], references: [id])
-  subTaskId         String?
-  projects          Project[]
+  subTaskAssignee   SubTask[]      @relation("subTaskAssignees")
+  projects          Project[]      @relation("members")
   tasks             Task[]
   subTasks          SubTask[]
   comments          Comment[]
   boards            Board[]
-  project           Project?       @relation("members", fields: [projectId], references: [id])
-  projectId         String?
+  projectsCreated   Project[]      @relation("projectCreatedBy")
+  orgsCreated       Organization[] @relation("orgCreatedBy")
+  roles             UserRoleOrg[]
 }
 
 model Organization {
-  id        String    @id @default(cuid())
-  name      String
-  slug      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  users     User[]
-  projects  Project[]
-  tasks     Task[]
-  tags      Tag[]
-  boards    Board[]
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdBy   User          @relation("orgCreatedBy", fields: [createdById], references: [id])
+  createdById String
+  members     User[]
+  projects    Project[]
+  tasks       Task[]
+  tags        Tag[]
+  boards      Board[]
+  userRoleOrg UserRoleOrg[]
 }
 
 model Project {
@@ -55,7 +57,7 @@ model Project {
   org         Organization @relation(fields: [orgId], references: [id])
   orgId       String
   members     User[]       @relation("members")
-  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdBy   User         @relation("projectCreatedBy", fields: [createdById], references: [id])
   createdById String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -121,8 +123,8 @@ model SubTask {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   completed    Boolean   @default(false)
-  task         Task?     @relation(fields: [taskId], references: [id])
-  taskId       String?
+  task         Task      @relation(fields: [taskId], references: [id])
+  taskId       String
 }
 
 model Tag {
@@ -148,6 +150,25 @@ model Comment {
   updatedAt   DateTime @updatedAt
   Task        Task?    @relation(fields: [taskId], references: [id])
   taskId      String?
+}
+
+model Role {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  permissions Json
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userRoleOrg UserRoleOrg[]
+}
+
+model UserRoleOrg {
+  id     String       @id @default(cuid())
+  org    Organization @relation(fields: [orgId], references: [id])
+  orgId  String
+  user   User         @relation(fields: [userId], references: [id])
+  userId String
+  role   Role         @relation(fields: [roleId], references: [id])
+  roleId String
 }
 
 enum Priority {

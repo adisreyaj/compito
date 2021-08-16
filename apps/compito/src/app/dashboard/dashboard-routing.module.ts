@@ -8,6 +8,11 @@ const routes: Routes = [
     component: DashboardComponent,
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        loadChildren: () => import('@compito/web/home').then((m) => m.WebHomeModule),
+      },
+      {
         path: 'orgs',
         loadChildren: () => import('@compito/web/orgs').then((m) => m.WebOrgsModule),
       },

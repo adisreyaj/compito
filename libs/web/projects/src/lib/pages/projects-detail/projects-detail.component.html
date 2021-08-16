@@ -21,15 +21,53 @@
   <section class="px-8 projects__container">
     <compito-section-header title="Members"></compito-section-header>
     <div class="projects__list">
-      <ng-container *ngFor="let board of details.boards">
-        <compito-boards-card [data]="board"></compito-boards-card>
+      <ng-container *ngFor="let member of details.members">
+        <compito-project-member-card [data]="member" (removed)="removeMember($event)"></compito-project-member-card>
       </ng-container>
     </div>
     <footer class="mt-4">
-      <button btn size="sm" (click)="addNewBoard()" class="flex items-center">
+      <button btn size="sm" [tippy]="addAssignees" placement="bottom-start" variation="menu" class="flex items-center">
         <rmx-icon class="icon-sm" name="add-line"></rmx-icon>
         <p class="text-sm">Add Members</p>
       </button>
     </footer>
   </section>
   </ng-container>
+<ng-template #addAssignees let-hide>
+  <div class="flex flex-col w-64 p-1" cdkTrapFocus>
+    <div class="mb-0 form-group">
+      <input type="text" class="w-full" autofocus />
+    </div>
+    <ul class="space-y-2 overflow-y-auto max-h-60">
+      <ng-container *ngFor="let user of users$ | async">
+        <li class="flex items-center p-2 space-x-2 rounded-md cursor-pointer hover:bg-gray-100"
+            (click)="toggleMembers(user)">
+          <div>
+            <ng-container *ngIf="!selectedMembers.has(user.id); else userAdded">
+              <img [src]="user?.image ?? 'https://avatar.tobi.sh/' + user.email" [alt]="user.firstName" width="40"
+                   height="40" class="rounded-full" />
+            </ng-container>
+            <ng-template #userAdded>
+              <div class="grid rounded-full bg-primary-translucent text-primary place-items-center"
+                   [style.height.px]="40" [style.width.px]="40">
+                <rmx-icon name="check-line"></rmx-icon>
+              </div>
+            </ng-template>
+          </div>
+          <div>
+            <p>
+              {{ user.firstName }}
+            </p>
+            <p class="text-sm text-gray-600">
+              {{ user.email }}
+            </p>
+          </div>
+        </li>
+      </ng-container>
+    </ul>
+    <footer class="flex items-center pt-2 space-x-2">
+      <button btn size="sm" (click)="updateMembers();hide()">Save</button>
+      <button btn size="sm" variant="secondary" (click)="hide()">Cancel</button>
+    </footer>
+  </div>
+</ng-template>

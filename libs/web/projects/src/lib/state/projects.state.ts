@@ -60,4 +60,12 @@ export class ProjectsState {
       }),
     );
   }
+  @Action(ProjectsAction.UpdateMembers)
+  updateMembers({ patchState }: StateContext<ProjectsStateModel>, { id, payload }: ProjectsAction.UpdateMembers) {
+    return this.projectService.updateMembers(id, payload).pipe(
+      tap((data) => {
+        patchState({ projectDetail: data });
+      }),
+    );
+  }
 }

@@ -1,9 +1,11 @@
-import { RequestParamsDto, TaskRequest, UserPayload } from '@compito/api-interfaces';
+import { RequestParams, TaskRequest, UserPayload } from '@compito/api-interfaces';
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Priority, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
+import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
+import { GET_SINGLE_TASK_SELECT } from './task.config';
 
 @Injectable()
 export class TaskService {
@@ -13,13 +15,20 @@ export class TaskService {
   async create(data: TaskRequest, user: UserPayload) {
     try {
       const { org, userId } = getUserDetails(user);
-
-      const { assignees, priority, tags, ...rest } = data;
-      let taskData: Prisma.TaskUncheckedCreateInput = {
+      const { assignees, priority, tags, boardId, projectId, ...rest } = data;
+      let taskData: Prisma.TaskCreateInput = {
         ...rest,
+        board: { connect: { id: boardId } },
+        project: { connect: { id: projectId } },
         priority: priority ?? Priority.Medium,
-        createdById: userId,
-        orgId: org,
+        createdBy: {
+          connect: { id: userId },
+        },
+        org: {
+          // connect: {
+          //   id: org,
+          // },
+        },
         assignees: {
           connect: assignees.map((id) => ({ id })),
         },
@@ -35,13 +44,26 @@ export class TaskService {
     }
   }
 
-  async findAll(query: RequestParamsDto) {
-    const { skip, limit } = query;
+  async findAll(query: RequestParams, where: Prisma.TaskWhereInput = {}) {
+    const { skip, limit, sort = 'updatedAt', order = 'asc' } = parseQuery(query);
+    if (Object.prototype.hasOwnProperty.call(query, 'priority')) {
+      where = {
+        ...where,
+        priority: {
+          in: query.priority.split(',') as any[],
+        },
+      };
+    }
     try {
-      const count$ = this.prisma.task.count();
+      const count$ = this.prisma.task.count({ where });
       const orgs$ = this.prisma.task.findMany({
+        where,
         skip,
+        orderBy: {
+          [sort]: order,
+        },
         take: limit,
+        select: GET_SINGLE_TASK_SELECT,
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -62,6 +84,7 @@ export class TaskService {
         where: {
           id,
         },
+        select: GET_SINGLE_TASK_SELECT,
       });
       if (task) {
         return task;
@@ -75,14 +98,20 @@ export class TaskService {
 
   async update(id: string, data: TaskRequest) {
     try {
-      const { assignees, priority, tags, ...rest } = data;
-      let taskData: Prisma.TaskUncheckedUpdateInput = {
+      const { assignees, priority, tags, assignedById, boardId, projectId, orgId, createdById, ...rest } = data;
+      let taskData: Prisma.TaskUpdateInput = {
         ...rest,
       };
+      if (assignedById) {
+        taskData = {
+          ...taskData,
+          assignedBy: { connect: { id: assignedById } },
+        };
+      }
       if (priority) {
         taskData = {
           ...taskData,
-          priority: priority as any,
+          priority: priority ?? Priority.Medium,
         };
       }
       if (assignees) {
@@ -106,8 +135,8 @@ export class TaskService {
           id,
         },
         data: taskData,
+        select: GET_SINGLE_TASK_SELECT,
       });
-      this.logger.debug(task);
       if (task) {
         return task;
       }

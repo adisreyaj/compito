@@ -8,22 +8,21 @@ import {
   IconModule,
   ModalModule,
   PageHeaderModule,
+  ProjectCardModule,
   TimeAgoModule,
   UserAvatarGroupModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
-import { NgxsModule } from '@ngxs/store';
 import { ProjectsComponent } from './projects.component';
 import { BoardCreateModalComponent } from './shared/components/board-create-modal/board-create-modal.component';
-import { ProjectCardComponent } from './shared/components/project-card/project-card.component';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
-import { ProjectsState } from './state/projects.state';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild([
       { path: '', pathMatch: 'full', component: ProjectsComponent },
+      { path: 'add', component: ProjectsComponent },
       {
         path: ':id',
         loadChildren: () =>
@@ -33,7 +32,6 @@ import { ProjectsState } from './state/projects.state';
     ReactiveFormsModule,
     FormsModule,
     PageHeaderModule,
-    NgxsModule.forFeature([ProjectsState]),
     IconModule,
     UserAvatarGroupModule,
     ModalModule,
@@ -41,7 +39,8 @@ import { ProjectsState } from './state/projects.state';
     A11yModule,
     TippyModule,
     TimeAgoModule,
+    ProjectCardModule,
   ],
-  declarations: [ProjectsComponent, ProjectCardComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
+  declarations: [ProjectsComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
 })
 export class WebProjectsModule {}
