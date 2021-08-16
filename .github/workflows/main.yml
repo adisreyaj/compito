@@ -1,0 +1,53 @@
+name: Deploy API
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: 'just-a-placeholder'
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.REMOTE_SERVER_ADDRESS }} >> ~/.ssh/known_hosts
+
+      - uses: actions/checkout@v2
+      - name: Build API
+        run: |
+          npm install
+          npm run build api --configuration=production
+
+      - name: Zip artifacts
+        run: |
+          tar -czvf build.tar.gz dist/ prisma/ package*
+
+      - name: Send artifacts to remote
+        env:
+          REMOTE_SERVER_USER: ${{ secrets.REMOTE_SERVER_USER }}
+          REMOTE_SERVER_ADDRESS: ${{ secrets.REMOTE_SERVER_ADDRESS }}
+        run: |
+          rsync -azIv ./build.tar.gz $REMOTE_SERVER_USER@$REMOTE_SERVER_ADDRESS:/home/$REMOTE_SERVER_USER/compito/build.tar.gz
+
+      - name: Start API
+        uses: appleboy/ssh-action@master
+        env:
+          REMOTE_SERVER_USER: ${{ secrets.REMOTE_SERVER_USER }}
+        with:
+          host: ${{ secrets.REMOTE_SERVER_ADDRESS }}
+          username: ${{ secrets.REMOTE_SERVER_USER }}
+          password: ${{ secrets.REMOTE_SERVER_PASSWORD }}
+          envs: REMOTE_SERVER_USER
+          script: |
+            cd /home/$REMOTE_SERVER_USER/compito
+            tar -xzvf build.tar.gz
+            npm install
+            npx prisma migrate deploy
+            npx prisma generate
+            pm2 stop compito
+            pm2 start dist/apps/api/main.js --name compito
+            rm -rf build.tar.gz
