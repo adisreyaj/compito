@@ -40,7 +40,7 @@ jobs:
         with:
           host: ${{ secrets.REMOTE_SERVER_ADDRESS }}
           username: ${{ secrets.REMOTE_SERVER_USER }}
-          password: ${{ secrets.REMOTE_SERVER_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: REMOTE_SERVER_USER
           script: |
             cd /home/$REMOTE_SERVER_USER/compito
