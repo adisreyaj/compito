@@ -74,11 +74,25 @@ export class BoardsState {
     );
   }
   @Action(BoardsAction.UpdateAssignees)
-  updateAssignees({ setState }: StateContext<BoardsStateModel>, { assignees, taskId }: BoardsAction.UpdateAssignees) {
+  updateAssignees(
+    { patchState, getState }: StateContext<BoardsStateModel>,
+    { assignees, taskId, listId }: BoardsAction.UpdateAssignees,
+  ) {
     return this.boardService.updateAssignees(taskId, assignees).pipe(
       tap(
         (data) => {
-          this.toast.success('Task added successfully!');
+          const { lists } = getState();
+          patchState({
+            lists: produce(lists, (draft) => {
+              const list = draft.find(({ id }) => id === listId);
+              if (list) {
+                const task = list.tasks.find(({ id }) => id === taskId);
+                if (task) {
+                  task.assignees = data.assignees;
+                }
+              }
+            }),
+          });
         },
         () => {
           this.toast.error('Failed to creat task!');

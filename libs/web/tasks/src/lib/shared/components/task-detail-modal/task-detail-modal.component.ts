@@ -198,7 +198,7 @@ export class TaskDetailModalComponent implements OnInit {
 
   updateAssignees() {
     const assignees = [...this.selectedAssignees.keys()];
-    this.store.dispatch(new BoardsAction.UpdateAssignees(this.taskId, assignees));
+    this.store.dispatch(new BoardsAction.UpdateAssignees(this.listId, this.taskId, assignees));
     this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
   }
 
@@ -231,5 +231,8 @@ export class TaskDetailModalComponent implements OnInit {
 
   private get taskId() {
     return this.ref.data.task.id;
+  }
+  private get listId() {
+    return this.ref.data.list.id;
   }
 }

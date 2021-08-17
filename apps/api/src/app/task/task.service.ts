@@ -165,7 +165,7 @@ export class TaskService {
         taskData = {
           ...taskData,
           assignees: {
-            connect: assignees.map((id) => ({ id })),
+            set: assignees.map((id) => ({ id })),
           },
         };
       }
@@ -182,6 +182,17 @@ export class TaskService {
           id,
         },
         data: taskData,
+        include: {
+          assignees: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              image: true,
+              email: true,
+            },
+          },
+        },
       });
       this.logger.debug(task);
       if (task) {
