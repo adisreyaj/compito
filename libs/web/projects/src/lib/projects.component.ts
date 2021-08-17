@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '@auth0/auth0-angular';
 import { Project } from '@compito/api-interfaces';
-import { Breadcrumb } from '@compito/web/ui';
+import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
 import { Observable } from 'rxjs';
+import { withLatestFrom } from 'rxjs/operators';
 import { ProjectsAction } from './state/projects.actions';
 import { ProjectsState } from './state/projects.state';
 @Component({
@@ -53,20 +55,26 @@ export class ProjectsComponent implements OnInit {
   @Select(ProjectsState.getAllProjects)
   projects$!: Observable<Project[]>;
 
-  constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private dialog: DialogService,
+    private store: Store,
+    private activatedRoute: ActivatedRoute,
+    private auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.store.dispatch(new ProjectsAction.GetAll({}));
     if (this.isAddNewRoute) {
       this.createNew();
     }
+    this.auth.user$.subscribe(console.log);
   }
 
   createNew() {
     const ref = this.dialog.open(ProjectsCreateModalComponent);
-    ref.afterClosed$.subscribe((data) => {
+    ref.afterClosed$.pipe(withLatestFrom(this.auth.user$.pipe(formatUser()))).subscribe(([data, user]) => {
       if (data) {
-        this.store.dispatch(new ProjectsAction.Add(data));
+        this.store.dispatch(new ProjectsAction.Add({ ...data, orgId: user?.org }));
       }
     });
   }

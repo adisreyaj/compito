@@ -30,3 +30,17 @@ export type UpdateMembersRequestType = 'modify' | 'set';
 type ModifyMembers = { type: 'modify'; add?: string[]; remove?: string[] };
 type SetMembers = { type: 'set'; set: string[] };
 export type UpdateMembersRequest = ModifyMembers | SetMembers;
+
+export interface UserDetails {
+  role: string;
+  userId: string;
+  org: string;
+  family_name: string;
+  nickname: string;
+  name: string;
+  picture: string;
+  updated_at: string;
+  email: string;
+  email_verified: string;
+  sub: string;
+}

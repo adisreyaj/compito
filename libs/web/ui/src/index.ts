@@ -12,3 +12,4 @@ export * from './components/user-card';
 export * from './directives/priority-color.directive';
 export * from './pipes/time-ago/time-ago.module';
 export * from './tokens/api.token';
+export * from './util/format-user.operator';

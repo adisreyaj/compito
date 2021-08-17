@@ -20,23 +20,25 @@ export class ProjectService {
 
   async create(data: ProjectRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
+    const { orgId, ...rest } = data;
     switch (role.name) {
       case 'super-admin':
         break;
       case 'admin':
       case 'org-admin':
-        if (data.orgId !== org) {
+        if (orgId !== org) {
           throw new ForbiddenException('No permissions to create project');
         }
+        break;
       default:
         throw new ForbiddenException('No permissions to create project');
     }
     try {
       const projectData: Prisma.ProjectCreateInput = {
-        ...data,
+        ...rest,
         org: {
           connect: {
-            id: data.orgId,
+            id: orgId,
           },
         },
         createdBy: {
@@ -54,7 +56,7 @@ export class ProjectService {
       return project;
     } catch (error) {
       this.logger.error('Failed to create project', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
