@@ -15,7 +15,7 @@ import { UsersState } from './state/users.state';
     <section class="projects__container">
       <div class="projects__list px-8">
         <article
-          (click)="createNew()"
+          (click)="inviteUser()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
@@ -25,7 +25,7 @@ import { UsersState } from './state/users.state';
             <div class=" border rounded-md shadow-sm bg-white">
               <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
             </div>
-            <p class="text-sm">Add New User</p>
+            <p class="text-sm">Invite User</p>
           </div>
         </article>
         <ng-container *ngFor="let user of users$ | async">
@@ -60,7 +60,7 @@ export class UsersComponent implements OnInit {
     this.store.dispatch(new UsersAction.GetAll({}));
   }
 
-  createNew() {
+  inviteUser() {
     const ref = this.dialog.open(UsersCreateModalComponent);
     ref.afterClosed$.subscribe((data) => {
       if (data) {
