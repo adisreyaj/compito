@@ -140,7 +140,7 @@ export class TaskService {
         }
         return task;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to fetch task', error);
       throw new InternalServerErrorException();

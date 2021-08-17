@@ -341,7 +341,7 @@ export class UserService {
       };
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
   async find(id: string, user: UserPayload) {
@@ -403,7 +403,7 @@ export class UserService {
       return user;
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -470,7 +470,7 @@ export class UserService {
     } catch (error) {
       this.logger.error(error);
       if (error?.name === 'NotFoundError') {
-        return new NotFoundException();
+        throw new NotFoundException();
       }
       throw new InternalServerErrorException('Failed to delete user');
     }

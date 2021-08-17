@@ -67,7 +67,7 @@ export class BoardsService {
       return board;
     } catch (error) {
       this.logger.error('Failed to create board', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -128,7 +128,7 @@ export class BoardsService {
       };
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -171,10 +171,10 @@ export class BoardsService {
         delete board.project.members;
         return board;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to fetch board', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -197,15 +197,15 @@ export class BoardsService {
       if (board) {
         return board;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update board', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   };
 
@@ -221,10 +221,10 @@ export class BoardsService {
       if (board) {
         return board;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to delete board', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   };
 }

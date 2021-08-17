@@ -26,7 +26,7 @@ export class OrganizationService {
       return org;
     } catch (error) {
       this.logger.error('Failed to create org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -79,7 +79,7 @@ export class OrganizationService {
       };
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -176,10 +176,10 @@ export class OrganizationService {
       if (org) {
         return org;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to fetch org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -198,15 +198,15 @@ export class OrganizationService {
       if (org) {
         return org;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -262,15 +262,15 @@ export class OrganizationService {
       if (project) {
         return project;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update members', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -286,10 +286,10 @@ export class OrganizationService {
       if (org) {
         return org;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to delete org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
