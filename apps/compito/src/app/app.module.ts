@@ -31,7 +31,9 @@ enableMapSet();
       audience: environment.auth.audience,
       clientId: environment.auth.clientId,
       redirectUri: window.location.origin,
-      errorPath: '/auth./login',
+      errorPath: '/auth/login',
+      cacheLocation: 'localstorage',
+      useRefreshTokens: true,
       httpInterceptor: {
         allowedList: [
           {
