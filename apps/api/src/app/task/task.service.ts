@@ -99,6 +99,20 @@ export class TaskService {
         orderBy: {
           [sort]: order,
         },
+        include: {
+          board: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
