@@ -27,13 +27,24 @@ export class ProjectService {
       case 'admin':
       case 'org-admin':
         if (orgId !== org) {
+          this.logger.error(`CREATE:PROJECT-->Org doesn't match`);
           throw new ForbiddenException('No permissions to create project');
         }
         break;
       default:
+        this.logger.error(`CREATE:PROJECT-->Org doesn't match`);
         throw new ForbiddenException('No permissions to create project');
     }
     try {
+      let members = [];
+      if (data.members?.length > 0) {
+        members = data.members.map((id) => ({ id }));
+        if (!data.members.includes(userId)) {
+          members.push({ id: userId });
+        }
+      } else {
+        members.push({ id: userId });
+      }
       const projectData: Prisma.ProjectCreateInput = {
         ...rest,
         org: {
@@ -47,11 +58,16 @@ export class ProjectService {
           },
         },
         members: {
-          connect: data.members.map((id) => ({ id })),
+          connect: members,
         },
       };
       const project = await this.prisma.project.create({
         data: projectData,
+        include: {
+          members: {
+            select: USER_BASIC_DETAILS,
+          },
+        },
       });
       return project;
     } catch (error) {
