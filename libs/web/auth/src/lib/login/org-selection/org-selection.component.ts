@@ -9,14 +9,14 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
           <img src="assets/images/logo-full.svg" alt="Compito" width="150" height="55" class="rounded-full" />
         </div>
         <section class="flex flex-col items-center">
-          <img src="assets/images/welcome.svg" alt="Welcome" height="300" width="300" />
+          <img src="assets/images/welcome.svg" alt="Welcome" height="350" width="350" />
           <div class="flex items-center space-x-2">
             <h1 class="text-4xl font-bold">Login Successful!</h1>
             <div class="bg-green-500 rounded-full p-1 text-white">
               <rmx-icon class="" name="arrow-right-line"></rmx-icon>
             </div>
           </div>
-          <p class="mt-2 text-gray-500">Choose which org to access from below</p>
+          <p class="mt-2 text-gray-500">Choose which org to access</p>
         </section>
       </div>
       <div class="overflow-y-auto grid place-items-center bg-gray-100">
@@ -27,7 +27,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
                 sectionHeader;
                 context: {
                   $implicit: 'Your Orgs',
-                  subtitle: 'You are part of multiple Orgs, select an org to login to'
+                  subtitle: 'You are part of multiple Orgs, Click on any one org to login'
                 }
               "
             ></ng-container>
@@ -86,9 +86,13 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
                         <span class="font-medium text-gray-600">2 days ago</span> by
                         <span class="font-medium text-gray-600">John Doe</span>
                       </p>
+                      <p>
+                        as
+                        <span class="font-medium text-gray-600">Org Admin</span>
+                      </p>
                     </div>
                   </header>
-                  <footer class="flex justify-end space-x-4 mt-4">
+                  <footer class="flex justify-end space-x-4 mt-6">
                     <button btn size="sm" type="button" variant="secondary" (click)="({})">Reject</button>
                     <button btn size="sm" type="submit" form="orgForm" variant="primary">Accept & Login</button>
                   </footer>
