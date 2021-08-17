@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Organization } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { append, patch } from '@ngxs/store/operators';
 import { tap } from 'rxjs/operators';
 import { OrgService } from '../orgs.service';
 import { OrgsAction } from './orgs.actions';
@@ -32,6 +33,18 @@ export class OrgsState {
 
   constructor(private orgService: OrgService) {}
 
+  @Action(OrgsAction.Add)
+  add({ setState }: StateContext<OrgsStateModel>, { payload }: OrgsAction.Add) {
+    return this.orgService.create(payload).pipe(
+      tap((result) => {
+        setState(
+          patch({
+            orgs: append([result]),
+          }),
+        );
+      }),
+    );
+  }
   @Action(OrgsAction.GetAll)
   getAll({ getState, patchState }: StateContext<OrgsStateModel>) {
     return this.orgService.getAll().pipe(

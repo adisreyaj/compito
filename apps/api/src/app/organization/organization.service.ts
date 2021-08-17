@@ -18,10 +18,32 @@ export class OrganizationService {
   private logger = new Logger('ORG');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: OrganizationRequest) {
+  async create(data: OrganizationRequest, user: UserPayload) {
+    const { userId } = getUserDetails(user);
     try {
+      let members = [];
+      if (data.members?.length > 0) {
+        members = data.members.map((id) => ({ id }));
+        if (!data.members.includes(userId)) {
+          members.push({ id: userId });
+        }
+      } else {
+        members.push({ id: userId });
+      }
+      let orgData: Prisma.OrganizationCreateInput = {
+        name: data.name,
+        slug: data.slug,
+        createdBy: {
+          connect: {
+            id: userId,
+          },
+        },
+        members: {
+          connect: members,
+        },
+      };
       const org = await this.prisma.organization.create({
-        data,
+        data: orgData,
       });
       return org;
     } catch (error) {
@@ -192,7 +214,7 @@ export class OrganizationService {
     try {
       const org = await this.prisma.organization.update({
         where,
-        data,
+        data: {},
       });
       this.logger.debug(org);
       if (org) {

@@ -15,8 +15,8 @@ export class OrganizationController {
   @Role('admin')
   @Permissions(PERMISSIONS.org.create)
   @Post()
-  create(@Body() organization: OrganizationRequest) {
-    return this.organizationService.create(organization);
+  create(@Body() organization: OrganizationRequest, @Req() req: RequestWithUser) {
+    return this.organizationService.create(organization, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
