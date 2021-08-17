@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { Project } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { append, patch } from '@ngxs/store/operators';
+import produce from 'immer';
 import { tap } from 'rxjs/operators';
 import { ProjectsService } from '../projects.service';
 import { ProjectsAction } from './projects.actions';
-
 export class ProjectsStateModel {
   public projects: Project[] = [];
   public projectDetail: Project | null = null;
@@ -40,8 +40,16 @@ export class ProjectsState {
     );
   }
   @Action(ProjectsAction.AddBoard)
-  addBoard({}: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.AddBoard) {
-    return this.projectService.createBoard(payload);
+  addBoard({ patchState, getState }: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.AddBoard) {
+    return this.projectService.createBoard(payload).pipe(
+      tap((data) => {
+        const { projectDetail } = getState();
+        const projectDetailUpdated = produce(projectDetail, (draft) => {
+          draft?.boards.push(data);
+        });
+        patchState({ projectDetail: projectDetailUpdated });
+      }),
+    );
   }
 
   @Action(ProjectsAction.GetAll)

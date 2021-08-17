@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '@auth0/auth0-angular';
 import { Project, User } from '@compito/api-interfaces';
-import { Breadcrumb } from '@compito/web/ui';
+import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { withLatestFrom } from 'rxjs/operators';
 import { BoardCreateModalComponent } from '../../shared/components/board-create-modal/board-create-modal.component';
 import { ProjectsAction } from '../../state/projects.actions';
 import { ProjectsState } from '../../state/projects.state';
@@ -41,7 +43,12 @@ export class ProjectsDetailComponent implements OnInit {
   @Select(ProjectsState.getProjectDetail)
   projectDetails$!: Observable<Project | null>;
 
-  constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private dialog: DialogService,
+    private store: Store,
+    private activatedRoute: ActivatedRoute,
+    private auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     if (this.projectId) {
@@ -59,14 +66,10 @@ export class ProjectsDetailComponent implements OnInit {
 
   addNewBoard() {
     if (this.projectId) {
-      const ref = this.dialog.open(BoardCreateModalComponent, {
-        data: {
-          projectId: this.projectId,
-        },
-      });
-      ref.afterClosed$.subscribe((data) => {
+      const ref = this.dialog.open(BoardCreateModalComponent);
+      ref.afterClosed$.pipe(withLatestFrom(this.auth.user$.pipe(formatUser()))).subscribe(([data, user]) => {
         if (data) {
-          this.store.dispatch(new ProjectsAction.AddBoard(data));
+          this.store.dispatch(new ProjectsAction.AddBoard({ ...data, projectId: this.projectId, orgId: user?.org }));
         }
       });
     }

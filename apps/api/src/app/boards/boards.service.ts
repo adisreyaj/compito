@@ -58,7 +58,6 @@ export class BoardsService {
       const boardData: Prisma.BoardUncheckedCreateInput = {
         ...data,
         lists: data.lists as any[],
-        orgId: data.orgId,
         createdById: userId,
       };
       const board = await this.prisma.board.create({

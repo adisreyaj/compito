@@ -37,7 +37,6 @@ export class BoardCreateModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.boardForm.get('projectId')?.setValue(this.ref.data.projectId);
   }
 
   handleFormSubmit() {
@@ -49,7 +48,6 @@ export class BoardCreateModalComponent implements OnInit {
       name: ['', [Validators.required, Validators.maxLength(20), Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.maxLength(200), Validators.minLength(3)]],
       lists: [defaultLists()],
-      projectId: ['', Validators.required],
     });
   }
 }
