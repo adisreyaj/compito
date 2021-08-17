@@ -1,7 +1,7 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
-@import "~@ng-select/ng-select/themes/default.theme.css";
+@import '~@ng-select/ng-select/themes/default.theme.css';
 @import 'partials/colors';
 @import 'partials/buttons';
 @import 'partials/icons';
@@ -41,5 +41,20 @@ body {
 .task-list:hover:not(.cdk-drag-preview):not(.cdk-drag-dragging):not(.cdk-drop-list-dragging) {
   .list__drag {
     @apply opacity-100;
+  }
+}
+
+.box {
+  @apply mx-auto;
+  @media only screen and (min-width: 960px) {
+    max-width: 900px;
+  }
+  @media only screen and (min-width: 1440px) {
+    max-width: 1400px;
+    /* styles for browsers larger than 1440px; */
+  }
+  @media only screen and (min-width: 2000px) {
+    max-width: 1600px;
+    /* for sumo sized (mac) screens */
   }
 }
