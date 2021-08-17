@@ -20,6 +20,7 @@ export class TaskService {
   async create(data: TaskRequest, user: UserPayload) {
     try {
       const { userId, org, projects, role } = getUserDetails(user);
+      const { assignees, priority, tags, boardId, projectId, orgId, ...rest } = data;
       switch (role.name as Roles) {
         case 'user':
         case 'project-admin':
@@ -31,12 +32,11 @@ export class TaskService {
           }
           break;
         default:
-          if (data.orgId !== org) {
+          if (orgId !== org) {
             throw new ForbiddenException('Not enough permission to create task!');
           }
           break;
       }
-      const { assignees, priority, tags, boardId, projectId, ...rest } = data;
       const taskData: Prisma.TaskCreateInput = {
         ...rest,
         priority: priority ?? Priority.Medium,
@@ -45,7 +45,7 @@ export class TaskService {
         },
         org: {
           connect: {
-            id: org,
+            id: orgId,
           },
         },
         project: {

@@ -1,9 +1,10 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '@auth0/auth0-angular';
 import { Board, BoardList, BoardListWithTasks, Task, User } from '@compito/api-interfaces';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
-import { Breadcrumb } from '@compito/web/ui';
+import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -80,7 +81,12 @@ export class BoardsComponent implements OnInit {
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
 
-  constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private dialog: DialogService,
+    private store: Store,
+    private activatedRoute: ActivatedRoute,
+    private auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     if (this.taskId) {
@@ -141,13 +147,21 @@ export class BoardsComponent implements OnInit {
 
   createNewTask(listId: string) {
     const ref = this.dialog.open(TasksCreateModalComponent);
-    ref.afterClosed$.pipe(withLatestFrom(this.board$)).subscribe(([data, board]) => {
-      if (data) {
-        this.store.dispatch(
-          new BoardsAction.AddTask({ ...data, list: listId, boardId: board?.id, projectId: board?.project.id }),
-        );
-      }
-    });
+    ref.afterClosed$
+      .pipe(withLatestFrom(this.board$, this.auth.user$.pipe(formatUser())))
+      .subscribe(([data, board, user]) => {
+        if (data) {
+          this.store.dispatch(
+            new BoardsAction.AddTask({
+              ...data,
+              list: listId,
+              boardId: board?.id,
+              projectId: board?.project.id,
+              orgId: user?.org,
+            }),
+          );
+        }
+      });
   }
 
   viewTaskDetail(task: Task, list: BoardList) {
