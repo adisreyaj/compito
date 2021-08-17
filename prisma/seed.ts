@@ -122,27 +122,6 @@ const ROLES_PERMISSIONS = [
 ];
 
 async function main() {
-  const admin = await prisma.user.upsert({
-    where: { email: 'adi.sreyaj@gmail.com' },
-    update: {},
-    create: {
-      email: 'adi.sreyaj@gmail.com',
-      firstName: 'Adithya',
-      lastName: 'Sreyaj',
-      password: '$2a$12$0.g5pAEI55Fl57yd8zpxne61oxPEkL79z5Uwu7zKRKeIWphfV//NW',
-    },
-  });
-  console.log(`User Created Successfully!`, admin.id);
-  const org = await prisma.organization.upsert({
-    where: { slug: 'compito-org' },
-    update: {},
-    create: {
-      name: 'Compito',
-      slug: 'compito-org',
-      createdById: admin.id,
-    },
-  });
-  console.log(`Org Created Successfully!`, org.id);
   const rolesData: Prisma.RoleCreateManyInput[] = ROLES_PERMISSIONS.map((item) => ({
     name: item.name,
     permissions: item.permissions,

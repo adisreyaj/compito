@@ -84,8 +84,10 @@ export class TaskService {
         break;
     }
     if (Object.prototype.hasOwnProperty.call(query, 'priority')) {
-      Object.assign(where.priority, {
-        in: query.priority.split(',') as any[],
+      Object.assign(where, {
+        priority: {
+          in: (query.priority.split(',') as any[]) ?? [],
+        },
       });
     }
     try {
