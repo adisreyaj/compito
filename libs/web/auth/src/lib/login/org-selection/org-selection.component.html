@@ -1,0 +1,109 @@
+<main class="grid org-selection">
+  <div class="relative grid place-items-center">
+    <div class="absolute flex items-center top-10 left-10">
+      <img src="assets/images/logo-full.svg" alt="Compito" width="150" height="55" class="rounded-full" />
+    </div>
+    <section class="flex flex-col items-center">
+      <img src="assets/images/welcome.svg" alt="Welcome" height="400" width="400" />
+      <div class="flex items-center space-x-2">
+        <h1 class="text-4xl font-bold">Login Successful!</h1>
+        <div class="p-1 text-white bg-green-500 rounded-full">
+          <rmx-icon class="" name="arrow-right-line"></rmx-icon>
+        </div>
+      </div>
+      <p class="mt-2 text-gray-500">Choose which org to access</p>
+    </section>
+  </div>
+  <div class="grid overflow-y-auto bg-gray-100 place-items-center">
+    <div class="w-full px-8 2xl:px-10">
+      <section class="mb-10">
+        <ng-container *ngTemplateOutlet="
+                sectionHeader;
+                context: {
+                  $implicit: 'Your Orgs',
+                  subtitle: 'You are part of multiple Orgs, Click on any one org to login'
+                }
+              "></ng-container>
+        <div class="orgs__list">
+          <ng-container [ngSwitch]="(loadingDetailsState$ | async)?.type">
+            <ng-container *ngSwitchCase="'LOADING'">
+              <ng-container *ngFor="let item of [1, 2]">
+                <compito-loading-card height="106px">
+                  <div class="flex flex-col justify-between">
+                    <header>
+                      <shimmer height="24px" [rounded]="true"></shimmer>
+                      <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+                    </header>
+                    <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+                  </div>
+                </compito-loading-card>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'SUCCESS'">
+              <ng-container *ngFor="let item of orgs$ | async">
+                <compito-org-selection-card [data]="item" [userEmail]="userEmail$ | async"
+                                            (clicked)="loginToOrg($event)"></compito-org-selection-card>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </div>
+      </section>
+      <section>
+        <ng-container *ngTemplateOutlet="
+                sectionHeader;
+                context: {
+                  $implicit: 'Pending Invites',
+                  subtitle: 'You have pending invites. You can log into them once accepted'
+                }
+              "></ng-container>
+        <ng-container [ngSwitch]="(loadingDetailsState$ | async)?.type">
+          <ng-container *ngSwitchCase="'LOADING'">
+            <div class="invites__list">
+              <ng-container *ngFor="let item of [1, 2]">
+                <compito-loading-card height="106px">
+                  <div class="flex flex-col justify-between">
+                    <header>
+                      <shimmer height="24px" [rounded]="true"></shimmer>
+                      <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+                    </header>
+                    <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+                  </div>
+                </compito-loading-card>
+              </ng-container>
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="'SUCCESS'">
+            <div *ngIf="invites$ | async as invites">
+              <ng-container *ngIf="invites.length > 0; else noItems">
+                <div class="invites__list">
+                  <ng-container *ngFor="let item of invites">
+                    <compito-org-selection-card [data]="item" [userEmail]="userEmail$ | async"
+                                                (clicked)="loginToOrg($event)"></compito-org-selection-card>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </div>
+            <div class="flex items-center justify-center">
+              <ng-template #noItems>
+                <div class="flex justify-center mt-10">
+                  <div class="flex flex-col items-center">
+                    <img src="assets/images/nothing.svg" alt="No Items" width="250" height="187.5" />
+                    <p class="text-gray-600">No Pending Invites</p>
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="'ERROR'"> </ng-container>
+        </ng-container>
+      </section>
+    </div>
+  </div>
+</main>
+
+<ng-template #sectionHeader let-title let-subtitle="subtitle">
+  <header>
+    <h2 class="text-xl font-bold">{{ title }}</h2>
+    <p class="text-gray-500">{{ subtitle }}</p>
+  </header>
+</ng-template>
