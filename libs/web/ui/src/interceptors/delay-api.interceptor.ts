@@ -7,6 +7,6 @@ import { delay } from 'rxjs/operators';
 export class DelayInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     console.log(request);
-    return next.handle(request).pipe(delay(2000));
+    return next.handle(request).pipe(delay(20000));
   }
 }
