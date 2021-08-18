@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
+import { DataLoading, DataLoadingState } from '@compito/api-interfaces';
 import { BehaviorSubject } from 'rxjs';
 import { pluck } from 'rxjs/operators';
 import { environment } from '../../../../../../../apps/compito/src/environments/environment';
@@ -38,36 +39,29 @@ import { OrgSelectionService } from './org-selection.service';
               "
             ></ng-container>
             <div class="orgs__list">
-              <ng-container *ngFor="let item of orgs$ | async">
-                <article
-                  (click)="loginToOrg(item.id)"
-                  tabindex="0"
-                  class="p-4 relative rounded-md border cursor-pointer transition-all hover:shadow-lg duration-200 ease-in
-                     border-gray-100 bg-white shadow-sm ring-primary hover:ring-2 focus:ring-2 outline-none"
-                >
-                  <header class="flex items-center justify-between">
-                    <div>
-                      <div class="flex items-center justify-between">
-                        <p class="text-md font-medium cursor-pointer hover:text-primary">{{ item?.name }}</p>
+              <ng-container [ngSwitch]="(loadingDetailsState$ | async)?.type">
+                <ng-container *ngSwitchCase="'LOADING'">
+                  <ng-container *ngFor="let item of [1, 2]">
+                    <compito-loading-card height="106px">
+                      <div class="flex flex-col justify-between">
+                        <header>
+                          <shimmer height="24px" [rounded]="true"></shimmer>
+                          <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+                        </header>
+                        <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
                       </div>
-                      <p class=" text-xs text-gray-400 ">
-                        Owner
-                        <span class="font-medium text-gray-600">{{
-                          item?.createdBy?.email === (userEmail$ | async) ? 'You' : item?.createdBy?.firstName
-                        }}</span>
-                      </p>
-                    </div>
-                  </header>
-                  <div class="my-4">
-                    <!-- <compito-user-avatar-group [data]="[]"></compito-user-avatar-group> -->
-                  </div>
-                  <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">
-                    <p>
-                      Last Updated
-                      <span class="font-medium text-gray-600">{{ item?.updatedAt | timeAgo }}</span>
-                    </p>
-                  </footer>
-                </article>
+                    </compito-loading-card>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'SUCCESS'">
+                  <ng-container *ngFor="let item of orgs$ | async">
+                    <compito-org-selection-card
+                      [data]="item"
+                      [userEmail]="userEmail$ | async"
+                      (clicked)="loginToOrg($event)"
+                    ></compito-org-selection-card>
+                  </ng-container>
+                </ng-container>
               </ng-container>
             </div>
           </section>
@@ -82,34 +76,29 @@ import { OrgSelectionService } from './org-selection.service';
               "
             ></ng-container>
             <div class="invites__list">
-              <ng-container *ngFor="let item of invites$ | async">
-                <article
-                  class="p-4 relative rounded-md border transition-all duration-200 ease-in
-                     border-gray-100 bg-white shadow-sm"
-                >
-                  <header class="">
-                    <div>
-                      <div class="flex items-center justify-between">
-                        <p class="text-md font-medium cursor-pointer hover:text-primary">Sreyaj</p>
+              <ng-container [ngSwitch]="(loadingDetailsState$ | async)?.type">
+                <ng-container *ngSwitchCase="'LOADING'">
+                  <ng-container *ngFor="let item of [1, 2]">
+                    <compito-loading-card height="106px">
+                      <div class="flex flex-col justify-between">
+                        <header>
+                          <shimmer height="24px" [rounded]="true"></shimmer>
+                          <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+                        </header>
+                        <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
                       </div>
-                    </div>
-                    <div class="text-xs text-gray-400 mt-1">
-                      <p>
-                        Invited
-                        <span class="font-medium text-gray-600">2 days ago</span> by
-                        <span class="font-medium text-gray-600">John Doe</span>
-                      </p>
-                      <p>
-                        as
-                        <span class="font-medium text-gray-600">Org Admin</span>
-                      </p>
-                    </div>
-                  </header>
-                  <footer class="flex justify-end space-x-4 mt-6">
-                    <button btn size="sm" type="button" variant="secondary" (click)="({})">Reject</button>
-                    <button btn size="sm" type="submit" form="orgForm" variant="primary">Accept & Login</button>
-                  </footer>
-                </article>
+                    </compito-loading-card>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'SUCCESS'">
+                  <ng-container *ngFor="let item of invites$ | async">
+                    <compito-org-selection-card
+                      [data]="item"
+                      [userEmail]="userEmail$ | async"
+                      (clicked)="loginToOrg($event)"
+                    ></compito-org-selection-card>
+                  </ng-container>
+                </ng-container>
               </ng-container>
             </div>
           </section>
@@ -156,6 +145,9 @@ export class OrgSelectionComponent implements OnInit {
   inviteSubject = new BehaviorSubject<any[]>([]);
   invites$ = this.inviteSubject.asObservable();
 
+  loadingDetailsState = new BehaviorSubject<DataLoading>({ type: DataLoadingState.loading });
+  loadingDetailsState$ = this.loadingDetailsState.asObservable();
+
   userEmail$ = this.auth.user$.pipe(pluck('email'));
   constructor(
     private orgService: OrgSelectionService,
@@ -165,14 +157,21 @@ export class OrgSelectionComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.sessionToken) {
-      this.orgService.getOnboardingDetails(this.sessionToken).subscribe((data: any) => {
-        if (data.orgs) {
-          this.orgSubject.next(data.orgs);
-        }
-        if (data.invites) {
-          this.inviteSubject.next(data.invites);
-        }
-      });
+      this.loadingDetailsState.next({ type: DataLoadingState.loading });
+      this.orgService.getOnboardingDetails(this.sessionToken).subscribe(
+        (data: any) => {
+          if (data.orgs) {
+            this.orgSubject.next(data.orgs);
+          }
+          if (data.invites) {
+            this.inviteSubject.next(data.invites);
+          }
+          this.loadingDetailsState.next({ type: DataLoadingState.success });
+        },
+        () => {
+          this.loadingDetailsState.next({ type: DataLoadingState.error, error: new Error() });
+        },
+      );
     }
   }
 

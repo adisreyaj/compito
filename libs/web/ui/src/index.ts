@@ -1,6 +1,7 @@
 export * from './components/button';
 export * from './components/header';
 export * from './components/icon/icon.module';
+export * from './components/loading-card/loading-card.module';
 export * from './components/modal';
 export * from './components/page-header';
 export * from './components/project-card';
