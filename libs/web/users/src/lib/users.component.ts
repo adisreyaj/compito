@@ -36,17 +36,18 @@ import { UsersState } from './state/users.state';
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">
             <ng-container *ngFor="let org of [1, 2]">
-              <compito-loading-card height="226px">
-                <div class="flex flex-col justify-between h-full">
-                  <header>
+              <compito-loading-card height="246px">
+                <div class="flex flex-col justify-between h-full flex-1">
+                  <header class="mb-2">
                     <shimmer width="100px" height="100px" borderRadius="50%"></shimmer>
                   </header>
-                  <div>
-                    <shimmer height="24px" [rounded]="true"></shimmer>
-                    <shimmer height="20px" [rounded]="true"></shimmer>
+                  <div class="flex flex-1 flex-col">
+                    <shimmer height="24px" class="mb-1" width="70%" [rounded]="true"></shimmer>
+                    <shimmer height="18px" class="mb-1" [rounded]="true"></shimmer>
+                    <shimmer height="16px" class="mb-1" width="50%" [rounded]="true"></shimmer>
                   </div>
                   <footer class="flex items-center justify-between">
-                    <shimmer height="16px" width="50%" [rounded]="true"></shimmer>
+                    <shimmer height="12px" width="50%" [rounded]="true"></shimmer>
                   </footer>
                 </div>
               </compito-loading-card>
