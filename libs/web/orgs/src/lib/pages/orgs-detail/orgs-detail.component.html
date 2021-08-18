@@ -1,4 +1,5 @@
-<compito-page-header [title]="(orgDetails$ | async)?.name" [breadcrumbs]="breadcrumbs"></compito-page-header>
+<compito-page-header [title]="(orgDetails$ | async)?.name" [loading]="(orgDetailLoading$|async)?.type === 'LOADING'"
+                     [breadcrumbs]="breadcrumbs"></compito-page-header>
 <ng-container>
   <section class="px-8 orgs__container">
     <compito-section-header title="Projects"></compito-section-header>

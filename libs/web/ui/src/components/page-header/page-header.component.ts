@@ -17,7 +17,12 @@ export interface Breadcrumb {
         </ol>
       </nav>
       <div>
-        <h1 class="text-xl font-bold">{{ title }}</h1>
+        <ng-container *ngIf="loading; else titleSection">
+          <shimmer height="24px" class="mt-1" width="150px" [rounded]="true"></shimmer>
+        </ng-container>
+        <ng-template #titleSection>
+          <h1 class="text-xl font-bold">{{ title }}</h1>
+        </ng-template>
       </div>
     </header>
   `,
@@ -40,6 +45,7 @@ export interface Breadcrumb {
 })
 export class PageHeaderComponent implements OnInit {
   @Input() title: string | undefined = '';
+  @Input() loading = false;
   @Input() breadcrumbs: Breadcrumb[] = [];
   constructor() {}
 
