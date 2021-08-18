@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {
   ButtonModule,
   IconModule,
+  LoadingCardModule,
   PageHeaderModule,
   ProjectCardModule,
   SectionHeaderModule,
@@ -28,6 +29,7 @@ const routes: Routes = [{ path: '', component: OrgsDetailComponent }];
     UserCardModule,
     ProjectCardModule,
     ButtonModule,
+    LoadingCardModule,
   ],
 })
 export class OrgsDetailModule {}

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Organization, User } from '@compito/api-interfaces';
+import { DataLoading, Organization, User } from '@compito/api-interfaces';
 import { ProjectsCreateModalComponent } from '@compito/web/projects';
 import { ProjectsAction } from '@compito/web/projects/state';
 import { Breadcrumb } from '@compito/web/ui';
@@ -41,6 +41,9 @@ export class OrgsDetailComponent implements OnInit {
 
   @Select(OrgsState.getOrgDetail)
   orgDetails$!: Observable<Organization | null>;
+
+  @Select(OrgsState.orgDetailLoading)
+  orgDetailLoading$!: Observable<DataLoading>;
 
   constructor(
     private dialog: DialogService,
