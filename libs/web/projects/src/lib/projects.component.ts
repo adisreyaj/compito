@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { Project } from '@compito/api-interfaces';
+import { DataLoading, Project } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -29,8 +29,30 @@ import { ProjectsState } from './state/projects.state';
             <p class="text-sm">Add New Project</p>
           </div>
         </article>
-        <ng-container *ngFor="let project of projects$ | async">
-          <compito-project-card [data]="project"></compito-project-card>
+        <ng-container [ngSwitch]="(projectsLoading$ | async)?.type">
+          <ng-container *ngSwitchCase="'SUCCESS'">
+            <ng-container *ngFor="let project of projects$ | async">
+              <compito-project-card [data]="project"></compito-project-card>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="'LOADING'">
+            <ng-container *ngFor="let org of [1, 2]">
+              <compito-loading-card height="194px">
+                <div class="flex flex-col justify-between h-full">
+                  <header>
+                    <shimmer height="24px" [rounded]="true"></shimmer>
+                    <shimmer height="40px" [rounded]="true"></shimmer>
+                  </header>
+                  <div>
+                    <shimmer width="40px" height="40px" borderRadius="50%"></shimmer>
+                  </div>
+                  <footer class="flex items-center justify-between">
+                    <shimmer height="16px" width="50%" [rounded]="true"></shimmer>
+                  </footer>
+                </div>
+              </compito-loading-card>
+            </ng-container>
+          </ng-container>
         </ng-container>
       </div>
     </section>`,
@@ -51,6 +73,9 @@ import { ProjectsState } from './state/projects.state';
 })
 export class ProjectsComponent implements OnInit {
   breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
+
+  @Select(ProjectsState.projectsLoading)
+  projectsLoading$!: Observable<DataLoading>;
 
   @Select(ProjectsState.getAllProjects)
   projects$!: Observable<Project[]>;

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Organization } from '@compito/api-interfaces';
+import { DataLoading, Organization } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -27,8 +27,25 @@ import { OrgsState } from './state/orgs.state';
             <p class="text-sm">Create New Org</p>
           </div>
         </article>
-        <ng-container *ngFor="let org of orgs$ | async">
-          <compito-orgs-card [data]="org"></compito-orgs-card>
+        <ng-container [ngSwitch]="(orgsLoading$ | async)?.type">
+          <ng-container *ngSwitchCase="'SUCCESS'">
+            <ng-container *ngFor="let org of orgs$ | async">
+              <compito-orgs-card [data]="org"></compito-orgs-card>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="'LOADING'">
+            <ng-container *ngFor="let org of [1]">
+              <compito-loading-card height="106px">
+                <div class="flex flex-col justify-between h-full">
+                  <shimmer height="24px" [rounded]="true"></shimmer>
+                  <footer class="flex items-center justify-between">
+                    <shimmer height="12px" width="40%" [rounded]="true"></shimmer>
+                    <shimmer height="12px" width="40%" [rounded]="true"></shimmer>
+                  </footer>
+                </div>
+              </compito-loading-card>
+            </ng-container>
+          </ng-container>
         </ng-container>
       </div>
     </section>`,
@@ -51,6 +68,9 @@ export class OrgsComponent implements OnInit {
   breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
   @Select(OrgsState.getAllOrgs)
   orgs$!: Observable<Organization[]>;
+
+  @Select(OrgsState.orgsLoading)
+  orgsLoading$!: Observable<DataLoading>;
   constructor(private store: Store, private dialog: DialogService) {}
 
   ngOnInit(): void {
