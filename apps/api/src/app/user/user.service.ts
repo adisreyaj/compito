@@ -475,7 +475,24 @@ export class UserService {
         where: whereCondition,
         skip,
         take: limit,
-        select: { ...USER_BASIC_DETAILS, orgs: { select: { id: true, name: true } } },
+        select: {
+          ...USER_BASIC_DETAILS,
+          createdAt: true,
+          updatedAt: true,
+          roles: {
+            where: {
+              orgId: org,
+            },
+            select: {
+              role: {
+                select: {
+                  label: true,
+                },
+              },
+            },
+          },
+          orgs: { select: { id: true, name: true } },
+        },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -541,7 +558,7 @@ export class UserService {
     try {
       const user = await this.prisma.user.findFirst({
         where: whereCondition,
-        select: { ...USER_BASIC_DETAILS, orgs: { select: { id: true, name: true } } },
+        select: { ...USER_BASIC_DETAILS, createdAt: true, updatedAt: true, orgs: { select: { id: true, name: true } } },
       });
       if (!user) {
         throw new NotFoundException('User not found');

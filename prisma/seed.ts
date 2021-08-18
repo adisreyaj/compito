@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const ROLES_PERMISSIONS = [
   {
     name: 'super-admin',
+    label: 'Super Admin',
     permissions: [
       'role:create',
       'role:read',
@@ -33,6 +34,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'admin',
+    label: 'Admin',
     permissions: [
       'role:read',
       'user:create',
@@ -59,6 +61,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'org-admin',
+    label: 'Org Admin',
     permissions: [
       'role:read',
       'user:read',
@@ -82,6 +85,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'project-admin',
+    label: 'Project Admin',
     permissions: [
       'user:read',
       'org:create',
@@ -102,6 +106,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'user',
+    label: 'User',
     permissions: [
       'user:read',
       'org:create',
@@ -124,6 +129,7 @@ const ROLES_PERMISSIONS = [
 async function main() {
   const rolesData: Prisma.RoleCreateManyInput[] = ROLES_PERMISSIONS.map((item) => ({
     name: item.name,
+    label: item.label,
     permissions: item.permissions,
   }));
   const roles = await Promise.all(
@@ -133,6 +139,7 @@ async function main() {
         update: {},
         create: {
           name: data.name,
+          label: data.label,
           permissions: data.permissions,
         },
       });

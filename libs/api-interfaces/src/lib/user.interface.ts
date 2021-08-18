@@ -1,5 +1,6 @@
 import { DocDates } from './general.interface';
 import { Organization } from './organization.interface';
+import { Role } from './role.interface';
 
 export interface UserBase {
   email: string;
@@ -14,6 +15,7 @@ export interface User extends UserBase, DocDates {
   orgs: Organization[];
   blocked: boolean;
   verified: boolean;
+  roles: { role: Role }[];
 }
 
 export interface UserSignupRequest extends UserBase {
