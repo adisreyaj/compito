@@ -1,4 +1,4 @@
-import { RequestParams, Role, Roles, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
+import { RequestParams, Role, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
 import {
   ForbiddenException,
   Injectable,
@@ -32,9 +32,6 @@ export class UserService {
   async getUserDetails(sessionToken: string) {
     try {
       const secret = this.config.get('SESSION_TOKEN_SECRET');
-      if (!secret) {
-        throw new Error('Please provide the Session Token Secret');
-      }
       const token: JwtPayload = verify(sessionToken, secret) as any;
       if (!token) {
         throw new ForbiddenException('Session not valid. Please login again!');
@@ -219,40 +216,6 @@ export class UserService {
       return user;
     } catch (error) {
       throw new InternalServerErrorException('Failed to fetch user orgs');
-    }
-  }
-
-  async invite(data: { email: string; role: string }, user: UserPayload) {
-    const { org, userId, role } = getUserDetails(user);
-    switch (role.name as Roles) {
-      case 'user':
-      case 'project-admin':
-        throw new ForbiddenException('No permission to invite user');
-      default:
-        break;
-    }
-    try {
-      const invite = await this.prisma.userInvite.create({
-        data: {
-          email: data.email,
-          orgId: org,
-          invitedById: userId,
-          roleId: data.role,
-        },
-        select: {
-          email: true,
-          org: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      });
-      return invite;
-    } catch (error) {
-      this.logger.error('Failed to create invite', error);
-      throw new InternalServerErrorException('Failed to create invite');
     }
   }
 

@@ -33,7 +33,6 @@ export class UserController {
     return this.userService.findAll(query, req.user);
   }
 
-  // For Auth0 to access during login flow
   @Public()
   @Get('onboard')
   getOnboardingDetails(@Req() req: Request) {
@@ -62,13 +61,6 @@ export class UserController {
     return this.userService.find(id, req.user);
   }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('org-admin')
-  @Post('invite')
-  invite(@Body() data: { email: string; role: string }, @Req() req: RequestWithUser) {
-    return this.userService.invite(data, req.user);
-  }
-
   @Public()
   @Post('signup')
   signup(@Body() user: UserSignupRequest) {
@@ -82,8 +74,9 @@ export class UserController {
     return this.userService.updateUser(id, user, req.user);
   }
 
-  // @UseGuards(PermissionsGuard)
-  // @Permissions(PERMISSIONS.user.delete)
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Permissions(PERMISSIONS.user.delete)
+  @Role('org-admin')
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.userService.deleteUser(id, req.user);
