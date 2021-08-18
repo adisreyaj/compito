@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthHttpInterceptor, AuthModule } from '@auth0/auth0-angular';
-import { API_TOKEN } from '@compito/web/ui';
+import { API_TOKEN, DelayInterceptor } from '@compito/web/ui';
 import { UsersState } from '@compito/web/users';
 import { DialogModule } from '@ngneat/dialog';
 import { popperVariation, TippyModule, tooltipVariation } from '@ngneat/helipopper';
@@ -31,10 +31,14 @@ enableMapSet();
       audience: environment.auth.audience,
       clientId: environment.auth.clientId,
       redirectUri: window.location.origin,
+      errorPath: '/auth/login',
+      cacheLocation: 'localstorage',
+      useRefreshTokens: true,
       httpInterceptor: {
         allowedList: [
           {
-            uriMatcher: (uri: string) => uri.includes(environment.api) && !uri.includes('/ping'),
+            uriMatcher: (uri: string) =>
+              uri.includes(environment.api) && (!uri.includes('/ping') || !uri.includes('/pre-auth')),
           },
         ],
       },
@@ -65,6 +69,11 @@ enableMapSet();
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthHttpInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: DelayInterceptor,
       multi: true,
     },
     {

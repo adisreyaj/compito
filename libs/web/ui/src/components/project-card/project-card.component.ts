@@ -36,7 +36,7 @@ import { Project } from '@compito/api-interfaces';
           </p>
         </div>
         <div>
-          <p><span class="font-medium text-gray-600">19</span> Tasks</p>
+          <!-- <p><span class="font-medium text-gray-600">19</span> Tasks</p> -->
         </div>
       </footer>
     </article>

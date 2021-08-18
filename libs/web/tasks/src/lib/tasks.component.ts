@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
-import { Task } from '@compito/api-interfaces';
+import { DataLoading, Task } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -30,6 +30,9 @@ export class TasksComponent implements OnInit {
 
   @Select(TasksState.getMyTasks)
   tasks$!: Observable<Task[]>;
+
+  @Select(TasksState.tasksLoading)
+  tasksLoading$!: Observable<DataLoading>;
   constructor(private store: Store, private auth: AuthService) {}
 
   ngOnInit(): void {

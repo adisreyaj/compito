@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import {
   ButtonModule,
   IconModule,
+  LoadingCardModule,
   ModalModule,
   PageHeaderModule,
   PriorityColorDirectiveModule,
@@ -38,6 +39,7 @@ import { TasksComponent } from './tasks.component';
     TippyModule,
     A11yModule,
     PriorityColorDirectiveModule,
+    LoadingCardModule,
   ],
 })
 export class WebTasksModule {}

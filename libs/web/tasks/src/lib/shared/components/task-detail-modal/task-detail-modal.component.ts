@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BoardList, Task, User } from '@compito/api-interfaces';
 import { BoardsAction } from '@compito/web/boards/state';
@@ -53,7 +53,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
             <textarea class="w-3/4" type="text" id="description" rows="3" [formControl]="description"></textarea>
             <footer class="mt-4 flex items-center space-x-2">
               <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
-              <button btn size="sm" variant="secondary">Cancel</button>
+              <button btn size="sm" variant="secondary" *ngIf="description.dirty">Cancel</button>
             </footer>
           </div>
         </section>
@@ -73,7 +73,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
                   <textarea class="w-3/4" type="text" id="comment" [formControl]="comment" rows="2"></textarea>
                   <footer class="mt-4 flex items-center space-x-2">
                     <button btn size="sm" [disabled]="!comment.dirty">Save</button>
-                    <button btn size="sm" variant="secondary">Cancel</button>
+                    <button btn size="sm" variant="secondary" *ngIf="comment.dirty">Cancel</button>
                   </footer>
                 </div>
               </div>
@@ -177,6 +177,9 @@ export class TaskDetailModalComponent implements OnInit {
 
   description = new FormControl('Default description');
   comment = new FormControl('');
+  initialValues = {
+    description: '',
+  };
 
   constructor(
     public ref: DialogRef<{
@@ -185,11 +188,13 @@ export class TaskDetailModalComponent implements OnInit {
       users: Observable<User[]>;
     }>,
     private store: Store,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     const assignees = this.ref.data?.task?.assignees ?? [];
     this.description.setValue(this.ref.data.task.description ?? '');
+    this.initialValues.description = this.ref.data.task.description ?? '';
     assignees.forEach((assignee) => {
       this.selectedAssignees.set(assignee.id, assignee);
     });
@@ -198,13 +203,18 @@ export class TaskDetailModalComponent implements OnInit {
 
   updateAssignees() {
     const assignees = [...this.selectedAssignees.keys()];
-    this.store.dispatch(new BoardsAction.UpdateAssignees(this.taskId, assignees));
+    this.store.dispatch(new BoardsAction.UpdateAssignees(this.listId, this.taskId, assignees));
     this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
   }
 
   updateDescription() {
     if (this.description.valid) {
-      this.store.dispatch(new BoardsAction.UpdateTaskDescription(this.taskId, this.description.value));
+      const newValue = this.description.value;
+      this.store.dispatch(new BoardsAction.UpdateTaskDescription(this.taskId, this.description.value)).subscribe(() => {
+        this.description.markAsPristine();
+        this.initialValues.description = newValue;
+        this.cdr.markForCheck();
+      });
     }
   }
 
@@ -215,6 +225,11 @@ export class TaskDetailModalComponent implements OnInit {
         name: firstName,
       };
     });
+  }
+
+  revertDescription() {
+    this.description.setValue(this.initialValues.description);
+    this.description.markAsPristine();
   }
 
   toggleAssignee(user: User) {
@@ -231,5 +246,8 @@ export class TaskDetailModalComponent implements OnInit {
 
   private get taskId() {
     return this.ref.data.task.id;
+  }
+  private get listId() {
+    return this.ref.data.list.id;
   }
 }

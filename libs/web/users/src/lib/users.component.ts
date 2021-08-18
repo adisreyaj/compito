@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { User } from '@compito/api-interfaces';
+import { DataLoading, User } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -15,7 +15,7 @@ import { UsersState } from './state/users.state';
     <section class="projects__container">
       <div class="projects__list px-8">
         <article
-          (click)="createNew()"
+          (click)="inviteUser()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
@@ -25,11 +25,34 @@ import { UsersState } from './state/users.state';
             <div class=" border rounded-md shadow-sm bg-white">
               <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
             </div>
-            <p class="text-sm">Add New User</p>
+            <p class="text-sm">Invite User</p>
           </div>
         </article>
-        <ng-container *ngFor="let user of users$ | async">
-          <compito-users-card [data]="user"></compito-users-card>
+        <ng-container [ngSwitch]="(usersLoading$ | async)?.type">
+          <ng-container *ngSwitchCase="'SUCCESS'">
+            <ng-container *ngFor="let user of users$ | async">
+              <compito-users-card [data]="user"></compito-users-card>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="'LOADING'">
+            <ng-container *ngFor="let org of [1, 2]">
+              <compito-loading-card height="246px">
+                <div class="flex flex-col justify-between h-full flex-1">
+                  <header class="mb-2">
+                    <shimmer width="100px" height="100px" borderRadius="50%"></shimmer>
+                  </header>
+                  <div class="flex flex-1 flex-col">
+                    <shimmer height="24px" class="mb-1" width="70%" [rounded]="true"></shimmer>
+                    <shimmer height="18px" class="mb-1" [rounded]="true"></shimmer>
+                    <shimmer height="16px" class="mb-1" width="50%" [rounded]="true"></shimmer>
+                  </div>
+                  <footer class="flex items-center justify-between">
+                    <shimmer height="12px" width="50%" [rounded]="true"></shimmer>
+                  </footer>
+                </div>
+              </compito-loading-card>
+            </ng-container>
+          </ng-container>
         </ng-container>
       </div>
     </section>
@@ -52,6 +75,9 @@ import { UsersState } from './state/users.state';
 export class UsersComponent implements OnInit {
   breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
 
+  @Select(UsersState.usersLoading)
+  usersLoading$!: Observable<DataLoading>;
+
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
   constructor(private dialog: DialogService, private store: Store) {}
@@ -60,7 +86,7 @@ export class UsersComponent implements OnInit {
     this.store.dispatch(new UsersAction.GetAll({}));
   }
 
-  createNew() {
+  inviteUser() {
     const ref = this.dialog.open(UsersCreateModalComponent);
     ref.afterClosed$.subscribe((data) => {
       if (data) {

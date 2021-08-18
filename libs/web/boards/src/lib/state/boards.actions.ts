@@ -12,14 +12,14 @@ export namespace BoardsAction {
 
   export class UpdateAssignees {
     static readonly type = '[Task] Update assignees';
-    constructor(public taskId: string, public assignees: string[]) {}
+    constructor(public listId: string, public taskId: string, public assignees: string[]) {}
   }
-  
+
   export class UpdateTaskDescription {
     static readonly type = '[Task] Update task description';
     constructor(public taskId: string, public description: string) {}
   }
-  
+
   export class Reorder {
     static readonly type = '[Task] Reorder task';
     constructor(public id: string, public newList: BoardList[]) {}

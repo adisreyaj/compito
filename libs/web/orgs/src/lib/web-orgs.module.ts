@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import {
   ButtonModule,
   IconModule,
+  LoadingCardModule,
   ModalModule,
   PageHeaderModule,
   TimeAgoModule,
@@ -34,6 +35,7 @@ import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/
     ButtonModule,
     UserAvatarGroupModule,
     ModalModule,
+    LoadingCardModule,
   ],
   declarations: [OrgsComponent, OrgsCardComponent, OrgsCreateModalComponent],
 })

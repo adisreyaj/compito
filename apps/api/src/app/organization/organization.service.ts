@@ -1,4 +1,11 @@
-import { OrganizationRequest, RequestParams, Roles, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
+import {
+  OrganizationRequest,
+  RequestParams,
+  Role,
+  Roles,
+  UpdateMembersRequest,
+  UserPayload,
+} from '@compito/api-interfaces';
 import {
   ForbiddenException,
   Injectable,
@@ -18,15 +25,56 @@ export class OrganizationService {
   private logger = new Logger('ORG');
   constructor(private prisma: PrismaService) {}
 
-  async create(data: OrganizationRequest) {
+  async create(data: OrganizationRequest, user: UserPayload) {
+    const { userId } = getUserDetails(user);
+    let role: Role;
     try {
+      role = await this.prisma.role.findFirst({
+        where: {
+          name: 'admin',
+        },
+        rejectOnNotFound: true,
+      });
+      this.logger.debug('Admin role found', role.id);
+    } catch (error) {
+      this.logger.error('Failed to fetch the roles');
+      throw new InternalServerErrorException('Failed to create org!');
+    }
+    try {
+      let members = [];
+      if (data.members?.length > 0) {
+        members = data.members.map((id) => ({ id }));
+        if (!data.members.includes(userId)) {
+          members.push({ id: userId });
+        }
+      } else {
+        members.push({ id: userId });
+      }
+      let orgData: Prisma.OrganizationCreateInput = {
+        name: data.name,
+        slug: data.slug,
+        createdBy: {
+          connect: {
+            id: userId,
+          },
+        },
+        userRoleOrg: {
+          create: {
+            roleId: role.id,
+            userId,
+          },
+        },
+        members: {
+          connect: members,
+        },
+      };
       const org = await this.prisma.organization.create({
-        data,
+        data: orgData,
       });
       return org;
     } catch (error) {
       this.logger.error('Failed to create org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -79,7 +127,7 @@ export class OrganizationService {
       };
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -176,10 +224,10 @@ export class OrganizationService {
       if (org) {
         return org;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to fetch org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -192,21 +240,21 @@ export class OrganizationService {
     try {
       const org = await this.prisma.organization.update({
         where,
-        data,
+        data: {},
       });
       this.logger.debug(org);
       if (org) {
         return org;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -262,15 +310,15 @@ export class OrganizationService {
       if (project) {
         return project;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          return new NotFoundException();
+          throw new NotFoundException();
         }
       }
       this.logger.error('Failed to update members', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -286,10 +334,10 @@ export class OrganizationService {
       if (org) {
         return org;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to delete org', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 

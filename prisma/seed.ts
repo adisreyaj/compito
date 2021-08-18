@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const ROLES_PERMISSIONS = [
   {
     name: 'super-admin',
+    label: 'Super Admin',
     permissions: [
       'role:create',
       'role:read',
@@ -33,6 +34,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'admin',
+    label: 'Admin',
     permissions: [
       'role:read',
       'user:create',
@@ -59,6 +61,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'org-admin',
+    label: 'Org Admin',
     permissions: [
       'role:read',
       'user:read',
@@ -82,6 +85,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'project-admin',
+    label: 'Project Admin',
     permissions: [
       'user:read',
       'org:create',
@@ -102,6 +106,7 @@ const ROLES_PERMISSIONS = [
   },
   {
     name: 'user',
+    label: 'User',
     permissions: [
       'user:read',
       'org:create',
@@ -122,29 +127,9 @@ const ROLES_PERMISSIONS = [
 ];
 
 async function main() {
-  const admin = await prisma.user.upsert({
-    where: { email: 'adi.sreyaj@gmail.com' },
-    update: {},
-    create: {
-      email: 'adi.sreyaj@gmail.com',
-      firstName: 'Adithya',
-      lastName: 'Sreyaj',
-      password: '$2a$12$0.g5pAEI55Fl57yd8zpxne61oxPEkL79z5Uwu7zKRKeIWphfV//NW',
-    },
-  });
-  console.log(`User Created Successfully!`, admin.id);
-  const org = await prisma.organization.upsert({
-    where: { slug: 'compito-org' },
-    update: {},
-    create: {
-      name: 'Compito',
-      slug: 'compito-org',
-      createdById: admin.id,
-    },
-  });
-  console.log(`Org Created Successfully!`, org.id);
   const rolesData: Prisma.RoleCreateManyInput[] = ROLES_PERMISSIONS.map((item) => ({
     name: item.name,
+    label: item.label,
     permissions: item.permissions,
   }));
   const roles = await Promise.all(
@@ -154,6 +139,7 @@ async function main() {
         update: {},
         create: {
           name: data.name,
+          label: data.label,
           permissions: data.permissions,
         },
       });

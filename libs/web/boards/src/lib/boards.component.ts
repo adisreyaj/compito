@@ -1,9 +1,10 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Board, BoardList, BoardListWithTasks, Task, User } from '@compito/api-interfaces';
+import { AuthService } from '@auth0/auth0-angular';
+import { Board, BoardList, BoardListWithTasks, DataLoading, Task, User } from '@compito/api-interfaces';
 import { TasksCreateModalComponent } from '@compito/web/tasks';
-import { Breadcrumb } from '@compito/web/ui';
+import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -16,35 +17,54 @@ import { BoardsState } from './state/boards.state';
 @Component({
   selector: 'compito-boards',
   template: `
-    <compito-page-header [title]="(board$ | async)?.name" [breadcrumbs]="breadcrumbs"> </compito-page-header>
-    <ng-container *ngIf="lists$ | async as lists">
-      <section
-        class="board__container p-8 flex space-x-2"
-        cdkDropList
-        [cdkDropListData]="lists"
-        cdkDropListOrientation="horizontal"
-        (cdkDropListDropped)="drop($event)"
-      >
-        <ng-container *ngFor="let item of lists">
-          <compito-task-list
-            cdkDrag
-            [list]="item"
-            [allList]="lists"
-            (dropped)="dropTask($event)"
-            (newTask)="createNewTask($event)"
-            (taskClicked)="viewTaskDetail($event, item)"
+    <compito-page-header
+      [title]="(board$ | async)?.name"
+      [loading]="(loading$ | async)?.type === 'LOADING'"
+      [breadcrumbs]="breadcrumbs"
+    >
+    </compito-page-header>
+    <ng-container [ngSwitch]="(loading$ | async)?.type">
+      <ng-container *ngSwitchCase="'LOADING'">
+        <div class="grid place-items-center" style="min-height:calc(100vh - 64px - 64px)">
+          <div class="text-center -translate-y-8 transform">
+            <img src="assets/images/loading.svg" alt="Loading" width="300px" height="300px" />
+            <h1 class="text-md font-medium">Please wait...</h1>
+            <p class="text-gray-600">Your board is being loaded!</p>
+          </div>
+        </div>
+      </ng-container>
+      <ng-container *ngSwitchCase="'SUCCESS'">
+        <ng-container *ngIf="lists$ | async as lists">
+          <section
+            class="board__container p-8 flex space-x-2"
+            cdkDropList
+            [cdkDropListData]="lists"
+            cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="drop($event)"
           >
-            <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
-              <div
-                cdkDragHandle
-                class="list__drag transition-opacity duration-300 ease-in opacity-0 w-8 h-8 -mt-4 grid cursor-move place-items-center bg-gray-100 rounded-full"
+            <ng-container *ngFor="let item of lists">
+              <compito-task-list
+                cdkDrag
+                [list]="item"
+                [allList]="lists"
+                (dropped)="dropTask($event)"
+                (newTask)="createNewTask($event)"
+                (taskClicked)="viewTaskDetail($event, item)"
               >
-                <rmx-icon style="width: 20px; height:20px" name="drag-move-line"></rmx-icon>
-              </div>
-            </div>
-          </compito-task-list>
+                <div class="absolute flex justify-center left-0 top-0 w-full rounded-tl-md rounded-tr-md">
+                  <div
+                    cdkDragHandle
+                    class="list__drag transition-opacity duration-300 ease-in opacity-0 w-8 h-8 -mt-4 grid cursor-move place-items-center bg-gray-100 rounded-full"
+                  >
+                    <rmx-icon style="width: 20px; height:20px" name="drag-move-line"></rmx-icon>
+                  </div>
+                </div>
+              </compito-task-list>
+            </ng-container>
+          </section>
         </ng-container>
-      </section>
+      </ng-container>
+      <ng-container *ngSwitchCase="'ERROR'"> </ng-container>
     </ng-container>
   `,
   styles: [
@@ -77,10 +97,18 @@ export class BoardsComponent implements OnInit {
   @Select(BoardsState.getBoardLists)
   lists$!: Observable<BoardListWithTasks[]>;
 
+  @Select(BoardsState.loading)
+  loading$!: Observable<DataLoading>;
+
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
 
-  constructor(private dialog: DialogService, private store: Store, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private dialog: DialogService,
+    private store: Store,
+    private activatedRoute: ActivatedRoute,
+    private auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     if (this.taskId) {
@@ -141,13 +169,21 @@ export class BoardsComponent implements OnInit {
 
   createNewTask(listId: string) {
     const ref = this.dialog.open(TasksCreateModalComponent);
-    ref.afterClosed$.pipe(withLatestFrom(this.board$)).subscribe(([data, board]) => {
-      if (data) {
-        this.store.dispatch(
-          new BoardsAction.AddTask({ ...data, list: listId, boardId: board?.id, projectId: board?.project.id }),
-        );
-      }
-    });
+    ref.afterClosed$
+      .pipe(withLatestFrom(this.board$, this.auth.user$.pipe(formatUser())))
+      .subscribe(([data, board, user]) => {
+        if (data) {
+          this.store.dispatch(
+            new BoardsAction.AddTask({
+              ...data,
+              list: listId,
+              boardId: board?.id,
+              projectId: board?.project.id,
+              orgId: user?.org,
+            }),
+          );
+        }
+      });
   }
 
   viewTaskDetail(task: Task, list: BoardList) {

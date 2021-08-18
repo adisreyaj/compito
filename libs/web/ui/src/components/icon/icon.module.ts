@@ -5,6 +5,7 @@ import {
   RiAddCircleLine,
   RiAddLine,
   RiArrowDownSLine,
+  RiArrowRightLine,
   RiAttachment2,
   RiBuildingLine,
   RiCheckboxLine,
@@ -21,6 +22,7 @@ import {
 const icons = {
   RiNotification2Line,
   RiAddCircleLine,
+  RiArrowRightLine,
   RiHome5Line,
   RiTableLine,
   RiFolder4Line,

@@ -20,6 +20,7 @@ export class TaskService {
   async create(data: TaskRequest, user: UserPayload) {
     try {
       const { userId, org, projects, role } = getUserDetails(user);
+      const { assignees, priority, tags, boardId, projectId, orgId, ...rest } = data;
       switch (role.name as Roles) {
         case 'user':
         case 'project-admin':
@@ -31,12 +32,11 @@ export class TaskService {
           }
           break;
         default:
-          if (data.orgId !== org) {
+          if (orgId !== org) {
             throw new ForbiddenException('Not enough permission to create task!');
           }
           break;
       }
-      const { assignees, priority, tags, boardId, projectId, ...rest } = data;
       const taskData: Prisma.TaskCreateInput = {
         ...rest,
         priority: priority ?? Priority.Medium,
@@ -45,7 +45,7 @@ export class TaskService {
         },
         org: {
           connect: {
-            id: org,
+            id: orgId,
           },
         },
         project: {
@@ -84,8 +84,10 @@ export class TaskService {
         break;
     }
     if (Object.prototype.hasOwnProperty.call(query, 'priority')) {
-      Object.assign(where.priority, {
-        in: query.priority.split(',') as any[],
+      Object.assign(where, {
+        priority: {
+          in: (query.priority.split(',') as any[]) ?? [],
+        },
       });
     }
     try {
@@ -96,6 +98,20 @@ export class TaskService {
         take: limit,
         orderBy: {
           [sort]: order,
+        },
+        include: {
+          board: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
@@ -138,7 +154,7 @@ export class TaskService {
         }
         return task;
       }
-      return new NotFoundException();
+      throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to fetch task', error);
       throw new InternalServerErrorException();
@@ -163,7 +179,7 @@ export class TaskService {
         taskData = {
           ...taskData,
           assignees: {
-            connect: assignees.map((id) => ({ id })),
+            set: assignees.map((id) => ({ id })),
           },
         };
       }
@@ -180,6 +196,17 @@ export class TaskService {
           id,
         },
         data: taskData,
+        include: {
+          assignees: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              image: true,
+              email: true,
+            },
+          },
+        },
       });
       this.logger.debug(task);
       if (task) {

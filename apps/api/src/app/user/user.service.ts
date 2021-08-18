@@ -1,5 +1,6 @@
 import { RequestParams, Role, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -11,7 +12,7 @@ import { Prisma } from '@prisma/client';
 import { AppMetadata, AuthenticationClient, ManagementClient, SignUpUserData, UserMetadata } from 'auth0';
 import { hashSync } from 'bcrypt';
 import * as cuid from 'cuid';
-import { verify } from 'jsonwebtoken';
+import { JwtPayload, verify } from 'jsonwebtoken';
 import { kebabCase } from 'voca';
 import { AuthService } from '../auth/auth.service';
 import { getUserDetails } from '../core/utils/payload.util';
@@ -29,33 +30,169 @@ export class UserService {
     this.authClient = this.auth.auth;
   }
 
-  // TODO: add jwt based validation
-  async getUserPermissions(userId: string, orgId: string) {
+  async getUserDetails(sessionToken: string) {
     try {
-      const userRole = this.prisma.userRoleOrg.findFirst({
-        where: {
-          userId,
-          orgId,
-        },
-        select: {
-          role: {
-            select: {
-              id: true,
-              name: true,
-              permissions: true,
+      const secret = this.config.get('SESSION_TOKEN_SECRET');
+      const token: JwtPayload = verify(sessionToken, secret) as any;
+      if (!token) {
+        throw new ForbiddenException('Session not valid. Please login again!');
+      }
+      const [user, userInvite] = await this.prisma.$transaction([
+        this.prisma.user.findUnique({
+          where: {
+            id: token.userId,
+          },
+          select: {
+            email: true,
+            orgs: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            projects: {
+              select: {
+                id: true,
+                name: true,
+                orgId: true,
+              },
+            },
+            roles: {
+              select: {
+                orgId: true,
+                role: {
+                  select: {
+                    name: true,
+                    permissions: true,
+                  },
+                },
+              },
             },
           },
-        },
-      });
-      this.logger.debug('Fetched user role');
-      return userRole;
+        }),
+        this.prisma.userInvite.findMany({
+          where: {
+            email: token.email,
+          },
+          select: {
+            id: true,
+          },
+        }),
+      ]);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const { orgs = [], projects = [], roles = [] } = user;
+      const orgIds = orgs.map(({ id }) => id);
+      const projectIds = projects.map(({ id }) => id);
+      const inviteIds = userInvite.map(({ id }) => id);
+      const rolesData = roles.reduce((acc, { role, orgId }) => {
+        return {
+          ...acc,
+          [orgId]: role,
+        };
+      }, {});
+
+      if (token.org) {
+        if (!orgIds.includes(token.org)) {
+          throw new ForbiddenException('No access to org');
+        }
+        const projectsPartOfOrg = projects.filter(({ orgId: org }) => org === token.org).map(({ id }) => id);
+        return {
+          org: token.org,
+          projects: projectsPartOfOrg,
+          role: rolesData[token.org],
+        };
+      }
+      return {
+        orgs: orgIds,
+        projects: projectIds,
+        invites: inviteIds,
+        roles: rolesData,
+        partOfMultipleOrgs: orgIds.length > 1,
+        pendingInvites: inviteIds.length > 0,
+      };
     } catch (error) {
-      this.logger.error('Failed to retrieve user permissions');
-      throw new InternalServerErrorException('Failed to retrieve permissions');
+      throw new InternalServerErrorException('Failed to fetch user orgs');
     }
   }
 
-  async getUserOrgs(userId: string, sessionToken: string) {
+  async getOnboardingDetails(sessionToken: string) {
+    try {
+      const secret = this.config.get('SESSION_TOKEN_SECRET');
+      if (!secret) {
+        throw new Error('Please provide the Session Token Secret');
+      }
+      const token: JwtPayload = verify(sessionToken, secret) as JwtPayload;
+      if (!token) {
+        throw new ForbiddenException('Session not valid. Please login again!');
+      }
+      const [user, userInvite] = await this.prisma.$transaction([
+        this.prisma.user.findUnique({
+          where: {
+            id: token.userId,
+          },
+          select: {
+            ...USER_BASIC_DETAILS,
+            orgs: {
+              select: {
+                id: true,
+                name: true,
+                createdBy: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    image: true,
+                    email: true,
+                  },
+                },
+                updatedAt: true,
+              },
+            },
+            roles: {
+              select: {
+                orgId: true,
+                role: {
+                  select: {
+                    name: true,
+                    permissions: true,
+                  },
+                },
+              },
+            },
+          },
+        }),
+        this.prisma.userInvite.findMany({
+          where: {
+            email: token.email,
+          },
+          select: {
+            id: true,
+            email: true,
+            invitedBy: {
+              select: USER_BASIC_DETAILS,
+            },
+          },
+        }),
+      ]);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const { orgs = [], ...rest } = user;
+      return {
+        ...rest,
+        orgs,
+        invites: userInvite,
+      };
+    } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+        throw new BadRequestException('Session expired, Please login again!');
+      }
+      throw new InternalServerErrorException('Failed to onboard details for user');
+    }
+  }
+
+  async getUserOrgsAndInvites(userId: string, sessionToken: string) {
     try {
       const secret = this.config.get('SESSION_TOKEN_SECRET');
       if (!secret) {
@@ -86,38 +223,46 @@ export class UserService {
       throw new InternalServerErrorException('Failed to fetch user orgs');
     }
   }
-  async getUserProjects(userId: string, orgId: string, sessionToken: string) {
+
+  async acceptInvite(id: string, user: UserPayload) {
     try {
-      const secret = this.config.get('SESSION_TOKEN_SECRET');
-      if (!secret) {
-        throw new Error('Please provide the Session Token Secret');
-      }
-      const token = verify(sessionToken, secret);
-      if (!token) {
-        throw new ForbiddenException('Session not valid. Please login again!');
-      }
-      const user = await this.prisma.user.findUnique({
+      const inviteDetails = await this.prisma.userInvite.findUnique({
         where: {
-          id: userId,
+          id,
         },
         select: {
-          projects: {
-            select: {
-              id: true,
-            },
-            where: {
-              orgId,
-            },
-          },
+          orgId: true,
+          id: true,
+          roleId: true,
+          email: true,
         },
       });
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-      return user;
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: {
+            email: inviteDetails.email,
+          },
+          data: {
+            orgs: {
+              connect: {
+                id: inviteDetails.orgId,
+              },
+            },
+            roles: {
+              create: {
+                roleId: inviteDetails.roleId,
+                orgId: inviteDetails.orgId,
+              },
+            },
+          },
+        }),
+        this.prisma.userInvite.delete({
+          where: { id },
+        }),
+      ]);
     } catch (error) {
-      this.logger.error(error);
-      throw new InternalServerErrorException('Failed to fetch user orgs');
+      this.logger.error('Failed to accept invite', error);
+      throw new InternalServerErrorException('Failed to accept invite');
     }
   }
 
@@ -330,7 +475,24 @@ export class UserService {
         where: whereCondition,
         skip,
         take: limit,
-        select: { ...USER_BASIC_DETAILS, orgs: { select: { id: true, name: true } } },
+        select: {
+          ...USER_BASIC_DETAILS,
+          createdAt: true,
+          updatedAt: true,
+          roles: {
+            where: {
+              orgId: org,
+            },
+            select: {
+              role: {
+                select: {
+                  label: true,
+                },
+              },
+            },
+          },
+          orgs: { select: { id: true, name: true } },
+        },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -341,9 +503,10 @@ export class UserService {
       };
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
+
   async find(id: string, user: UserPayload) {
     const { org, role, projects } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {
@@ -395,7 +558,7 @@ export class UserService {
     try {
       const user = await this.prisma.user.findFirst({
         where: whereCondition,
-        select: { ...USER_BASIC_DETAILS, orgs: { select: { id: true, name: true } } },
+        select: { ...USER_BASIC_DETAILS, createdAt: true, updatedAt: true, orgs: { select: { id: true, name: true } } },
       });
       if (!user) {
         throw new NotFoundException('User not found');
@@ -403,7 +566,7 @@ export class UserService {
       return user;
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
-      return new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 
@@ -470,7 +633,7 @@ export class UserService {
     } catch (error) {
       this.logger.error(error);
       if (error?.name === 'NotFoundError') {
-        return new NotFoundException();
+        throw new NotFoundException();
       }
       throw new InternalServerErrorException('Failed to delete user');
     }
