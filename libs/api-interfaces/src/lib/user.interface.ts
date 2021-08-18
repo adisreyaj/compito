@@ -1,5 +1,6 @@
 import { DocDates } from './general.interface';
 import { Organization } from './organization.interface';
+import { Role } from './role.interface';
 
 export interface UserBase {
   email: string;
@@ -14,6 +15,7 @@ export interface User extends UserBase, DocDates {
   orgs: Organization[];
   blocked: boolean;
   verified: boolean;
+  roles: { role: Role }[];
 }
 
 export interface UserSignupRequest extends UserBase {
@@ -30,3 +32,17 @@ export type UpdateMembersRequestType = 'modify' | 'set';
 type ModifyMembers = { type: 'modify'; add?: string[]; remove?: string[] };
 type SetMembers = { type: 'set'; set: string[] };
 export type UpdateMembersRequest = ModifyMembers | SetMembers;
+
+export interface UserDetails {
+  role: string;
+  userId: string;
+  org: string;
+  family_name: string;
+  nickname: string;
+  name: string;
+  picture: string;
+  updated_at: string;
+  email: string;
+  email_verified: string;
+  sub: string;
+}

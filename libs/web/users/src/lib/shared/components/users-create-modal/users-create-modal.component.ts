@@ -7,23 +7,9 @@ import { DialogRef } from '@ngneat/dialog';
   template: ` <compito-modal title="Add New Project" [ref]="ref" cdkTrapFocus>
     <section>
       <form [formGroup]="userForm" id="userForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input class="w-full" type="text" id="firstName" formControlName="firstName" autofocus />
-          </div>
-          <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input class="w-full" type="text" id="lastName" formControlName="lastName" autofocus />
-          </div>
-        </div>
         <div class="form-group">
           <label for="email">Email</label>
           <input class="w-full" type="email" id="email" formControlName="email" />
-        </div>
-        <div class="form-group w-1/2">
-          <label for="password">Password</label>
-          <input class="w-full" type="password" id="password" formControlName="password" />
         </div>
       </form>
     </section>

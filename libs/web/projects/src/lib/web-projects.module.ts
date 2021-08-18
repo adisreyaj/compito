@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import {
   ButtonModule,
   IconModule,
+  LoadingCardModule,
   ModalModule,
   PageHeaderModule,
   ProjectCardModule,
@@ -40,6 +41,7 @@ import { ProjectsCreateModalComponent } from './shared/components/projects-creat
     TippyModule,
     TimeAgoModule,
     ProjectCardModule,
+    LoadingCardModule,
   ],
   declarations: [ProjectsComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
 })

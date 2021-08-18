@@ -1,6 +1,6 @@
 import { moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Injectable } from '@angular/core';
-import { Board, BoardListWithTasks } from '@compito/api-interfaces';
+import { Board, BoardListWithTasks, DataLoading, DataLoadingState } from '@compito/api-interfaces';
 import { ToastService } from '@compito/web/ui';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch, updateItem } from '@ngxs/store/operators';
@@ -13,11 +13,13 @@ import { BoardsAction } from './boards.actions';
 export class BoardsStateModel {
   public board: Board | null = null;
   public lists: BoardListWithTasks[] = [];
+  public loading: DataLoading = { type: DataLoadingState.init };
 }
 
 const defaults: BoardsStateModel = {
   board: null,
   lists: [],
+  loading: { type: DataLoadingState.init },
 };
 
 @State<BoardsStateModel>({
@@ -31,6 +33,10 @@ export class BoardsState {
     return state.board;
   }
   @Selector()
+  static loading(state: BoardsStateModel) {
+    return state.loading;
+  }
+  @Selector()
   static getBoardLists(state: BoardsStateModel) {
     return state?.lists ?? [];
   }
@@ -38,14 +44,28 @@ export class BoardsState {
   constructor(private boardService: BoardsService, private util: BoardsUtilService, private toast: ToastService) {}
   @Action(BoardsAction.Get)
   get({ patchState }: StateContext<BoardsStateModel>, { payload }: BoardsAction.Get) {
+    patchState({
+      loading: { type: DataLoadingState.loading },
+    });
     return this.boardService.get(payload).pipe(
-      tap((data) => {
-        const groupedTasks = this.util.getTasksGroupedByList(data.tasks);
-        const listsWithTasks = data.lists.map(
-          (data) => ({ ...data, tasks: groupedTasks[data.id] ?? [] } as BoardListWithTasks),
-        );
-        patchState({ board: data, lists: listsWithTasks });
-      }),
+      tap(
+        (data) => {
+          const groupedTasks = this.util.getTasksGroupedByList(data.tasks);
+          const listsWithTasks = data.lists.map(
+            (data) => ({ ...data, tasks: groupedTasks[data.id] ?? [] } as BoardListWithTasks),
+          );
+          patchState({
+            board: data,
+            lists: listsWithTasks,
+            loading: { type: DataLoadingState.success },
+          });
+        },
+        () => {
+          patchState({
+            loading: { type: DataLoadingState.error },
+          });
+        },
+      ),
     );
   }
   @Action(BoardsAction.AddTask)
@@ -74,11 +94,25 @@ export class BoardsState {
     );
   }
   @Action(BoardsAction.UpdateAssignees)
-  updateAssignees({ setState }: StateContext<BoardsStateModel>, { assignees, taskId }: BoardsAction.UpdateAssignees) {
+  updateAssignees(
+    { patchState, getState }: StateContext<BoardsStateModel>,
+    { assignees, taskId, listId }: BoardsAction.UpdateAssignees,
+  ) {
     return this.boardService.updateAssignees(taskId, assignees).pipe(
       tap(
         (data) => {
-          this.toast.success('Task added successfully!');
+          const { lists } = getState();
+          patchState({
+            lists: produce(lists, (draft) => {
+              const list = draft.find(({ id }) => id === listId);
+              if (list) {
+                const task = list.tasks.find(({ id }) => id === taskId);
+                if (task) {
+                  task.assignees = data.assignees;
+                }
+              }
+            }),
+          });
         },
         () => {
           this.toast.error('Failed to creat task!');

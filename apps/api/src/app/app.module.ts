@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { BoardsModule } from './boards/boards.module';
 import { AuthGuard } from './core/guards/auth.guard';
+import { InviteModule } from './invite/invite.module';
 import { OrganizationModule } from './organization/organization.module';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
@@ -21,6 +22,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     BoardsModule,
     TaskModule,
+    InviteModule,
   ],
   controllers: [AppController],
   providers: [

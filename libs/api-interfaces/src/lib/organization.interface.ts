@@ -14,4 +14,5 @@ export interface Organization extends OrganizationBase, DocDates {
 }
 export interface OrganizationRequest extends OrganizationBase {
   createdById: string;
+  members: string[];
 }

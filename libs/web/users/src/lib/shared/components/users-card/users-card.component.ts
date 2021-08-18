@@ -40,18 +40,19 @@ import { User } from '@compito/api-interfaces';
             {{ data?.firstName }} {{ data?.lastName }}
           </p>
           <p class="text-gray-400 text-sm line-clamp-2">{{ data?.email }}</p>
+          <p class="text-gray-400 text-sm">
+            Role
+            <span class="font-medium text-gray-600">{{ data?.roles?.[0]?.role?.label }}</span>
+          </p>
         </div>
       </header>
       <div class="my-4"></div>
       <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">
         <div>
           <p>
-            Created
-            <span class="font-medium text-gray-600">{{ data?.createdAt | timeAgo }}</span>
+            Since
+            <span class="font-medium text-gray-600">{{ data?.createdAt | date: 'mediumDate' }}</span>
           </p>
-        </div>
-        <div>
-          <p><span class="font-medium text-gray-600">19</span> Tasks</p>
         </div>
       </footer>
     </article>

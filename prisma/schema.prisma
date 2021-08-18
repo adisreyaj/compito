@@ -31,6 +31,7 @@ model User {
   projectsCreated   Project[]      @relation("projectCreatedBy")
   orgsCreated       Organization[] @relation("orgCreatedBy")
   roles             UserRoleOrg[]
+  userInvite        UserInvite[]
 }
 
 model Organization {
@@ -47,6 +48,7 @@ model Organization {
   tags        Tag[]
   boards      Board[]
   userRoleOrg UserRoleOrg[]
+  userInvite  UserInvite[]
 }
 
 model Project {
@@ -148,27 +150,31 @@ model Comment {
   createdById String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Task        Task?    @relation(fields: [taskId], references: [id])
+  task        Task?    @relation(fields: [taskId], references: [id])
   taskId      String?
 }
 
 model Role {
   id          String        @id @default(cuid())
   name        String        @unique
+  label       String        @unique
   permissions Json
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   userRoleOrg UserRoleOrg[]
+  userInvite  UserInvite[]
 }
 
 model UserRoleOrg {
-  id     String       @id @default(cuid())
-  org    Organization @relation(fields: [orgId], references: [id])
-  orgId  String
-  user   User         @relation(fields: [userId], references: [id])
-  userId String
-  role   Role         @relation(fields: [roleId], references: [id])
-  roleId String
+  id        String       @id @default(cuid())
+  org       Organization @relation(fields: [orgId], references: [id])
+  orgId     String
+  user      User         @relation(fields: [userId], references: [id])
+  userId    String
+  role      Role         @relation(fields: [roleId], references: [id])
+  roleId    String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now()) @updatedAt
 }
 
 // model LogTrail {
@@ -186,6 +192,19 @@ model UserRoleOrg {
 //   createdAt   DateTime      @default(now())
 //   updatedAt   DateTime      @updatedAt
 // }
+
+model UserInvite {
+  id          String       @id @default(cuid())
+  email       String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  org         Organization @relation(fields: [orgId], references: [id])
+  orgId       String
+  invitedBy   User         @relation(fields: [invitedById], references: [id])
+  invitedById String
+  role        Role         @relation(fields: [roleId], references: [id])
+  roleId      String
+}
 
 enum Priority {
   Lowest

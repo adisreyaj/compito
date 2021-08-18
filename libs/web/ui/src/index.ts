@@ -1,6 +1,7 @@
 export * from './components/button';
 export * from './components/header';
 export * from './components/icon/icon.module';
+export * from './components/loading-card/loading-card.module';
 export * from './components/modal';
 export * from './components/page-header';
 export * from './components/project-card';
@@ -10,5 +11,7 @@ export * from './components/toast/toast.service';
 export * from './components/user-avatar-group';
 export * from './components/user-card';
 export * from './directives/priority-color.directive';
+export * from './interceptors/delay-api.interceptor';
 export * from './pipes/time-ago/time-ago.module';
 export * from './tokens/api.token';
+export * from './util/format-user.operator';

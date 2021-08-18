@@ -14,5 +14,6 @@ export type Roles = NonFunctionKeys<typeof ROLE_LEVEL>;
 export interface Role {
   id: string;
   name: Roles | string;
+  label: string;
   permissions: any;
 }

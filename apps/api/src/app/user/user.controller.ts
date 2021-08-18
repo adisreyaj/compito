@@ -12,6 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
 import { Public } from '../core/decorators/public.decorator';
@@ -32,37 +33,26 @@ export class UserController {
     return this.userService.findAll(query, req.user);
   }
 
-  // For Auth0 to access
+  // For UI to get onboarding details post login flow
   @Public()
-  @Get(':id/orgs')
-  getUserOrgs(@Param('id') userId: string, @Req() req: RequestWithUser) {
+  @Get('pre-auth/onboard')
+  getOnboardingDetails(@Req() req: Request) {
     const sessionToken = req.headers['x-session-token'] as string;
     if (!sessionToken) {
       throw new ForbiddenException('Not enough permissions');
     }
-    return this.userService.getUserOrgs(userId, sessionToken);
+    return this.userService.getOnboardingDetails(sessionToken);
   }
 
-  // For Auth0 to access
+  // For Auth0 to access during login flow
   @Public()
-  @Get(':id/orgs/:orgId/projects')
-  getUserProjects(@Param('id') userId: string, @Param('orgId') orgId: string, @Req() req: RequestWithUser) {
+  @Get('auth')
+  getUserDetails(@Req() req: Request) {
     const sessionToken = req.headers['x-session-token'] as string;
     if (!sessionToken) {
       throw new ForbiddenException('Not enough permissions');
     }
-    return this.userService.getUserProjects(userId, orgId, sessionToken);
-  }
-
-  // For Auth0 to access
-  @Public()
-  @Get(':id/orgs/:orgId/permissions')
-  getUserPermissionsForOrg(@Param('id') userId: string, @Param('orgId') orgId: string, @Req() req: RequestWithUser) {
-    const sessionToken = req.headers['x-session-token'] as string;
-    if (!sessionToken) {
-      throw new ForbiddenException('Not enough permissions');
-    }
-    return this.userService.getUserPermissions(userId, orgId);
+    return this.userService.getUserDetails(sessionToken);
   }
 
   @UseGuards(PermissionsGuard)
@@ -85,8 +75,9 @@ export class UserController {
     return this.userService.updateUser(id, user, req.user);
   }
 
-  // @UseGuards(PermissionsGuard)
-  // @Permissions(PERMISSIONS.user.delete)
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Permissions(PERMISSIONS.user.delete)
+  @Role('org-admin')
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.userService.deleteUser(id, req.user);

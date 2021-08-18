@@ -1,30 +1,67 @@
-<compito-page-header [title]="(projectDetails$ | async)?.name" [breadcrumbs]="breadcrumbs"></compito-page-header>
-<ng-container *ngIf="(projectDetails$ | async) as details">
+<compito-page-header [title]="(projectDetails$ | async)?.name"
+                     [loading]="(projectDetailLoading$|async)?.type === 'LOADING'" [breadcrumbs]="breadcrumbs">
+</compito-page-header>
+<ng-container>
   <section class="px-8 projects__container">
     <compito-section-header title="Boards"></compito-section-header>
-    <div class="projects__list">
-      <article (click)="addNewBoard()"
-               class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
-               style="min-height: 112px;">
-        <div class="flex items-center space-x-2 text-gray-500">
-          <div class="bg-white border rounded-md shadow-sm ">
-            <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
-          </div>
-          <p class="text-sm">New Board</p>
+    <ng-container [ngSwitch]="(projectDetailLoading$|async)?.type">
+      <ng-container *ngSwitchCase="'SUCCESS'">
+        <div class="projects__list">
+          <ng-container *ngTemplateOutlet="addBoard"></ng-container>
+          <ng-container *ngFor="let board of (projectDetails$ | async)?.boards">
+            <compito-boards-card [data]="board"></compito-boards-card>
+          </ng-container>
         </div>
-      </article>
-      <ng-container *ngFor="let board of details.boards">
-        <compito-boards-card [data]="board"></compito-boards-card>
       </ng-container>
-    </div>
+      <ng-container *ngSwitchCase="'LOADING'">
+        <div class="projects__list">
+          <ng-container *ngTemplateOutlet="addBoard"></ng-container>
+          <compito-loading-card height="112px">
+            <div class="flex flex-col justify-between h-full">
+              <header class="flex flex-col space-y-1">
+                <shimmer height="24px" width="60%" [rounded]="true"></shimmer>
+                <shimmer height="14px" width="50%" [rounded]="true"></shimmer>
+              </header>
+              <footer class="flex items-center justify-between">
+                <shimmer height="16px" width="40%" [rounded]="true"></shimmer>
+                <shimmer height="16px" width="30%" [rounded]="true"></shimmer>
+              </footer>
+            </div>
+          </compito-loading-card>
+        </div>
+      </ng-container>
+      <ng-container *ngSwitchCase="'ERROR'"></ng-container>
+    </ng-container>
   </section>
   <section class="px-8 projects__container">
     <compito-section-header title="Members"></compito-section-header>
-    <div class="projects__list">
-      <ng-container *ngFor="let member of details.members">
-        <compito-project-member-card [data]="member" (removed)="removeMember($event)"></compito-project-member-card>
+    <ng-container [ngSwitch]="(projectDetailLoading$ | async)?.type">
+      <ng-container *ngSwitchCase="'SUCCESS'">
+        <div class="projects__list">
+          <ng-container *ngFor="let member of (projectDetails$ | async)?.members">
+            <compito-project-member-card [data]="member" (removed)="removeMember($event)"></compito-project-member-card>
+          </ng-container>
+        </div>
       </ng-container>
-    </div>
+      <ng-container *ngSwitchCase="'LOADING'">
+        <div class="projects__list">
+          <compito-loading-card height="84px">
+            <div class="flex items-center space-x-2">
+              <div style="width: 50px;height: 50px">
+                <shimmer height="50px" width="50px" borderRadius="50%"></shimmer>
+              </div>
+              <div class="w-full pt-1">
+                <shimmer height="20px" width="70%" [rounded]="true"></shimmer>
+                <shimmer height="14px" width="50%" [rounded]="true"></shimmer>
+              </div>
+            </div>
+          </compito-loading-card>
+        </div>
+      </ng-container>
+      <ng-container *ngSwitchCase="'ERROR'">
+
+      </ng-container>
+    </ng-container>
     <footer class="mt-4">
       <button btn size="sm" [tippy]="addAssignees" placement="bottom-start" variation="menu" class="flex items-center">
         <rmx-icon class="icon-sm" name="add-line"></rmx-icon>
@@ -32,7 +69,7 @@
       </button>
     </footer>
   </section>
-  </ng-container>
+</ng-container>
 <ng-template #addAssignees let-hide>
   <div class="flex flex-col w-64 p-1" cdkTrapFocus>
     <div class="mb-0 form-group">
@@ -70,4 +107,17 @@
       <button btn size="sm" variant="secondary" (click)="hide()">Cancel</button>
     </footer>
   </div>
+</ng-template>
+
+<ng-template #addBoard>
+  <article (click)="addNewBoard()"
+           class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
+           style="min-height: 112px;">
+    <div class="flex items-center space-x-2 text-gray-500">
+      <div class="bg-white border rounded-md shadow-sm ">
+        <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+      </div>
+      <p class="text-sm">New Board</p>
+    </div>
+  </article>
 </ng-template>

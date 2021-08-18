@@ -33,7 +33,7 @@ import { Board } from '@compito/api-interfaces';
         </p>
         <p>
           Tasks
-          <span class="font-medium text-gray-600">{{ data?.tasks?.length ?? 'n/a' }}</span>
+          <span class="font-medium text-gray-600">{{ data?.tasks?.length ?? '0' }}</span>
         </p>
       </footer>
     </article>
