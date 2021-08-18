@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { User } from '@compito/api-interfaces';
+import { DataLoading, User } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -28,8 +28,30 @@ import { UsersState } from './state/users.state';
             <p class="text-sm">Invite User</p>
           </div>
         </article>
-        <ng-container *ngFor="let user of users$ | async">
-          <compito-users-card [data]="user"></compito-users-card>
+        <ng-container [ngSwitch]="(usersLoading$ | async)?.type">
+          <ng-container *ngSwitchCase="'SUCCESS'">
+            <ng-container *ngFor="let user of users$ | async">
+              <compito-users-card [data]="user"></compito-users-card>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngSwitchCase="'LOADING'">
+            <ng-container *ngFor="let org of [1, 2]">
+              <compito-loading-card height="226px">
+                <div class="flex flex-col justify-between h-full">
+                  <header>
+                    <shimmer width="100px" height="100px" borderRadius="50%"></shimmer>
+                  </header>
+                  <div>
+                    <shimmer height="24px" [rounded]="true"></shimmer>
+                    <shimmer height="20px" [rounded]="true"></shimmer>
+                  </div>
+                  <footer class="flex items-center justify-between">
+                    <shimmer height="16px" width="50%" [rounded]="true"></shimmer>
+                  </footer>
+                </div>
+              </compito-loading-card>
+            </ng-container>
+          </ng-container>
         </ng-container>
       </div>
     </section>
@@ -51,6 +73,9 @@ import { UsersState } from './state/users.state';
 })
 export class UsersComponent implements OnInit {
   breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
+
+  @Select(UsersState.usersLoading)
+  usersLoading$!: Observable<DataLoading>;
 
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
