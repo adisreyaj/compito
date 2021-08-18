@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { Project, User } from '@compito/api-interfaces';
+import { DataLoading, Project, User } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
@@ -42,6 +42,9 @@ export class ProjectsDetailComponent implements OnInit {
 
   @Select(ProjectsState.getProjectDetail)
   projectDetails$!: Observable<Project | null>;
+
+  @Select(ProjectsState.projectDetailLoading)
+  projectDetailLoading$!: Observable<DataLoading>;
 
   constructor(
     private dialog: DialogService,
