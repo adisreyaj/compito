@@ -69,7 +69,7 @@ exports.onContinuePostLogin = async (event, api) => {
       secret: event.secrets.TOKEN_SECRET,
       payload: {
         email: event.user.email,
-        org: event.user.user_metadata.org,
+        org: orgId,
         userId: event.user.user_metadata.userId,
       },
     });

@@ -37,7 +37,8 @@ enableMapSet();
       httpInterceptor: {
         allowedList: [
           {
-            uriMatcher: (uri: string) => uri.includes(environment.api) && !uri.includes('/ping'),
+            uriMatcher: (uri: string) =>
+              uri.includes(environment.api) && (!uri.includes('/ping') || !uri.includes('/pre-auth')),
           },
         ],
       },

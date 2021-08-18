@@ -22,48 +22,49 @@ export class InviteController {
     return this.inviteService.invite(data, req.user);
   }
 
-  @Post(':id/accept')
-  acceptInvite(@Param('id') id: string, @Req() req: RequestWithUser) {
+  @Post('/pre-auth/:id/accept')
+  acceptInvitePreAuth(@Param('id') id: string, @Req() req: RequestWithUser) {
     const sessionToken = req.headers['x-session-token'] as string;
-    let email = null;
-    let userId = null;
     if (sessionToken) {
       const secret = this.config.get('SESSION_TOKEN_SECRET');
       const token: JwtPayload = verify(sessionToken, secret) as any;
       if (!token) {
         throw new ForbiddenException('Session not valid. Please login again!');
       }
-      email = token.email;
-      userId = token.userId;
+      const email = token.email;
+      const userId = token.userId;
+      return this.inviteService.accept(id, userId, email);
     } else {
-      const { userId: userIdVale, email: userEmail } = getUserDetails(req.user);
-      email = userEmail;
-      userId = userIdVale;
+      throw new ForbiddenException('Session not valid. Please login again!');
     }
+  }
+  @Post(':id/accept')
+  acceptInvite(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const { userId, email } = getUserDetails(req.user);
     if (email == null && userId == null) {
       throw new BadRequestException();
     }
     return this.inviteService.accept(id, userId, email);
   }
-
-  @Post(':id/reject')
-  rejectInvite(@Param('id') id: string, @Req() req: RequestWithUser) {
+  @Post('/pre-auth/:id/reject')
+  rejectInvitePreAuth(@Param('id') id: string, @Req() req: RequestWithUser) {
     const sessionToken = req.headers['x-session-token'] as string;
-    let email = null;
-    let userId = null;
     if (sessionToken) {
       const secret = this.config.get('SESSION_TOKEN_SECRET');
       const token: JwtPayload = verify(sessionToken, secret) as any;
       if (!token) {
         throw new ForbiddenException('Session not valid. Please login again!');
       }
-      email = token.email;
-      userId = token.userId;
+      const email = token.email;
+      const userId = token.userId;
+      return this.inviteService.reject(id, userId, email);
     } else {
-      const { userId: userIdVale, email: userEmail } = getUserDetails(req.user);
-      email = userEmail;
-      userId = userIdVale;
+      throw new ForbiddenException('Session not valid. Please login again!');
     }
+  }
+  @Post(':id/reject')
+  rejectInvite(@Param('id') id: string, @Req() req: RequestWithUser) {
+    const { userId, email } = getUserDetails(req.user);
     if (email == null && userId == null) {
       throw new BadRequestException();
     }

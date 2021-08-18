@@ -1,5 +1,6 @@
 import { RequestParams, Role, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -92,15 +93,15 @@ export class UserService {
         };
       }, {});
 
-      if (token.orgId) {
-        if (!orgIds.includes(token.orgId)) {
+      if (token.org) {
+        if (!orgIds.includes(token.org)) {
           throw new ForbiddenException('No access to org');
         }
-        const projectsPartOfOrg = projects.filter(({ orgId: org }) => org === token.orgId).map(({ id }) => id);
+        const projectsPartOfOrg = projects.filter(({ orgId: org }) => org === token.org).map(({ id }) => id);
         return {
-          org: token.orgId,
+          org: token.org,
           projects: projectsPartOfOrg,
-          role: rolesData[token.orgId],
+          role: rolesData[token.org],
         };
       }
       return {
@@ -137,13 +138,15 @@ export class UserService {
               select: {
                 id: true,
                 name: true,
-              },
-            },
-            projects: {
-              select: {
-                id: true,
-                name: true,
-                orgId: true,
+                createdBy: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    image: true,
+                    email: true,
+                  },
+                },
+                updatedAt: true,
               },
             },
             roles: {
@@ -175,14 +178,16 @@ export class UserService {
       if (!user) {
         throw new NotFoundException('User not found');
       }
-      const { orgs = [], projects = [], ...rest } = user;
+      const { orgs = [], ...rest } = user;
       return {
         ...rest,
         orgs,
-        projects,
         invites: userInvite,
       };
     } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+        throw new BadRequestException('Session expired, Please login again!');
+      }
       throw new InternalServerErrorException('Failed to onboard details for user');
     }
   }

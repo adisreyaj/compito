@@ -33,8 +33,9 @@ export class UserController {
     return this.userService.findAll(query, req.user);
   }
 
+  // For UI to get onboarding details post login flow
   @Public()
-  @Get('onboard')
+  @Get('pre-auth/onboard')
   getOnboardingDetails(@Req() req: Request) {
     const sessionToken = req.headers['x-session-token'] as string;
     if (!sessionToken) {

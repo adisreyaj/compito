@@ -1,4 +1,11 @@
-import { OrganizationRequest, RequestParams, Roles, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
+import {
+  OrganizationRequest,
+  RequestParams,
+  Role,
+  Roles,
+  UpdateMembersRequest,
+  UserPayload,
+} from '@compito/api-interfaces';
 import {
   ForbiddenException,
   Injectable,
@@ -20,6 +27,19 @@ export class OrganizationService {
 
   async create(data: OrganizationRequest, user: UserPayload) {
     const { userId } = getUserDetails(user);
+    let role: Role;
+    try {
+      role = await this.prisma.role.findFirst({
+        where: {
+          name: 'admin',
+        },
+        rejectOnNotFound: true,
+      });
+      this.logger.debug('Admin role found', role.id);
+    } catch (error) {
+      this.logger.error('Failed to fetch the roles');
+      throw new InternalServerErrorException('Failed to create org!');
+    }
     try {
       let members = [];
       if (data.members?.length > 0) {
@@ -36,6 +56,12 @@ export class OrganizationService {
         createdBy: {
           connect: {
             id: userId,
+          },
+        },
+        userRoleOrg: {
+          create: {
+            roleId: role.id,
+            userId,
           },
         },
         members: {
