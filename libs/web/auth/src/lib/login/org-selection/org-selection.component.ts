@@ -1,4 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '@auth0/auth0-angular';
+import { BehaviorSubject } from 'rxjs';
+import { pluck } from 'rxjs/operators';
+import { environment } from '../../../../../../../apps/compito/src/environments/environment';
+import { OrgSelectionService } from './org-selection.service';
 
 @Component({
   selector: 'compito-org-selection',
@@ -32,8 +38,9 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
               "
             ></ng-container>
             <div class="orgs__list">
-              <ng-container *ngFor="let item of orgs">
+              <ng-container *ngFor="let item of orgs$ | async">
                 <article
+                  (click)="loginToOrg(item.id)"
                   tabindex="0"
                   class="p-4 relative rounded-md border cursor-pointer transition-all hover:shadow-lg duration-200 ease-in
                      border-gray-100 bg-white shadow-sm ring-primary hover:ring-2 focus:ring-2 outline-none"
@@ -41,8 +48,14 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
                   <header class="flex items-center justify-between">
                     <div>
                       <div class="flex items-center justify-between">
-                        <p class="text-md font-medium cursor-pointer hover:text-primary">Sreyaj</p>
+                        <p class="text-md font-medium cursor-pointer hover:text-primary">{{ item?.name }}</p>
                       </div>
+                      <p class=" text-xs text-gray-400 ">
+                        Owner
+                        <span class="font-medium text-gray-600">{{
+                          item?.createdBy?.email === (userEmail$ | async) ? 'You' : item?.createdBy?.firstName
+                        }}</span>
+                      </p>
                     </div>
                   </header>
                   <div class="my-4">
@@ -50,8 +63,8 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
                   </div>
                   <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">
                     <p>
-                      Created
-                      <!-- <span class="font-medium text-gray-600">{{ data?.createdAt | timeAgo }}</span> -->
+                      Last Updated
+                      <span class="font-medium text-gray-600">{{ item?.updatedAt | timeAgo }}</span>
                     </p>
                   </footer>
                 </article>
@@ -69,7 +82,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
               "
             ></ng-container>
             <div class="invites__list">
-              <ng-container *ngFor="let item of orgs">
+              <ng-container *ngFor="let item of invites$ | async">
                 <article
                   class="p-4 relative rounded-md border transition-all duration-200 ease-in
                      border-gray-100 bg-white shadow-sm"
@@ -138,8 +151,39 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrgSelectionComponent implements OnInit {
-  orgs = [1, 2, 3];
-  constructor() {}
+  orgSubject = new BehaviorSubject<any[]>([]);
+  orgs$ = this.orgSubject.asObservable();
+  inviteSubject = new BehaviorSubject<any[]>([]);
+  invites$ = this.inviteSubject.asObservable();
 
-  ngOnInit(): void {}
+  userEmail$ = this.auth.user$.pipe(pluck('email'));
+  constructor(
+    private orgService: OrgSelectionService,
+    private activatedRoute: ActivatedRoute,
+    private auth: AuthService,
+  ) {}
+
+  ngOnInit(): void {
+    if (this.sessionToken) {
+      this.orgService.getOnboardingDetails(this.sessionToken).subscribe((data: any) => {
+        if (data.orgs) {
+          this.orgSubject.next(data.orgs);
+        }
+        if (data.invites) {
+          this.inviteSubject.next(data.invites);
+        }
+      });
+    }
+  }
+
+  loginToOrg(orgId: string) {
+    window.location.href = `https://${environment.auth.domain}/continue?state=${this.state}&orgId=${orgId}`;
+  }
+
+  private get sessionToken() {
+    return this.activatedRoute.snapshot.queryParams['session_token'];
+  }
+  private get state() {
+    return this.activatedRoute.snapshot.queryParams['state'];
+  }
 }
