@@ -39,11 +39,14 @@ import { ProjectsState } from './state/projects.state';
             <ng-container *ngFor="let org of [1, 2]">
               <compito-loading-card height="194px">
                 <div class="flex flex-col justify-between h-full">
-                  <header>
-                    <shimmer height="24px" [rounded]="true"></shimmer>
-                    <shimmer height="40px" [rounded]="true"></shimmer>
+                  <header class="flex flex-col space-y-1">
+                    <shimmer height="24px" width="60%" [rounded]="true"></shimmer>
+                    <shimmer height="14px" [rounded]="true"></shimmer>
+                    <shimmer height="14px" width="50%" [rounded]="true"></shimmer>
                   </header>
-                  <div>
+                  <div class="flex items-center -space-x-4">
+                    <shimmer width="40px" height="40px" borderRadius="50%"></shimmer>
+                    <shimmer width="40px" height="40px" borderRadius="50%"></shimmer>
                     <shimmer width="40px" height="40px" borderRadius="50%"></shimmer>
                   </div>
                   <footer class="flex items-center justify-between">
