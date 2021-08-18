@@ -8,13 +8,17 @@ import { ProjectsService } from '../projects.service';
 import { ProjectsAction } from './projects.actions';
 export class ProjectsStateModel {
   public projects: Project[] = [];
+  public projectsFetched = false;
   public projectDetail: Project | null = null;
+  public projectDetailFetched = false;
   public projectLoading: DataLoading = { type: DataLoadingState.init };
   public projectDetailLoading: DataLoading = { type: DataLoadingState.init };
 }
 
 const defaults: ProjectsStateModel = {
   projects: [],
+  projectsFetched: false,
+  projectDetailFetched: false,
   projectDetail: null,
   projectLoading: { type: DataLoadingState.init },
   projectDetailLoading: { type: DataLoadingState.init },
@@ -29,6 +33,14 @@ export class ProjectsState {
   @Selector()
   static getAllProjects(state: ProjectsStateModel) {
     return state.projects;
+  }
+  @Selector()
+  static projectsFetched(state: ProjectsStateModel) {
+    return state.projectsFetched;
+  }
+  @Selector()
+  static projectDetailFetched(state: ProjectsStateModel) {
+    return state.projectDetailFetched;
   }
   @Selector()
   static projectsLoading(state: ProjectsStateModel) {
@@ -72,7 +84,7 @@ export class ProjectsState {
     return this.projectService.getAll().pipe(
       tap(
         ({ payload: projects }) => {
-          patchState({ projects, projectLoading: { type: DataLoadingState.success } });
+          patchState({ projects, projectLoading: { type: DataLoadingState.success }, projectsFetched: true });
         },
         () => {
           patchState({
@@ -93,6 +105,7 @@ export class ProjectsState {
           patchState({
             projectDetail: data,
             projectDetailLoading: { type: DataLoadingState.success },
+            projectDetailFetched: true,
           });
         },
         () => {

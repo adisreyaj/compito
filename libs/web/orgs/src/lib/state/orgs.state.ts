@@ -8,16 +8,20 @@ import { OrgsAction } from './orgs.actions';
 
 export class OrgsStateModel {
   public orgs: Organization[] = [];
+  public orgsFetched = false;
   public orgsLoading: DataLoading = { type: DataLoadingState.init };
   public orgDetail: Organization | null = null;
+  public orgDetailFetched = false;
   public orgDetailLoading: DataLoading = { type: DataLoadingState.init };
 }
 
 const defaults: OrgsStateModel = {
   orgs: [],
-  orgDetail: null,
   orgsLoading: { type: DataLoadingState.init },
+  orgsFetched: false,
+  orgDetail: null,
   orgDetailLoading: { type: DataLoadingState.init },
+  orgDetailFetched: false,
 };
 
 @State<OrgsStateModel>({
@@ -33,6 +37,10 @@ export class OrgsState {
   @Selector()
   static orgsLoading(state: OrgsStateModel) {
     return state.orgsLoading;
+  }
+  @Selector()
+  static orgsFetched(state: OrgsStateModel) {
+    return state.orgsFetched;
   }
   @Selector()
   static orgDetailLoading(state: OrgsStateModel) {
@@ -68,6 +76,7 @@ export class OrgsState {
           patchState({
             orgs: result.payload,
             orgsLoading: { type: DataLoadingState.success },
+            orgsFetched: true,
           });
         },
         () => {
@@ -90,6 +99,7 @@ export class OrgsState {
           patchState({
             orgDetail: data,
             orgDetailLoading: { type: DataLoadingState.success },
+            orgDetailFetched: true,
           });
         },
         () => {

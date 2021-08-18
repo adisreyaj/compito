@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { DataLoading, Organization } from '@compito/api-interfaces';
+import { DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { map, withLatestFrom } from 'rxjs/operators';
 import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/orgs-create-modal.component';
 import { OrgsAction } from './state/orgs.actions';
 import { OrgsState } from './state/orgs.state';
@@ -27,7 +28,7 @@ import { OrgsState } from './state/orgs.state';
             <p class="text-sm">Create New Org</p>
           </div>
         </article>
-        <ng-container [ngSwitch]="(orgsLoading$ | async)?.type">
+        <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let org of orgs$ | async">
               <compito-orgs-card [data]="org"></compito-orgs-card>
@@ -71,7 +72,19 @@ export class OrgsComponent implements OnInit {
 
   @Select(OrgsState.orgsLoading)
   orgsLoading$!: Observable<DataLoading>;
+  @Select(OrgsState.orgsFetched)
+  orgsFetched$!: Observable<DataLoading>;
   constructor(private store: Store, private dialog: DialogService) {}
+
+  uiView$: Observable<DataLoading> = this.orgsLoading$.pipe(
+    withLatestFrom(this.orgsFetched$),
+    map(([loading, fetched]) => {
+      if (fetched) {
+        return { type: DataLoadingState.success };
+      }
+      return loading;
+    }),
+  );
 
   ngOnInit(): void {
     this.store.dispatch(new OrgsAction.GetAll());

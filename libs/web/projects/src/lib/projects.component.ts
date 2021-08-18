@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { DataLoading, Project } from '@compito/api-interfaces';
+import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
 import { Observable } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
+import { map, withLatestFrom } from 'rxjs/operators';
 import { ProjectsAction } from './state/projects.actions';
 import { ProjectsState } from './state/projects.state';
 @Component({
@@ -29,7 +29,7 @@ import { ProjectsState } from './state/projects.state';
             <p class="text-sm">Add New Project</p>
           </div>
         </article>
-        <ng-container [ngSwitch]="(projectsLoading$ | async)?.type">
+        <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let project of projects$ | async">
               <compito-project-card [data]="project"></compito-project-card>
@@ -82,6 +82,19 @@ export class ProjectsComponent implements OnInit {
 
   @Select(ProjectsState.getAllProjects)
   projects$!: Observable<Project[]>;
+
+  @Select(ProjectsState.projectsFetched)
+  projectsFetched$!: Observable<boolean>;
+
+  uiView$: Observable<DataLoading> = this.projectsLoading$.pipe(
+    withLatestFrom(this.projectsFetched$),
+    map(([loading, fetched]) => {
+      if (fetched) {
+        return { type: DataLoadingState.success };
+      }
+      return loading;
+    }),
+  );
 
   constructor(
     private dialog: DialogService,
