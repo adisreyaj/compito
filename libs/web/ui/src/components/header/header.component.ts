@@ -40,6 +40,7 @@ import { AuthService } from '@auth0/auth0-angular';
             <rmx-icon name="notification-2-line"></rmx-icon>
           </button>
         </div>
+        <!-- <div class="text-xs text-gray-500">Org: <span class="font-medium text-sm text-gray-700">Sreyaj</span></div> -->
         <div
           *ngIf="auth.user$ | async as user"
           class="flex items-center space-x-2 cursor-pointer"
@@ -48,9 +49,18 @@ import { AuthService } from '@auth0/auth0-angular';
           variation="menu"
           [offset]="[-10, 10]"
         >
-          <img [src]="user.picture" alt="Adithya" width="40" height="40" class="rounded-full" />
-          <div class="flex items-center">
-            <p class="text-sm font-medium">{{ user.given_name }}</p>
+          <img
+            [src]="'https://avatar.tobi.sh/' + user.email"
+            alt="Adithya"
+            width="40"
+            height="40"
+            class="rounded-full"
+          />
+          <div class="flex items-center space-x-2">
+            <div class="flex flex-col items-end">
+              <p class="text-sm font-medium">{{ user.given_name }}</p>
+              <p class="text-xs text-gray-500">Admin</p>
+            </div>
             <rmx-icon class="text-gray-400" style="width: 16px;height: 16px;" name="arrow-down-s-line"></rmx-icon>
           </div>
         </div>

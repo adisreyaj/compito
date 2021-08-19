@@ -35,7 +35,7 @@ import { UsersState } from './state/users.state';
             </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">
-            <ng-container *ngFor="let org of [1, 2]">
+            <ng-container *ngFor="let org of [1]">
               <compito-loading-card height="246px">
                 <div class="flex flex-col justify-between h-full flex-1">
                   <header class="mb-2">

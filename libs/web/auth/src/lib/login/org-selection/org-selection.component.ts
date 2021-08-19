@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, DataLoadingState } from '@compito/api-interfaces';
+import { ToastService } from '@compito/web/ui';
 import { BehaviorSubject } from 'rxjs';
 import { pluck } from 'rxjs/operators';
 import { environment } from '../../../../../../../apps/compito/src/environments/environment';
@@ -50,6 +51,8 @@ export class OrgSelectionComponent implements OnInit {
     private orgService: OrgSelectionService,
     private activatedRoute: ActivatedRoute,
     private auth: AuthService,
+    private toast: ToastService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +72,9 @@ export class OrgSelectionComponent implements OnInit {
           this.loadingDetailsState.next({ type: DataLoadingState.error, error: new Error() });
         },
       );
+    } else {
+      this.toast.error('Please login first!');
+      this.router.navigate(['/auth', 'login']);
     }
   }
 
