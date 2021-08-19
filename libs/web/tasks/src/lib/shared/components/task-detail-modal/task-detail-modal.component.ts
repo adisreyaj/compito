@@ -8,6 +8,7 @@ import { DialogRef } from '@ngneat/dialog';
 import { Store } from '@ngxs/store';
 import produce from 'immer';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'compito-task-detail-modal',
   template: `
@@ -45,6 +46,16 @@ import { BehaviorSubject, Observable } from 'rxjs';
                 <rmx-icon name="add-line"></rmx-icon>
               </div>
             </div>
+          </div>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Priority' }"></ng-container>
+          <div class="form-group">
+            <select name="priority" id="priority" [formControl]="priority">
+              <ng-container *ngFor="let priority of priorities | async">
+                <option [value]="priority">{{ priority }}</option>
+              </ng-container>
+            </select>
           </div>
         </section>
         <section class="task-detail__section">
@@ -176,6 +187,7 @@ export class TaskDetailModalComponent implements OnInit {
   assignedUsers$ = this.assignedUsersSubject.asObservable();
 
   description = new FormControl('Default description');
+  priority = new FormControl('');
   comment = new FormControl('');
   initialValues = {
     description: '',
@@ -186,6 +198,7 @@ export class TaskDetailModalComponent implements OnInit {
       task: Task;
       list: BoardList;
       users: Observable<User[]>;
+      priorities$: Observable<string[]>;
     }>,
     private store: Store,
     private cdr: ChangeDetectorRef,
@@ -194,11 +207,19 @@ export class TaskDetailModalComponent implements OnInit {
   ngOnInit(): void {
     const assignees = this.ref.data?.task?.assignees ?? [];
     this.description.setValue(this.ref.data.task.description ?? '');
+    this.priority.setValue(this.ref.data.task.priority ?? '');
     this.initialValues.description = this.ref.data.task.description ?? '';
     assignees.forEach((assignee) => {
       this.selectedAssignees.set(assignee.id, assignee);
     });
     this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
+    this.priority.valueChanges
+      .pipe(
+        switchMap((priority) =>
+          this.store.dispatch(new BoardsAction.UpdateTaskPriority(this.taskId, priority, this.listId)),
+        ),
+      )
+      .subscribe();
   }
 
   updateAssignees() {
@@ -210,11 +231,13 @@ export class TaskDetailModalComponent implements OnInit {
   updateDescription() {
     if (this.description.valid) {
       const newValue = this.description.value;
-      this.store.dispatch(new BoardsAction.UpdateTaskDescription(this.taskId, this.description.value)).subscribe(() => {
-        this.description.markAsPristine();
-        this.initialValues.description = newValue;
-        this.cdr.markForCheck();
-      });
+      this.store
+        .dispatch(new BoardsAction.UpdateTaskDescription(this.taskId, this.description.value, this.listId))
+        .subscribe(() => {
+          this.description.markAsPristine();
+          this.initialValues.description = newValue;
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -242,6 +265,10 @@ export class TaskDetailModalComponent implements OnInit {
         draft.set(user.id, user);
       });
     }
+  }
+
+  get priorities() {
+    return this.ref.data.priorities$ as Observable<string[]>;
   }
 
   private get taskId() {

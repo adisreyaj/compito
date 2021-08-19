@@ -97,6 +97,9 @@ export class BoardsComponent implements OnInit {
   @Select(BoardsState.getBoardLists)
   lists$!: Observable<BoardListWithTasks[]>;
 
+  @Select(BoardsState.priorities)
+  priorities$!: Observable<string[]>;
+
   @Select(BoardsState.loading)
   loading$!: Observable<DataLoading>;
 
@@ -115,6 +118,7 @@ export class BoardsComponent implements OnInit {
       forkJoin([
         this.store.dispatch(new BoardsAction.Get(this.boardId)),
         this.store.dispatch(new UsersAction.GetAll({})),
+        this.store.dispatch(new BoardsAction.GetPriorities()),
       ])
         .pipe(
           withLatestFrom(this.board$, this.lists$),
@@ -130,6 +134,7 @@ export class BoardsComponent implements OnInit {
     } else {
       this.store.dispatch(new BoardsAction.Get(this.boardId));
       this.store.dispatch(new UsersAction.GetAll({}));
+      this.store.dispatch(new BoardsAction.GetPriorities());
     }
     this.board$
       .pipe(
@@ -168,7 +173,11 @@ export class BoardsComponent implements OnInit {
   }
 
   createNewTask(listId: string) {
-    const ref = this.dialog.open(TasksCreateModalComponent);
+    const ref = this.dialog.open(TasksCreateModalComponent, {
+      data: {
+        priorities$: this.priorities$,
+      },
+    });
     ref.afterClosed$
       .pipe(withLatestFrom(this.board$, this.auth.user$.pipe(formatUser())))
       .subscribe(([data, board, user]) => {
@@ -193,6 +202,7 @@ export class BoardsComponent implements OnInit {
         task,
         list,
         users: this.users$,
+        priorities$: this.priorities$,
       },
     });
     return ref;

@@ -12,7 +12,7 @@ export class PriorityColorDirective {
   }
 
   @Input() class = '';
-  @Input() priorityColor: Priority | null = null;
+  @Input() priorityColor: Priority | null | string = null;
   constructor() {}
 }
 
