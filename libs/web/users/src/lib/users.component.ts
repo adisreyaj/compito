@@ -32,7 +32,7 @@ import { UsersState } from './state/users.state';
         <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let user of users$ | async">
-              <compito-users-card [data]="user"></compito-users-card>
+              <compito-user-card [data]="user"></compito-user-card>
             </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">

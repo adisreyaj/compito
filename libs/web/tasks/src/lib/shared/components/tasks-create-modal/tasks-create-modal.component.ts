@@ -45,6 +45,10 @@ export class TasksCreateModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    const initialData = this.ref.data?.initialData;
+    if (initialData) {
+      this.taskForm.setValue(initialData);
+    }
   }
 
   handleFormSubmit() {

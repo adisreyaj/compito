@@ -5,7 +5,6 @@ import { Task } from '@compito/api-interfaces';
   selector: 'compito-task-list',
   template: `
     <div>
-      <compito-section-header [title]="title"></compito-section-header>
       <ul *ngIf="data && data.length > 0" class="shadow-sm rounded-md border">
         <li
           *ngFor="let task of data"

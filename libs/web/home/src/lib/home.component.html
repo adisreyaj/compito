@@ -2,27 +2,117 @@
   <p class="text-gray-500">Welcome,</p>
   <h2 class="text-2xl font-bold">{{(user$ | async)?.given_name}}</h2>
 </section>
-<section class="grid px-8 mt-10 cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+<section class="grid px-8 mt-10 cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-8">
   <div>
-    <compito-task-list [data]="recentTasks$ | async" title="Recent Tasks"></compito-task-list>
+    <compito-section-header title="Recent Tasks"></compito-section-header>
+    <ng-container [ngSwitch]="(recentTasksLoading$ | async)?.type">
+      <ng-container *ngSwitchCase="'SUCCESS'">
+        <compito-task-list [data]="recentTasks$ | async"></compito-task-list>
+      </ng-container>
+      <ng-container *ngSwitchCase="'LOADING'">
+        <ng-container *ngTemplateOutlet="tasksLoading"></ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="'ERROR'">
+
+      </ng-container>
+    </ng-container>
   </div>
   <div>
-    <compito-task-list [data]="hightPriorityTasks$ | async" title="Higher Priority Tasks"></compito-task-list>
+    <compito-section-header title="Higher Priority Tasks"></compito-section-header>
+    <ng-container [ngSwitch]="(recentTasksLoading$ | async)?.type">
+      <ng-container *ngSwitchCase="'SUCCESS'">
+        <compito-task-list [data]="hightPriorityTasks$ | async"></compito-task-list>
+      </ng-container>
+      <ng-container *ngSwitchCase="'LOADING'">
+        <ng-container *ngTemplateOutlet="tasksLoading"></ng-container>
+
+      </ng-container>
+      <ng-container *ngSwitchCase="'ERROR'">
+
+      </ng-container>
+    </ng-container>
   </div>
 </section>
 <section class="px-8 mt-10 projects__container">
   <compito-section-header title="Projects"></compito-section-header>
-  <div class="projects__list">
-    <ng-container *ngFor="let project of projects$ | async">
-      <compito-project-mini-card [data]="project"></compito-project-mini-card>
+  <ng-container [ngSwitch]="(projectsLoading$ | async)?.type">
+    <ng-container *ngSwitchCase="'SUCCESS'">
+      <div class="projects__list">
+        <ng-container *ngFor="let project of projects$ | async">
+          <compito-project-mini-card [data]="project"></compito-project-mini-card>
+        </ng-container>
+      </div>
     </ng-container>
-  </div>
+    <ng-container *ngSwitchCase="'LOADING'">
+      <div class="projects__list">
+        <ng-container *ngFor="let item of [1]">
+          <compito-loading-card height="130px">
+            <div class="flex flex-col justify-between h-full">
+              <header class="flex flex-col space-y-1">
+                <shimmer height="24px" width="60%" [rounded]="true"></shimmer>
+                <shimmer height="14px" [rounded]="true"></shimmer>
+                <shimmer height="14px" width="50%" [rounded]="true"></shimmer>
+              </header>
+              <footer class="flex items-center justify-between">
+                <shimmer height="16px" width="50%" [rounded]="true"></shimmer>
+              </footer>
+            </div>
+          </compito-loading-card>
+        </ng-container>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'ERROR'">
+      <!-- TODO -->
+    </ng-container>
+  </ng-container>
 </section>
 <section class="px-8 mt-10 projects__container">
   <compito-section-header title="Boards"></compito-section-header>
-  <div class="projects__list">
-    <ng-container *ngFor="let board of boards$ | async">
-      <compito-board-mini-card [data]="board"></compito-board-mini-card>
+  <ng-container [ngSwitch]="(boardsLoading$ | async)?.type">
+    <ng-container *ngSwitchCase="'SUCCESS'">
+      <div class="projects__list">
+        <ng-container *ngFor="let board of boards$ | async">
+          <compito-board-mini-card [data]="board"></compito-board-mini-card>
+        </ng-container>
+      </div>
     </ng-container>
-  </div>
+    <ng-container *ngSwitchCase="'LOADING'">
+      <div class="projects__list">
+        <ng-container *ngFor="let item of [1]">
+          <compito-loading-card height="106px">
+            <div class="flex flex-col justify-between h-full">
+              <header class="flex flex-col space-y-1">
+                <shimmer height="24px" width="60%" [rounded]="true"></shimmer>
+                <shimmer height="14px" width="50%" [rounded]="true"></shimmer>
+              </header>
+              <footer class="flex items-center justify-between">
+                <shimmer height="14px" width="50%" [rounded]="true"></shimmer>
+              </footer>
+            </div>
+          </compito-loading-card>
+        </ng-container>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'ERROR'">
+      <!-- TODO -->
+    </ng-container>
+  </ng-container>
 </section>
+
+
+<ng-template #tasksLoading>
+  <div>
+    <ul class="border rounded-md shadow-sm">
+      <li *ngFor="let task of [1]" [style.height]="'65px'"
+          class="p-2 transition-all duration-200 bg-white border-b cursor-pointer group first:rounded-t-md last:rounded-b-md last:border-b-0 hover:bg-gray-50">
+        <header>
+          <shimmer height="16px" width="60%" [rounded]="true"></shimmer>
+        </header>
+        <footer class="flex items-center justify-between mt-2 text-xs text-gray-400">
+          <shimmer height="14px" width="40%" [rounded]="true"></shimmer>
+          <shimmer height="14px" width="30%" [rounded]="true"></shimmer>
+        </footer>
+      </li>
+    </ul>
+  </div>
+</ng-template>

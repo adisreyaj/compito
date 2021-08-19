@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import {
   BoardCardModule,
   IconModule,
+  LoadingCardModule,
   PageHeaderModule,
   PriorityColorDirectiveModule,
   ProjectCardModule,
@@ -27,6 +28,7 @@ import { HomeState } from './state/home.state';
     BoardCardModule,
     SectionHeaderModule,
     PageHeaderModule,
+    LoadingCardModule,
   ],
   declarations: [HomeComponent, TaskListComponent],
 })

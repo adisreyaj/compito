@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
-import { Board, Project, Task } from '@compito/api-interfaces';
+import { Board, DataLoading, Project, Task } from '@compito/api-interfaces';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { HomeAction } from './state/home.actions';
@@ -23,6 +23,18 @@ import { HomeState } from './state/home.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
+  @Select(HomeState.projectsLoading)
+  projectsLoading$!: Observable<DataLoading>;
+
+  @Select(HomeState.boardsLoading)
+  boardsLoading$!: Observable<DataLoading>;
+
+  @Select(HomeState.highPriorityTasksLoading)
+  highPriorityTasksLoading$!: Observable<DataLoading>;
+
+  @Select(HomeState.recentTasksLoading)
+  recentTasksLoading$!: Observable<DataLoading>;
+
   @Select(HomeState.getProjects)
   projects$!: Observable<Project[]>;
 
