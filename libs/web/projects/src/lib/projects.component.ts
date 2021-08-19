@@ -36,7 +36,7 @@ import { ProjectsState } from './state/projects.state';
             </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">
-            <ng-container *ngFor="let org of [1, 2]">
+            <ng-container *ngFor="let org of [1]">
               <compito-loading-card height="194px">
                 <div class="flex flex-col justify-between h-full">
                   <header class="flex flex-col space-y-1">
@@ -108,7 +108,6 @@ export class ProjectsComponent implements OnInit {
     if (this.isAddNewRoute) {
       this.createNew();
     }
-    this.auth.user$.subscribe(console.log);
   }
 
   createNew() {
