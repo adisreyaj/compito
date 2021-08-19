@@ -1,23 +1,29 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { MultiDocPayload, Role, User, UserRequest } from '@compito/api-interfaces';
+import { InviteRequest, MultiDocPayload, Role, User } from '@compito/api-interfaces';
 import { API_TOKEN } from '@compito/web/ui';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UsersService {
-  usersAPI = `${this.baseURL}/users`;
-  rolesAPI = `${this.baseURL}/roles`;
+  private readonly usersAPI = `${this.baseURL}/users`;
+  private readonly rolesAPI = `${this.baseURL}/roles`;
+  private readonly invitesAPI = `${this.baseURL}/invites`;
   constructor(private http: HttpClient, @Inject(API_TOKEN) private baseURL: string) {}
 
-  create(data: UserRequest) {
-    return this.http.post<User>(this.usersAPI, data);
+  inviteUser(data: InviteRequest) {
+    return this.http.post<User>(this.invitesAPI, data);
   }
 
   getAllRoles() {
     return this.http.get<Role[]>(this.rolesAPI);
   }
+
+  getInvites() {
+    return this.http.get<any[]>(this.invitesAPI);
+  }
+
   getAll() {
     return this.http.get<MultiDocPayload<User>>(this.usersAPI);
   }

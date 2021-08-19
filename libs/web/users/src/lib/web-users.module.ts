@@ -9,6 +9,7 @@ import {
   LoadingCardModule,
   ModalModule,
   PageHeaderModule,
+  SectionHeaderModule,
   TimeAgoModule,
   UserCardModule,
 } from '@compito/web/ui';
@@ -37,6 +38,7 @@ export const webUsersRoutes: Route[] = [
     A11yModule,
     LoadingCardModule,
     UserCardModule,
+    SectionHeaderModule,
   ],
   declarations: [UsersComponent, UsersCreateModalComponent],
 })

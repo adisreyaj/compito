@@ -39,6 +39,10 @@ export class UsersCreateModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    const initialData = this.ref.data?.initialData;
+    if (initialData) {
+      this.userForm.setValue(initialData);
+    }
   }
 
   handleFormSubmit() {

@@ -4,10 +4,11 @@ import { TippyModule } from '@ngneat/helipopper';
 import { IconModule } from '../icon/icon.module';
 import { MiniUserCardComponent } from './mini-user-card/mini-user-card.component';
 import { UserCardComponent } from './user-card/user-card.component';
+import { UserInviteCardComponent } from './user-invite-card/user-invite-card.component';
 
 @NgModule({
-  declarations: [MiniUserCardComponent, UserCardComponent],
+  declarations: [MiniUserCardComponent, UserCardComponent, UserInviteCardComponent],
   imports: [CommonModule, IconModule, TippyModule],
-  exports: [MiniUserCardComponent, UserCardComponent],
+  exports: [MiniUserCardComponent, UserCardComponent, UserInviteCardComponent],
 })
 export class UserCardModule {}

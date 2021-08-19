@@ -1,8 +1,12 @@
-import { UserRequest } from '@compito/api-interfaces';
+import { InviteRequest } from '@compito/api-interfaces';
 export namespace UsersAction {
-  export class Add {
-    static readonly type = '[Users] Add item';
-    constructor(public payload: UserRequest) {}
+  export class GetInvites {
+    static readonly type = '[Users] Get Invites';
+    constructor() {}
+  }
+  export class InviteUser {
+    static readonly type = '[Users] Invite User';
+    constructor(public payload: InviteRequest) {}
   }
   export class GetRoles {
     static readonly type = '[Users] Get roles';
