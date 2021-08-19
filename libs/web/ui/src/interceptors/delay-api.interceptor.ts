@@ -10,6 +10,6 @@ export class DelayInterceptor implements HttpInterceptor {
     if (environment.production) {
       return next.handle(request);
     }
-    return next.handle(request).pipe(delay(20000));
+    return next.handle(request).pipe(delay(1000));
   }
 }

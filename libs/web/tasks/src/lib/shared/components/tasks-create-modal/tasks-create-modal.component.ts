@@ -5,12 +5,12 @@ import { DialogRef } from '@ngneat/dialog';
 @Component({
   selector: 'compito-tasks-create-modal',
   template: `
-    <compito-modal title="Add New Task" [ref]="ref">
+    <compito-modal title="Add New Task" [ref]="ref" cdkTrapFocus cdkTrapFocusAutoCapture>
       <section>
         <form [formGroup]="taskForm" id="taskForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
           <div class="form-group">
             <label for="title">Title</label>
-            <input class="w-full" type="text" id="title" formControlName="title" autofocus />
+            <input class="w-full" type="text" id="title" formControlName="title" cdkFocusInitial />
           </div>
           <div class="form-group">
             <label for="description">Description</label>

@@ -5,12 +5,12 @@ import { kebabCase } from 'voca';
 @Component({
   selector: 'compito-projects-create-modal',
   template: `
-    <compito-modal title="Add New Project" [ref]="ref" cdkTrapFocus>
+    <compito-modal title="Add New Project" [ref]="ref" cdkTrapFocus cdkTrapFocusAutoCapture>
       <section>
         <form [formGroup]="projectForm" id="projectForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
           <div class="form-group">
             <label for="name">Name</label>
-            <input class="w-full" type="text" id="name" formControlName="name" autofocus />
+            <input class="w-full" type="text" id="name" formControlName="name" cdkFocusInitial />
           </div>
           <div class="form-group">
             <label for="description">Description</label>
