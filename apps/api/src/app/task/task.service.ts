@@ -39,7 +39,7 @@ export class TaskService {
       }
       const taskData: Prisma.TaskCreateInput = {
         ...rest,
-        priority: priority ?? Priority.Medium,
+        priority: (priority as any) ?? Priority.Medium,
         createdBy: {
           connect: { id: userId },
         },
@@ -125,6 +125,10 @@ export class TaskService {
       this.logger.error('Failed to fetch orgs', error);
       throw new InternalServerErrorException();
     }
+  }
+
+  async findAllPriorities() {
+    return ['Lowest', 'Low', 'Medium', 'High', 'Highest'];
   }
 
   async findOne(id: string, user: UserPayload) {

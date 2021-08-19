@@ -1,4 +1,5 @@
 import { A11yModule } from '@angular/cdk/a11y';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,6 +19,7 @@ import { MyTaskCardComponent } from './shared/components/my-task-card/my-task-ca
 import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
 import { TasksCreateModalComponent } from './shared/components/tasks-create-modal/tasks-create-modal.component';
 import { TasksComponent } from './tasks.component';
+
 @NgModule({
   declarations: [TasksComponent, TasksCreateModalComponent, TaskDetailModalComponent, MyTaskCardComponent],
   imports: [
@@ -40,6 +42,7 @@ import { TasksComponent } from './tasks.component';
     A11yModule,
     PriorityColorDirectiveModule,
     LoadingCardModule,
+    TextFieldModule,
   ],
 })
 export class WebTasksModule {}
