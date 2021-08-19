@@ -18,12 +18,30 @@
     color: hsl(160, 84%, 39%);
   }
   &.medium {
-    color: hsl(45, 93%, 47%)
+    color: hsl(45, 93%, 47%);
   }
   &.high {
     color: hsl(25, 95%, 53%);
   }
   &.highest {
     color: hsl(0, 84%, 60%);
+  }
+
+  &--bg {
+    &.lowest {
+      background-color: hsl(213, 94%, 68%);
+    }
+    &.low {
+      background-color: hsl(160, 84%, 39%);
+    }
+    &.medium {
+      background-color: hsl(45, 93%, 47%);
+    }
+    &.high {
+      background-color: hsl(25, 95%, 53%);
+    }
+    &.highest {
+      background-color: hsl(0, 84%, 60%);
+    }
   }
 }

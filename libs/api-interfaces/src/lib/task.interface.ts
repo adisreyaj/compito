@@ -1,7 +1,6 @@
 import { Comment } from './comment.interface';
 import { DocDates } from './general.interface';
 import { Organization } from './organization.interface';
-import { Priority } from './priority.interface';
 import { Project } from './project.interface';
 import { Tag } from './tag.interface';
 import { User } from './user.interface';
@@ -9,7 +8,7 @@ import { User } from './user.interface';
 export interface TaskBase {
   title: string;
   description: string;
-  priority: Priority;
+  priority: string;
   completed: boolean;
   list: string;
 }

@@ -5,6 +5,10 @@ export namespace BoardsAction {
     static readonly type = '[Boards] Get board';
     constructor(public payload: string) {}
   }
+  export class GetPriorities {
+    static readonly type = '[Boards] Get priorities';
+    constructor() {}
+  }
   export class AddTask {
     static readonly type = '[Task] Add Task';
     constructor(public payload: TaskRequest) {}
@@ -17,7 +21,11 @@ export namespace BoardsAction {
 
   export class UpdateTaskDescription {
     static readonly type = '[Task] Update task description';
-    constructor(public taskId: string, public description: string) {}
+    constructor(public taskId: string, public description: string, public listId: string) {}
+  }
+  export class UpdateTaskPriority {
+    static readonly type = '[Task] Update task priority';
+    constructor(public taskId: string, public priority: string, public listId: string) {}
   }
 
   export class Reorder {

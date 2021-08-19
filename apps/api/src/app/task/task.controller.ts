@@ -29,6 +29,11 @@ export class TaskController {
     return this.taskService.findAll(query, {}, req.user);
   }
 
+  @Get('priorities')
+  findAllPriorities() {
+    return this.taskService.findAllPriorities();
+  }
+
   @UseGuards(RolesGuard, PermissionsGuard)
   @Role('user')
   @Permissions(PERMISSIONS.task.read)
