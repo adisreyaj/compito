@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Project, Task } from '@compito/api-interfaces';
+import { AuthService } from '@auth0/auth0-angular';
+import { Board, DataLoading, Project, Task } from '@compito/api-interfaces';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { HomeAction } from './state/home.actions';
@@ -12,7 +13,6 @@ import { HomeState } from './state/home.state';
     `
       .projects {
         &__container {
-          @apply pb-10;
         }
         &__list {
           @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4;
@@ -23,8 +23,23 @@ import { HomeState } from './state/home.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
+  @Select(HomeState.projectsLoading)
+  projectsLoading$!: Observable<DataLoading>;
+
+  @Select(HomeState.boardsLoading)
+  boardsLoading$!: Observable<DataLoading>;
+
+  @Select(HomeState.highPriorityTasksLoading)
+  highPriorityTasksLoading$!: Observable<DataLoading>;
+
+  @Select(HomeState.recentTasksLoading)
+  recentTasksLoading$!: Observable<DataLoading>;
+
   @Select(HomeState.getProjects)
   projects$!: Observable<Project[]>;
+
+  @Select(HomeState.getBoards)
+  boards$!: Observable<Board[]>;
 
   @Select(HomeState.getHighPriorityTasks)
   hightPriorityTasks$!: Observable<Task[]>;
@@ -32,11 +47,14 @@ export class HomeComponent implements OnInit {
   @Select(HomeState.getRecentTasks)
   recentTasks$!: Observable<Task[]>;
 
-  constructor(private store: Store) {}
+  user$ = this.auth.user$;
+
+  constructor(private store: Store, private auth: AuthService) {}
 
   ngOnInit(): void {
     this.store.dispatch(new HomeAction.GetProjects());
     this.store.dispatch(new HomeAction.GetRecentTasks());
     this.store.dispatch(new HomeAction.GetHighPriorityTasks());
+    this.store.dispatch(new HomeAction.GetBoards());
   }
 }

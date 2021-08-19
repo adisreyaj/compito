@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { User } from '@compito/api-interfaces';
 
 @Component({
-  selector: 'compito-users-card',
+  selector: 'compito-user-invite-card',
   template: `
     <article
       *ngIf="data"
@@ -19,30 +18,16 @@ import { User } from '@compito/api-interfaces';
       </button>
       <header class="flex items-center justify-between relative">
         <div class="">
-          <div class="relative">
-            <img
-              [src]="data?.image ?? 'https://avatar.tobi.sh/' + data.email"
-              [alt]="data?.firstName"
-              width="100"
-              height="100"
-              class="rounded-full mb-4"
-            />
-            <div
-              *ngIf="data?.verified"
-              class="bg-primary text-white absolute bottom-0 left-0 rounded-full border-4 border-white"
-              [style.padding.px]="2"
-              tippy="Verified"
+          <p class="text-md font-medium">{{ data?.email }}</p>
+          <p class="text-xs text-gray-400">
+            Invited By
+            <span class="font-medium text-gray-600"
+              >{{ data?.invitedBy?.firstName }} {{ data?.invitedBy?.lastName }}</span
             >
-              <rmx-icon name="check-line" class="icon-xxs"></rmx-icon>
-            </div>
-          </div>
-          <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/projects', data.id]">
-            {{ data?.firstName }} {{ data?.lastName }}
           </p>
-          <p class="text-gray-400 text-sm line-clamp-2">{{ data?.email }}</p>
-          <p class="text-gray-400 text-sm">
+          <p class="text-xs text-gray-400">
             Role
-            <span class="font-medium text-gray-600">{{ data?.roles?.[0]?.role?.label }}</span>
+            <span class="font-medium text-gray-600">{{ data?.role?.label }}</span>
           </p>
         </div>
       </header>
@@ -50,7 +35,7 @@ import { User } from '@compito/api-interfaces';
       <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">
         <div>
           <p>
-            Since
+            Sent on
             <span class="font-medium text-gray-600">{{ data?.createdAt | date: 'mediumDate' }}</span>
           </p>
         </div>
@@ -67,10 +52,11 @@ import { User } from '@compito/api-interfaces';
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsersCardComponent implements OnInit {
-  @Input() data: User | null = null;
-
+export class UserInviteCardComponent implements OnInit {
+  @Input() data: any;
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.data);
+  }
 }

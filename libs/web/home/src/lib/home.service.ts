@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { MultiDocPayload, Project, Task } from '@compito/api-interfaces';
+import { Board, MultiDocPayload, Project, Task } from '@compito/api-interfaces';
 import { API_TOKEN } from '@compito/web/ui';
 
 @Injectable({
@@ -26,5 +26,7 @@ export class HomeService {
     return this.http.get<MultiDocPayload<Project>>(`${this.projects}?limit=5&sort=updatedAt&order=desc`);
   }
 
-  getBoards() {}
+  getBoards() {
+    return this.http.get<MultiDocPayload<Board>>(`${this.boards}?limit=5&sort=updatedAt&order=desc`);
+  }
 }

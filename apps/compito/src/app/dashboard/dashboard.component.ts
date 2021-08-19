@@ -9,7 +9,12 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'compito-dashboard',
-  templateUrl: './dashboard.component.html',
+  template: ` <main class="h-screen grid">
+    <compito-header></compito-header>
+    <section style="min-height: calc(100vh - 64px);">
+      <router-outlet></router-outlet>
+    </section>
+  </main>`,
 })
 export class DashboardComponent implements OnInit {
   @Select(OrgsState.getAllOrgs)

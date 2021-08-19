@@ -31,6 +31,10 @@ export class OrgsCreateModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    const initialData = this.ref.data?.initialData;
+    if (initialData) {
+      this.orgForm.setValue(initialData);
+    }
   }
 
   handleFormSubmit() {

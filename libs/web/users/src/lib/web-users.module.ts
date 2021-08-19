@@ -9,10 +9,11 @@ import {
   LoadingCardModule,
   ModalModule,
   PageHeaderModule,
+  SectionHeaderModule,
   TimeAgoModule,
+  UserCardModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
-import { UsersCardComponent } from './shared/components/users-card/users-card.component';
 import { UsersCreateModalComponent } from './shared/components/users-create-modal/users-create-modal.component';
 import { UsersComponent } from './users.component';
 export const webUsersRoutes: Route[] = [
@@ -36,7 +37,9 @@ export const webUsersRoutes: Route[] = [
     ButtonModule,
     A11yModule,
     LoadingCardModule,
+    UserCardModule,
+    SectionHeaderModule,
   ],
-  declarations: [UsersComponent, UsersCardComponent, UsersCreateModalComponent],
+  declarations: [UsersComponent, UsersCreateModalComponent],
 })
 export class WebUsersModule {}

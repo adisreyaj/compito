@@ -1,5 +1,15 @@
 import { RequestWithUser } from '@compito/api-interfaces';
-import { BadRequestException, Body, Controller, ForbiddenException, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { PERMISSIONS } from '../core/config/permissions.config';
@@ -20,6 +30,14 @@ export class InviteController {
   @Post('')
   invite(@Body() data: { email: string; role: string }, @Req() req: RequestWithUser) {
     return this.inviteService.invite(data, req.user);
+  }
+
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('org-admin')
+  @Permissions(PERMISSIONS.user.create)
+  @Get('')
+  getInvites(@Req() req: RequestWithUser) {
+    return this.inviteService.getInvites(req.user);
   }
 
   @Post('/pre-auth/:id/accept')

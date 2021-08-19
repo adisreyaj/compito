@@ -7,11 +7,13 @@ import { TasksActions } from './tasks.actions';
 
 export class TasksStateModel {
   public tasks: Task[] = [];
+  public tasksFetched = false;
   public tasksLoading: DataLoading = { type: DataLoadingState.init };
 }
 
 const defaults: TasksStateModel = {
   tasks: [],
+  tasksFetched: false,
   tasksLoading: { type: DataLoadingState.init },
 };
 
@@ -24,6 +26,10 @@ export class TasksState {
   @Selector()
   static getMyTasks(state: TasksStateModel) {
     return state.tasks;
+  }
+  @Selector()
+  static tasksFetched(state: TasksStateModel) {
+    return state.tasksFetched;
   }
   @Selector()
   static tasksLoading(state: TasksStateModel) {
@@ -42,6 +48,7 @@ export class TasksState {
           patchState({
             tasks,
             tasksLoading: { type: DataLoadingState.success },
+            tasksFetched: true,
           });
         },
         () => {

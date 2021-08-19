@@ -10,8 +10,8 @@ import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import produce from 'immer';
 import { TaskDetailModalComponent } from 'libs/web/tasks/src/lib/shared/components/task-detail-modal/task-detail-modal.component';
-import { forkJoin, Observable } from 'rxjs';
-import { filter, map, take, tap, withLatestFrom } from 'rxjs/operators';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError, filter, map, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
 import { BoardsAction } from './state/boards.actions';
 import { BoardsState } from './state/boards.state';
 @Component({
@@ -172,27 +172,40 @@ export class BoardsComponent implements OnInit {
     }
   }
 
-  createNewTask(listId: string) {
+  createNewTask(listId: string, initialData = null) {
     const ref = this.dialog.open(TasksCreateModalComponent, {
       data: {
         priorities$: this.priorities$,
+        initialData,
       },
     });
     ref.afterClosed$
-      .pipe(withLatestFrom(this.board$, this.auth.user$.pipe(formatUser())))
-      .subscribe(([data, board, user]) => {
-        if (data) {
-          this.store.dispatch(
-            new BoardsAction.AddTask({
-              ...data,
-              list: listId,
-              boardId: board?.id,
-              projectId: board?.project.id,
-              orgId: user?.org,
-            }),
-          );
-        }
-      });
+      .pipe(
+        withLatestFrom(this.board$, this.auth.user$.pipe(formatUser())),
+        switchMap(([data, board, user]) => {
+          if (data) {
+            return this.store
+              .dispatch(
+                new BoardsAction.AddTask({
+                  ...data,
+                  list: listId,
+                  boardId: board?.id,
+                  projectId: board?.project.id,
+                  orgId: user?.org,
+                }),
+              )
+              .pipe(
+                // Reopen the modal with the filled data if fails
+                catchError(() => {
+                  this.createNewTask(listId, data);
+                  return throwError(new Error('Failed to create task!'));
+                }),
+              );
+          }
+          return of(null);
+        }),
+      )
+      .subscribe();
   }
 
   viewTaskDetail(task: Task, list: BoardList) {

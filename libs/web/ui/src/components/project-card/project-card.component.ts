@@ -22,7 +22,7 @@ import { Project } from '@compito/api-interfaces';
           <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/projects', data.id]">
             {{ data?.name }}
           </p>
-          <p class="text-gray-400 text-sm line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+          <p class="text-gray-400 text-sm line-clamp-2" [style.minHeight.px]="40">{{ data?.description }}</p>
         </div>
       </header>
       <div class="my-4" [style.minHeight.px]="48">
