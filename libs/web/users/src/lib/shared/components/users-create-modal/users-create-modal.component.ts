@@ -4,12 +4,12 @@ import { DialogRef } from '@ngneat/dialog';
 
 @Component({
   selector: 'compito-users-create-modal',
-  template: ` <compito-modal title="Add New Project" [ref]="ref" cdkTrapFocus>
+  template: ` <compito-modal title="Add New Project" [ref]="ref" cdkTrapFocus cdkTrapFocusAutoCapture>
     <section>
       <form [formGroup]="userForm" id="userForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
         <div class="form-group">
           <label for="email">Email</label>
-          <input class="w-full" type="email" id="email" formControlName="email" />
+          <input class="w-full" type="email" id="email" formControlName="email" cdkFocusInitial />
         </div>
       </form>
     </section>

@@ -6,12 +6,12 @@ import { defaultLists } from '../../../config/boards.config';
 @Component({
   selector: 'compito-board-create-modal',
   template: `
-    <compito-modal title="Add New Board" [ref]="ref" cdkTrapFocus>
+    <compito-modal title="Add New Board" [ref]="ref" cdkTrapFocus cdkTrapFocusAutoCapture>
       <section>
         <form [formGroup]="boardForm" id="boardForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
           <div class="form-group">
             <label for="name">Name</label>
-            <input class="w-full" type="text" id="name" formControlName="name" autofocus />
+            <input class="w-full" type="text" id="name" formControlName="name" cdkFocusInitial />
           </div>
           <div class="form-group">
             <label for="description">Description</label>
