@@ -1,4 +1,5 @@
 // TODD: Move this to common place
+import { Prisma } from '@prisma/client';
 import { NonFunctionKeys } from 'utility-types';
 
 export const ROLE_LEVEL = {
@@ -15,5 +16,5 @@ export interface Role {
   id: string;
   name: Roles | string;
   label: string;
-  permissions?: string[];
+  permissions?: Prisma.JsonValue;
 }

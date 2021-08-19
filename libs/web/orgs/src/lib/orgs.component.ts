@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
-import { Breadcrumb } from '@compito/web/ui';
+import { Breadcrumb, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/orgs-create-modal.component';
 import { OrgsAction } from './state/orgs.actions';
 import { OrgsState } from './state/orgs.state';
@@ -74,7 +74,7 @@ export class OrgsComponent implements OnInit {
   orgsLoading$!: Observable<DataLoading>;
   @Select(OrgsState.orgsFetched)
   orgsFetched$!: Observable<DataLoading>;
-  constructor(private store: Store, private dialog: DialogService) {}
+  constructor(private store: Store, private dialog: DialogService, private toast: ToastService) {}
 
   uiView$: Observable<DataLoading> = this.orgsLoading$.pipe(
     withLatestFrom(this.orgsFetched$),
@@ -90,12 +90,28 @@ export class OrgsComponent implements OnInit {
     this.store.dispatch(new OrgsAction.GetAll());
   }
 
-  createNew() {
-    const ref = this.dialog.open(OrgsCreateModalComponent);
-    ref.afterClosed$.subscribe((data) => {
-      if (data) {
-        this.store.dispatch(new OrgsAction.Add(data));
-      }
+  createNew(initialData = null) {
+    const ref = this.dialog.open(OrgsCreateModalComponent, {
+      data: {
+        initialData,
+      },
     });
+    ref.afterClosed$
+      .pipe(
+        switchMap((data) => {
+          if (data) {
+            return this.store.dispatch(new OrgsAction.Add(data)).pipe(
+              // Reopen the modal with the filled data if fails
+              catchError(() => {
+                this.createNew(data);
+                this.toast.error('Failed to create org!');
+                return throwError(new Error('Failed to create org!'));
+              }),
+            );
+          }
+          return of(null);
+        }),
+      )
+      .subscribe();
   }
 }

@@ -39,6 +39,10 @@ export class ProjectsCreateModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    const initialData = this.ref.data?.initialData;
+    if (initialData) {
+      this.projectForm.setValue(initialData);
+    }
   }
 
   handleFormSubmit() {

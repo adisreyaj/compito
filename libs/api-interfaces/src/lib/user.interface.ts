@@ -28,6 +28,10 @@ export interface UserRequest extends UserBase {
   password: string;
 }
 
+export interface InviteRequest {
+  email: string;
+  role: string;
+}
 export type UpdateMembersRequestType = 'modify' | 'set';
 type ModifyMembers = { type: 'modify'; add?: string[]; remove?: string[] };
 type SetMembers = { type: 'set'; set: string[] };

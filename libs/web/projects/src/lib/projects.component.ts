@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
-import { Breadcrumb, formatUser } from '@compito/web/ui';
+import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
-import { Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { ProjectsAction } from './state/projects.actions';
 import { ProjectsState } from './state/projects.state';
 @Component({
@@ -101,6 +101,7 @@ export class ProjectsComponent implements OnInit {
     private store: Store,
     private activatedRoute: ActivatedRoute,
     private auth: AuthService,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -110,13 +111,30 @@ export class ProjectsComponent implements OnInit {
     }
   }
 
-  createNew() {
-    const ref = this.dialog.open(ProjectsCreateModalComponent);
-    ref.afterClosed$.pipe(withLatestFrom(this.auth.user$.pipe(formatUser()))).subscribe(([data, user]) => {
-      if (data) {
-        this.store.dispatch(new ProjectsAction.Add({ ...data, orgId: user?.org }));
-      }
+  createNew(initialData = null) {
+    const ref = this.dialog.open(ProjectsCreateModalComponent, {
+      data: {
+        initialData,
+      },
     });
+    ref.afterClosed$
+      .pipe(
+        withLatestFrom(this.auth.user$.pipe(formatUser())),
+        switchMap(([data, user]) => {
+          if (data) {
+            return this.store.dispatch(new ProjectsAction.Add({ ...data, orgId: user?.org })).pipe(
+              // Reopen the modal with the filled data if fails
+              catchError(() => {
+                this.createNew(data);
+                this.toast.error('Failed to create project!');
+                return throwError(new Error('Failed to create project!'));
+              }),
+            );
+          }
+          return of(null);
+        }),
+      )
+      .subscribe();
   }
 
   private get isAddNewRoute() {

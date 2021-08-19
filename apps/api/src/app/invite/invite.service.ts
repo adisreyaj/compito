@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { getUserDetails } from '../core/utils/payload.util';
 import { PrismaService } from '../prisma.service';
+import { USER_BASIC_DETAILS } from '../task/task.config';
 
 @Injectable()
 export class InviteService {
@@ -44,6 +45,41 @@ export class InviteService {
     } catch (error) {
       this.logger.error('Failed to create invite', error);
       throw new InternalServerErrorException('Failed to create invite');
+    }
+  }
+
+  async getInvites(user: UserPayload) {
+    const { org, role } = getUserDetails(user);
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin':
+        throw new ForbiddenException('No permission to invite user');
+      default:
+        break;
+    }
+    try {
+      return await this.prisma.userInvite.findMany({
+        where: {
+          orgId: org,
+        },
+        select: {
+          id: true,
+          createdAt: true,
+          email: true,
+          role: {
+            select: {
+              id: true,
+              label: true,
+            },
+          },
+          invitedBy: {
+            select: USER_BASIC_DETAILS,
+          },
+        },
+      });
+    } catch (error) {
+      this.logger.error('Failed to retrieve invites');
+      throw new InternalServerErrorException('Failed to retrieve invites');
     }
   }
 
