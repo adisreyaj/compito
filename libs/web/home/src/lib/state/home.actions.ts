@@ -3,6 +3,10 @@ export namespace HomeAction {
     static readonly type = '[Home] Get projects';
     constructor() {}
   }
+  export class GetBoards {
+    static readonly type = '[Home] Get boards';
+    constructor() {}
+  }
   export class GetRecentTasks {
     static readonly type = '[Home] Get recent tasks';
     constructor() {}

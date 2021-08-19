@@ -1,3 +1,4 @@
+export * from './components/board-card';
 export * from './components/button';
 export * from './components/header';
 export * from './components/icon/icon.module';

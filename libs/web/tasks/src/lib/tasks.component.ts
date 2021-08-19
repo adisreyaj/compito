@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
-import { DataLoading, Task } from '@compito/api-interfaces';
+import { DataLoading, DataLoadingState, Task } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { map, withLatestFrom } from 'rxjs/operators';
 import { TasksActions } from './state/tasks.actions';
 import { TasksState } from './state/tasks.state';
 
@@ -33,6 +34,18 @@ export class TasksComponent implements OnInit {
 
   @Select(TasksState.tasksLoading)
   tasksLoading$!: Observable<DataLoading>;
+  @Select(TasksState.tasksFetched)
+  tasksFetched$!: Observable<boolean>;
+
+  uiView$: Observable<DataLoading> = this.tasksLoading$.pipe(
+    withLatestFrom(this.tasksFetched$),
+    map(([loading, fetched]) => {
+      if (fetched) {
+        return { type: DataLoadingState.success };
+      }
+      return loading;
+    }),
+  );
   constructor(private store: Store, private auth: AuthService) {}
 
   ngOnInit(): void {

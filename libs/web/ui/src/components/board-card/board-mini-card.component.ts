@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Project } from '@compito/api-interfaces';
+import { Board } from '@compito/api-interfaces';
 
 @Component({
-  selector: 'compito-project-mini-card',
+  selector: 'compito-board-mini-card',
   template: `
     <article
       *ngIf="data"
-      [routerLink]="['/projects', data.id]"
+      [routerLink]="['/boards', data.id]"
       class="p-4 relative rounded-md border group cursor-pointer transition-all hover:shadow-lg duration-200 ease-in
       border-gray-100 bg-white shadow-sm hover:border-gray-200"
     >
@@ -15,7 +15,10 @@ import { Project } from '@compito/api-interfaces';
           <p class="text-md font-medium group-hover:text-primary">
             {{ data?.name }}
           </p>
-          <p class="text-gray-400 text-sm line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+          <p class="text-xs text-gray-400">
+            Project
+            <span class="font-medium text-gray-600">{{ data?.project?.name }}</span>
+          </p>
         </div>
       </header>
       <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">
@@ -23,11 +26,6 @@ import { Project } from '@compito/api-interfaces';
           <p>
             Updated
             <span class="font-medium text-gray-600">{{ data?.updatedAt | timeAgo }}</span>
-          </p>
-        </div>
-        <div>
-          <p>
-            <span class="font-medium text-gray-600">{{ data?.boards?.length }}</span> Boards
           </p>
         </div>
       </footer>
@@ -43,8 +41,8 @@ import { Project } from '@compito/api-interfaces';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProjectMiniCardComponent implements OnInit {
-  @Input() data: Project | null = null;
+export class BoardMiniCardComponent implements OnInit {
+  @Input() data: Board | null = null;
 
   constructor() {}
 

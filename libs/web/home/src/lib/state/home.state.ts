@@ -30,6 +30,10 @@ export class HomeState {
     return state.projects;
   }
   @Selector()
+  static getBoards(state: HomeStateModel) {
+    return state.boards;
+  }
+  @Selector()
   static getRecentTasks(state: HomeStateModel) {
     return state.recentlyAddedTasks;
   }
@@ -45,6 +49,16 @@ export class HomeState {
       tap((data) => {
         patchState({
           projects: data.payload,
+        });
+      }),
+    );
+  }
+  @Action(HomeAction.GetBoards)
+  getBoards({ patchState }: StateContext<HomeStateModel>) {
+    return this.homeService.getBoards().pipe(
+      tap((data) => {
+        patchState({
+          boards: data.payload,
         });
       }),
     );

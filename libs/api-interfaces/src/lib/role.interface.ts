@@ -15,5 +15,5 @@ export interface Role {
   id: string;
   name: Roles | string;
   label: string;
-  permissions: any;
+  permissions?: string[];
 }
