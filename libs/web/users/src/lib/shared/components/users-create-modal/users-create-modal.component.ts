@@ -11,6 +11,14 @@ import { DialogRef } from '@ngneat/dialog';
           <label for="email">Email</label>
           <input class="w-full" type="email" id="email" formControlName="email" cdkFocusInitial />
         </div>
+        <div class="form-group">
+          <label for="priority">Role</label>
+          <select name="priority" id="priority" formControlName="role">
+            <ng-container *ngFor="let role of roles$ | async">
+              <option [value]="role.id">{{ role?.label }}</option>
+            </ng-container>
+          </select>
+        </div>
       </form>
     </section>
 
@@ -39,10 +47,12 @@ export class UsersCreateModalComponent implements OnInit {
 
   private initForm() {
     this.userForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.maxLength(100), Validators.minLength(3)]],
-      lastName: ['', [Validators.required, Validators.maxLength(100), Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.maxLength(200), Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.maxLength(24), Validators.minLength(3)]],
+      role: ['', [Validators.required]],
     });
+  }
+
+  get roles$() {
+    return this.ref.data.roles$;
   }
 }

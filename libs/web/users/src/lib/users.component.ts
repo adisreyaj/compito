@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { DataLoading, DataLoadingState, User } from '@compito/api-interfaces';
+import { DataLoading, DataLoadingState, Role, User } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -82,6 +82,9 @@ export class UsersComponent implements OnInit {
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
 
+  @Select(UsersState.roles)
+  roles$!: Observable<Role[]>;
+
   @Select(UsersState.usersFetched)
   usersFetched$!: Observable<boolean>;
 
@@ -98,10 +101,15 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(new UsersAction.GetAll({}));
+    this.store.dispatch(new UsersAction.GetRoles());
   }
 
   inviteUser() {
-    const ref = this.dialog.open(UsersCreateModalComponent);
+    const ref = this.dialog.open(UsersCreateModalComponent, {
+      data: {
+        roles$: this.roles$,
+      },
+    });
     ref.afterClosed$.subscribe((data) => {
       if (data) {
         this.store.dispatch(new UsersAction.Add(data));
