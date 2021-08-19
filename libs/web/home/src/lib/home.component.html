@@ -1,16 +1,28 @@
-<section class="grid px-8 py-10 border-b cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+<section class="px-8 mt-10 mb-10">
+  <p class="text-gray-500">Welcome,</p>
+  <h2 class="text-2xl font-bold">{{(user$ | async)?.given_name}}</h2>
+</section>
+<section class="grid px-8 mt-10 cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
   <div>
-    <compito-task-list [data]="recentTasks$ | async" title="Recently Added Tasks"></compito-task-list>
+    <compito-task-list [data]="recentTasks$ | async" title="Recent Tasks"></compito-task-list>
   </div>
   <div>
     <compito-task-list [data]="hightPriorityTasks$ | async" title="Higher Priority Tasks"></compito-task-list>
   </div>
 </section>
-<section class="px-8 mt-4 projects__container">
+<section class="px-8 mt-10 projects__container">
   <compito-section-header title="Projects"></compito-section-header>
   <div class="projects__list">
     <ng-container *ngFor="let project of projects$ | async">
       <compito-project-mini-card [data]="project"></compito-project-mini-card>
+    </ng-container>
+  </div>
+</section>
+<section class="px-8 mt-10 projects__container">
+  <compito-section-header title="Boards"></compito-section-header>
+  <div class="projects__list">
+    <ng-container *ngFor="let board of boards$ | async">
+      <compito-board-mini-card [data]="board"></compito-board-mini-card>
     </ng-container>
   </div>
 </section>

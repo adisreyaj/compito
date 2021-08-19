@@ -117,6 +117,14 @@ export class BoardsService {
         where,
         skip,
         take: limit,
+        include: {
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {

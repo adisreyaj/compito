@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {
+  BoardCardModule,
   IconModule,
   PageHeaderModule,
   PriorityColorDirectiveModule,
@@ -23,6 +24,7 @@ import { HomeState } from './state/home.state';
     TimeAgoModule,
     PriorityColorDirectiveModule,
     ProjectCardModule,
+    BoardCardModule,
     SectionHeaderModule,
     PageHeaderModule,
   ],
