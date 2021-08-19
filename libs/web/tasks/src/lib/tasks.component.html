@@ -1,6 +1,6 @@
 <compito-page-header title="My Tasks" [breadcrumbs]="breadcrumbs"> </compito-page-header>
 <section class="tasks__container">
-  <ng-container [ngSwitch]="(tasksLoading$ | async)?.type">
+  <ng-container [ngSwitch]="(uiView$ | async)?.type">
     <ng-container *ngSwitchCase="'SUCCESS'">
       <div class="px-8 tasks__list">
         <ng-container *ngFor="let task of (tasks$ | async)">

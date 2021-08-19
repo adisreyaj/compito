@@ -7,11 +7,13 @@ import { UsersAction } from './users.actions';
 
 export class UsersStateModel {
   public users: User[] = [];
+  public usersFetched = false;
   public usersLoading: DataLoading = { type: DataLoadingState.init };
 }
 
 const defaults: UsersStateModel = {
   users: [],
+  usersFetched: false,
   usersLoading: { type: DataLoadingState.init },
 };
 
@@ -24,6 +26,10 @@ export class UsersState {
   @Selector()
   static usersLoading(state: UsersStateModel) {
     return state.usersLoading;
+  }
+  @Selector()
+  static usersFetched(state: UsersStateModel) {
+    return state.usersFetched;
   }
   @Selector()
   static getAllUsers(state: UsersStateModel) {
@@ -42,6 +48,7 @@ export class UsersState {
           patchState({
             users: result.payload,
             usersLoading: { type: DataLoadingState.success },
+            usersFetched: true,
           });
         },
         () => {

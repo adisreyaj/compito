@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { DataLoading, User } from '@compito/api-interfaces';
+import { DataLoading, DataLoadingState, User } from '@compito/api-interfaces';
 import { Breadcrumb } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { map, withLatestFrom } from 'rxjs/operators';
 import { UsersCreateModalComponent } from './shared/components/users-create-modal/users-create-modal.component';
 import { UsersAction } from './state/users.actions';
 import { UsersState } from './state/users.state';
@@ -28,7 +29,7 @@ import { UsersState } from './state/users.state';
             <p class="text-sm">Invite User</p>
           </div>
         </article>
-        <ng-container [ngSwitch]="(usersLoading$ | async)?.type">
+        <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let user of users$ | async">
               <compito-users-card [data]="user"></compito-users-card>
@@ -80,6 +81,19 @@ export class UsersComponent implements OnInit {
 
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
+
+  @Select(UsersState.usersFetched)
+  usersFetched$!: Observable<boolean>;
+
+  uiView$: Observable<DataLoading> = this.usersLoading$.pipe(
+    withLatestFrom(this.usersFetched$),
+    map(([loading, fetched]) => {
+      if (fetched) {
+        return { type: DataLoadingState.success };
+      }
+      return loading;
+    }),
+  );
   constructor(private dialog: DialogService, private store: Store) {}
 
   ngOnInit(): void {
