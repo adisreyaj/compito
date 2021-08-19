@@ -10,6 +10,7 @@ import { OrganizationModule } from './organization/organization.module';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserModule } from './user/user.module';
     BoardsModule,
     TaskModule,
     InviteModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [
