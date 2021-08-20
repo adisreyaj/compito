@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
@@ -68,7 +69,13 @@ export class OrgSelectionComponent implements OnInit {
           }
           this.loadingDetailsState.next({ type: DataLoadingState.success });
         },
-        () => {
+        (err) => {
+          if (err instanceof HttpErrorResponse) {
+            if (err.status === 400) {
+              this.toast.error(err.error?.message);
+              this.router.navigate(['/auth', 'login']);
+            }
+          }
           this.loadingDetailsState.next({ type: DataLoadingState.error, error: new Error() });
         },
       );
@@ -80,6 +87,25 @@ export class OrgSelectionComponent implements OnInit {
 
   loginToOrg(orgId: string) {
     window.location.href = `https://${environment.auth.domain}/continue?state=${this.state}&orgId=${orgId}`;
+  }
+
+  handleInvite(type: 'accept' | 'reject', id: string, orgId: string) {
+    switch (type) {
+      case 'accept':
+        this.orgService.accept(id, this.sessionToken).subscribe(() => {
+          this.loginToOrg(orgId);
+        });
+        break;
+      case 'reject':
+        this.orgService.reject(id, this.sessionToken).subscribe(() => {
+          const existingOrgs = this.orgSubject.value;
+          this.orgSubject.next(existingOrgs.filter(({ id: orgId }) => orgId !== id));
+        });
+        break;
+
+      default:
+        break;
+    }
   }
 
   private get sessionToken() {

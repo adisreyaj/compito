@@ -77,8 +77,8 @@
               <ng-container *ngIf="invites.length > 0; else noItems">
                 <div class="invites__list">
                   <ng-container *ngFor="let item of invites">
-                    <compito-org-selection-card [data]="item" [userEmail]="userEmail$ | async"
-                                                (clicked)="loginToOrg($event)"></compito-org-selection-card>
+                    <compito-org-invite-card [data]="item" (clicked)="handleInvite($event, item.id, item.org.id)">
+                    </compito-org-invite-card>
                   </ng-container>
                 </div>
               </ng-container>
