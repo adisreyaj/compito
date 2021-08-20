@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { append, patch } from '@ngxs/store/operators';
+import { append, patch, updateItem } from '@ngxs/store/operators';
 import produce from 'immer';
 import { tap } from 'rxjs/operators';
 import { ProjectsService } from '../projects.service';
@@ -60,6 +60,14 @@ export class ProjectsState {
     return this.projectService.create(payload).pipe(
       tap((project) => {
         setState(patch({ projects: append([project]) }));
+      }),
+    );
+  }
+  @Action(ProjectsAction.Update)
+  update({ setState }: StateContext<ProjectsStateModel>, { payload, id }: ProjectsAction.Update) {
+    return this.projectService.update(id, payload).pipe(
+      tap((project) => {
+        setState(patch({ projects: updateItem<Project>((item) => item?.id === id, project) }));
       }),
     );
   }

@@ -5,6 +5,10 @@ export namespace ProjectsAction {
     static readonly type = '[Projects] Add project';
     constructor(public payload: ProjectRequest) {}
   }
+  export class Update {
+    static readonly type = '[Projects] Update project';
+    constructor(public id: string, public payload: ProjectRequest) {}
+  }
   export class AddBoard {
     static readonly type = '[Projects] Add board to project';
     constructor(public payload: BoardRequest) {}

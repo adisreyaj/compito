@@ -23,7 +23,7 @@ import { kebabCase } from 'voca';
         <div class="flex justify-end space-x-4">
           <button btn type="button" variant="secondary" (click)="ref.close()">Close</button>
           <button btn type="submit" form="projectForm" variant="primary" [disabled]="projectForm.invalid">
-            Create
+            {{ ref.data.isUpdateMode ? 'Update' : 'Create' }}
           </button>
         </div>
       </ng-template>
@@ -41,7 +41,7 @@ export class ProjectsCreateModalComponent implements OnInit {
     this.initForm();
     const initialData = this.ref.data?.initialData;
     if (initialData) {
-      this.projectForm.setValue(initialData);
+      this.projectForm.patchValue(initialData);
     }
   }
 

@@ -7,7 +7,6 @@ export namespace BoardsAction {
   }
   export class GetPriorities {
     static readonly type = '[Boards] Get priorities';
-    constructor() {}
   }
   export class AddTask {
     static readonly type = '[Task] Add Task';

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CardEvent } from '@compito/api-interfaces';
 
 @Component({
   selector: 'compito-user-invite-card',
@@ -55,5 +56,5 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 export class UserInviteCardComponent {
   @Input() data: any;
 
-  @Output() clicked = new EventEmitter<{ type: string; data?: any }>();
+  @Output() clicked = new EventEmitter<CardEvent>();
 }

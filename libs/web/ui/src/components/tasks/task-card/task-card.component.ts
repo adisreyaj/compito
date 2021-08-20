@@ -11,7 +11,7 @@ import { UserAvatarGroupData } from '../../user-avatar-group';
       (click)="clicked.emit(task)"
     >
       <header>
-        <div class="w-8 h-2 priority--bg rounded-full" [class]="task.priority | lowercase"></div>
+        <div class="w-8 h-1 priority--bg rounded-full" [class]="task.priority | lowercase"></div>
         <p class="font-medium text-sm line-clamp-1">{{ task?.title }}</p>
       </header>
       <div>
