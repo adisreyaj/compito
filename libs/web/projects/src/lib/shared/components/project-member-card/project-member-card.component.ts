@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { User } from '@compito/api-interfaces';
 
 @Component({
@@ -43,11 +43,8 @@ import { User } from '@compito/api-interfaces';
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProjectMemberCardComponent implements OnInit {
+export class ProjectMemberCardComponent {
   @Input() data: User | null = null;
 
   @Output() removed = new EventEmitter<string>();
-  constructor() {}
-
-  ngOnInit(): void {}
 }

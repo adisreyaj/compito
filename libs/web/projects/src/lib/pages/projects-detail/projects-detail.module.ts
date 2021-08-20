@@ -8,6 +8,7 @@ import {
   PageHeaderModule,
   SectionHeaderModule,
   TimeAgoModule,
+  UserSelectModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
 import { BoardsCardComponent } from '../../shared/components/boards-card/boards-card.component';
@@ -28,6 +29,7 @@ const routes: Routes = [{ path: '', component: ProjectsDetailComponent }];
     TimeAgoModule,
     SectionHeaderModule,
     LoadingCardModule,
+    UserSelectModule,
   ],
 })
 export class ProjectsDetailModule {}

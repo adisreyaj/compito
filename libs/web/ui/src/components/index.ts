@@ -12,3 +12,4 @@ export * from './tasks';
 export * from './toast/toast.service';
 export * from './user-avatar-group';
 export * from './user-card';
+export * from './user-select';

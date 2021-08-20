@@ -213,7 +213,7 @@ export class BoardsComponent implements OnInit {
       data: {
         task,
         list,
-        users: this.users$,
+        users$: this.users$,
         priorities$: this.priorities$,
       },
     });

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataLoading, Organization, User } from '@compito/api-interfaces';
+import { CardEvent, DataLoading, Organization, User } from '@compito/api-interfaces';
 import { ProjectsCreateModalComponent } from '@compito/web/projects';
 import { ProjectsAction } from '@compito/web/projects/state';
 import { Breadcrumb } from '@compito/web/ui';
@@ -90,6 +90,17 @@ export class OrgsDetailComponent implements OnInit {
         this.store.dispatch(new ProjectsAction.Add(data));
       }
     });
+  }
+
+  handleUserSelectEvent({ type, payload }: CardEvent) {
+    switch (type) {
+      case 'toggle':
+        this.toggleMembers(payload);
+        break;
+      case 'save':
+        this.updateMembers();
+        break;
+    }
   }
   private get orgId() {
     return this.activatedRoute.snapshot.params?.id || null;

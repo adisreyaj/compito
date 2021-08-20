@@ -9,6 +9,7 @@ import {
   ProjectCardModule,
   SectionHeaderModule,
   UserCardModule,
+  UserSelectModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
 import { OrgsDetailRoutingModule } from './orgs-detail-routing.module';
@@ -30,6 +31,7 @@ const routes: Routes = [{ path: '', component: OrgsDetailComponent }];
     ProjectCardModule,
     ButtonModule,
     LoadingCardModule,
+    UserSelectModule,
   ],
 })
 export class OrgsDetailModule {}

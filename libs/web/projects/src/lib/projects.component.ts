@@ -3,8 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { CardEvent, DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
+import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
+import { User } from '@prisma/client';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
@@ -89,6 +91,9 @@ export class ProjectsComponent implements OnInit {
   @Select(ProjectsState.projectsFetched)
   projectsFetched$!: Observable<boolean>;
 
+  @Select(UsersState.getAllUsers)
+  users$!: Observable<User[]>;
+
   uiView$: Observable<DataLoading> = this.projectsLoading$.pipe(
     withLatestFrom(this.projectsFetched$),
     map(([loading, fetched]) => {
@@ -109,6 +114,8 @@ export class ProjectsComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(new ProjectsAction.GetAll({}));
+    this.store.dispatch(new UsersAction.GetAll({}));
+
     if (this.isAddNewRoute) {
       this.openProjectModal();
     }
@@ -137,6 +144,7 @@ export class ProjectsComponent implements OnInit {
       data: {
         initialData,
         isUpdateMode,
+        users$: this.users$,
       },
     });
     ref.afterClosed$

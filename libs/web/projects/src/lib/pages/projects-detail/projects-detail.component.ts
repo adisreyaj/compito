@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { DataLoading, Project, User } from '@compito/api-interfaces';
+import { CardEvent, DataLoading, Project, User } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
@@ -93,6 +93,17 @@ export class ProjectsDetailComponent implements OnInit {
   updateMembers() {
     const members = [...this.selectedMembers.keys()];
     this.store.dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'set', set: members }));
+  }
+
+  handleUserSelectEvent({ type, payload }: CardEvent) {
+    switch (type) {
+      case 'toggle':
+        this.toggleMembers(payload);
+        break;
+      case 'save':
+        this.updateMembers();
+        break;
+    }
   }
 
   private get projectId() {

@@ -10,6 +10,7 @@ import {
   TaskSharedModule,
   TimeAgoModule,
   UserAvatarGroupModule,
+  UserSelectModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
 import { BoardsComponent } from './boards.component';
@@ -37,6 +38,7 @@ import { TaskDetailModalComponent } from './shared/components/task-detail-modal/
     ReactiveFormsModule,
     TimeAgoModule,
     TaskSharedModule,
+    UserSelectModule,
   ],
   declarations: [BoardsComponent, TaskDetailModalComponent],
 })
