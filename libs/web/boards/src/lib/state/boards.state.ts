@@ -191,9 +191,12 @@ export class BoardsState {
     });
     patchState({ lists: updatedLists });
     return this.boardService.moveTask(taskId, to).pipe(
-      tap(() => {
-        patchState({ lists });
-      }),
+      tap(
+        () => {},
+        () => {
+          patchState({ lists });
+        },
+      ),
     );
   }
 

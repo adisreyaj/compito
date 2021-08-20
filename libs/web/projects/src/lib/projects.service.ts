@@ -21,6 +21,10 @@ export class ProjectsService {
     return this.http.post<Project>(this.api, data);
   }
 
+  update(id: string, data: ProjectRequest) {
+    return this.http.patch<Project>(`${this.api}/${id}`, data);
+  }
+
   getAll() {
     return this.http.get<MultiDocPayload<Project>>(this.api);
   }

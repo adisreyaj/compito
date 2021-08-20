@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthHttpInterceptor, AuthModule } from '@auth0/auth0-angular';
-import { DelayInterceptor, IconModule } from '@compito/web/ui';
+import { DelayInterceptor, IconModule, TokenValidatorInterceptor } from '@compito/web/ui';
 import { API_TOKEN, ENV_TOKEN } from '@compito/web/ui/tokens';
 import { UsersState } from '@compito/web/users/state/users.state';
 import { DialogModule } from '@ngneat/dialog';
@@ -76,6 +76,11 @@ enableMapSet();
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthHttpInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenValidatorInterceptor,
       multi: true,
     },
     {

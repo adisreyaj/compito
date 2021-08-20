@@ -18,9 +18,13 @@ import {
   RiMore2Fill,
   RiNotification2Line,
   RiTableLine,
+  RiUserSettingsLine,
+  RiUserShared2Line,
 } from 'angular-remix-icon';
 const icons = {
   RiNotification2Line,
+  RiUserSettingsLine,
+  RiUserShared2Line,
   RiAddCircleLine,
   RiArrowRightLine,
   RiHome5Line,

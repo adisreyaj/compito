@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
+import { CardEvent, DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
+import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
-import { ProjectsCreateModalComponent } from 'libs/web/projects/src/lib/shared/components/projects-create-modal/projects-create-modal.component';
+import { User } from '@prisma/client';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
 import { ProjectsAction } from './state/projects.actions';
 import { ProjectsState } from './state/projects.state';
 @Component({
@@ -16,7 +18,7 @@ import { ProjectsState } from './state/projects.state';
     <section class="projects__container">
       <div class="projects__list px-8">
         <article
-          (click)="createNew()"
+          (click)="openProjectModal()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
@@ -32,7 +34,10 @@ import { ProjectsState } from './state/projects.state';
         <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let project of projects$ | async">
-              <compito-project-card [data]="project"></compito-project-card>
+              <compito-project-card
+                [data]="project"
+                (clicked)="handleProjectCardEvents($event, project)"
+              ></compito-project-card>
             </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">
@@ -86,6 +91,9 @@ export class ProjectsComponent implements OnInit {
   @Select(ProjectsState.projectsFetched)
   projectsFetched$!: Observable<boolean>;
 
+  @Select(UsersState.getAllUsers)
+  users$!: Observable<User[]>;
+
   uiView$: Observable<DataLoading> = this.projectsLoading$.pipe(
     withLatestFrom(this.projectsFetched$),
     map(([loading, fetched]) => {
@@ -106,15 +114,37 @@ export class ProjectsComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(new ProjectsAction.GetAll({}));
+    this.store.dispatch(new UsersAction.GetAll({}));
+
     if (this.isAddNewRoute) {
-      this.createNew();
+      this.openProjectModal();
     }
   }
 
-  createNew(initialData = null) {
+  handleProjectCardEvents({ type, payload }: CardEvent, project: Project) {
+    switch (type) {
+      case 'edit': {
+        const data = {
+          id: project.id,
+          name: project.name,
+          description: project.description,
+          members: project.members.map(({ id }) => id),
+        };
+        this.openProjectModal(data, true);
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
+  openProjectModal(initialData: any = null, isUpdateMode = false) {
     const ref = this.dialog.open(ProjectsCreateModalComponent, {
       data: {
         initialData,
+        isUpdateMode,
+        users$: this.users$,
       },
     });
     ref.afterClosed$
@@ -122,10 +152,13 @@ export class ProjectsComponent implements OnInit {
         withLatestFrom(this.auth.user$.pipe(formatUser())),
         switchMap(([data, user]) => {
           if (data) {
-            return this.store.dispatch(new ProjectsAction.Add({ ...data, orgId: user?.org })).pipe(
+            const action = isUpdateMode
+              ? this.store.dispatch(new ProjectsAction.Update(initialData.id, { ...data, orgId: user?.org }))
+              : this.store.dispatch(new ProjectsAction.Add({ ...data, orgId: user?.org }));
+            action.pipe(
               // Reopen the modal with the filled data if fails
               catchError(() => {
-                this.createNew(data);
+                this.openProjectModal(data);
                 this.toast.error('Failed to create project!');
                 return throwError(new Error('Failed to create project!'));
               }),

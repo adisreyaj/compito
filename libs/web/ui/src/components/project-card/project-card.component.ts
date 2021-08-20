@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Project } from '@compito/api-interfaces';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CardEvent, Project } from '@compito/api-interfaces';
 
 @Component({
   selector: 'compito-project-card',
@@ -45,8 +45,8 @@ import { Project } from '@compito/api-interfaces';
 
     <ng-template #moreOptions let-hide>
       <div class="flex flex-col w-44">
-        <div class="dropdown-item" (click)="hide()">Edit</div>
-        <div class="text-red-600 dropdown-item" (click)="hide()">Delete</div>
+        <div class="dropdown-item" (click)="clicked.emit({ type: 'edit' }); hide()">Edit</div>
+        <div class="text-red-600 dropdown-item" (click)="clicked.emit({ type: 'delete' }); hide()">Delete</div>
       </div>
     </ng-template>
   `,
@@ -62,4 +62,5 @@ import { Project } from '@compito/api-interfaces';
 })
 export class ProjectCardComponent {
   @Input() data: Project | null = null;
+  @Output() clicked = new EventEmitter<CardEvent>();
 }

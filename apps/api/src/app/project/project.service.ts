@@ -82,7 +82,7 @@ export class ProjectService {
     let where: Prisma.ProjectWhereInput = {
       orgId: org,
     };
-    let select: Prisma.ProjectSelect = {
+    const select: Prisma.ProjectSelect = {
       id: true,
       name: true,
       description: true,
@@ -330,8 +330,6 @@ export class ProjectService {
             throw new NotFoundException('Project not found');
           }
         }
-      default:
-        break;
     }
   }
 }

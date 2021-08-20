@@ -12,6 +12,7 @@ import {
   ProjectCardModule,
   TimeAgoModule,
   UserAvatarGroupModule,
+  UserSelectModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
 import { ProjectsComponent } from './projects.component';
@@ -42,6 +43,7 @@ import { ProjectsCreateModalComponent } from './shared/components/projects-creat
     TimeAgoModule,
     ProjectCardModule,
     LoadingCardModule,
+    UserSelectModule,
   ],
   declarations: [ProjectsComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
 })

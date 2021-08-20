@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'compito-org-invite-card',
@@ -36,11 +36,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrgInviteCardComponent implements OnInit {
+export class OrgInviteCardComponent {
   @Input() data: any;
 
   @Output() clicked = new EventEmitter<'accept' | 'reject'>();
-  constructor() {}
-
-  ngOnInit(): void {}
 }

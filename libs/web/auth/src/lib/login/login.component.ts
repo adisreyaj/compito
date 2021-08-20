@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
+import { ToastService } from '@compito/web/ui';
 
 @Component({
   selector: 'compito-login',
@@ -34,9 +36,13 @@ import { AuthService } from '@auth0/auth0-angular';
   ],
 })
 export class LoginComponent implements OnInit {
-  constructor(public auth: AuthService) {}
+  constructor(public auth: AuthService, private activatedRoute: ActivatedRoute, private toast: ToastService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.activatedRoute.snapshot.queryParams?.code === 'INVALID_SESSION') {
+      this.toast.error('Invalid session! Please login again');
+    }
+  }
 
   login() {
     this.auth.loginWithRedirect({});

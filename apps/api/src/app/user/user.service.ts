@@ -5,7 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
+  NotFoundException
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
@@ -236,48 +236,6 @@ export class UserService {
     }
   }
 
-  async acceptInvite(id: string, user: UserPayload) {
-    try {
-      const inviteDetails = await this.prisma.userInvite.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          orgId: true,
-          id: true,
-          roleId: true,
-          email: true,
-        },
-      });
-      await this.prisma.$transaction([
-        this.prisma.user.update({
-          where: {
-            email: inviteDetails.email,
-          },
-          data: {
-            orgs: {
-              connect: {
-                id: inviteDetails.orgId,
-              },
-            },
-            roles: {
-              create: {
-                roleId: inviteDetails.roleId,
-                orgId: inviteDetails.orgId,
-              },
-            },
-          },
-        }),
-        this.prisma.userInvite.delete({
-          where: { id },
-        }),
-      ]);
-    } catch (error) {
-      this.logger.error('Failed to accept invite', error);
-      throw new InternalServerErrorException('Failed to accept invite');
-    }
-  }
-
   async signup(data: UserSignupRequest) {
     const connection = this.config.get('AUTH0_DB');
     if (!connection) {
@@ -435,7 +393,7 @@ export class UserService {
   }
 
   async findAll(query: RequestParams, user: UserPayload) {
-    const { org, role, userId, projects } = getUserDetails(user);
+    const { org, role, userId } = getUserDetails(user);
     let whereCondition: Prisma.UserWhereInput = {};
     switch (role.name) {
       /**
@@ -443,6 +401,25 @@ export class UserService {
        */
       case 'user':
         {
+          let projects = [];
+          try {
+            const user = await this.prisma.user.findUnique({
+              where: {
+                id: userId,
+              },
+              select: {
+                projects: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            });
+            projects = user.projects.map(({ id }) => id);
+          } catch (error) {
+            this.logger.error('Failed to fetch user details');
+            throw new InternalServerErrorException('Failed to fetch users');
+          }
           whereCondition = {
             ...whereCondition,
             AND: [
@@ -457,7 +434,7 @@ export class UserService {
                 projects: {
                   some: {
                     id: {
-                      in: projects ?? [],
+                      in: projects,
                     },
                   },
                 },
@@ -583,52 +560,25 @@ export class UserService {
   }
 
   async updateUser(id: string, data: Partial<UserRequest>, user: UserPayload) {
-    const { userId, role, org } = getUserDetails(user);
-    const updateUser = async () => {
-      try {
-        return await this.prisma.user.update({
-          where: {
-            id,
-          },
-          data,
-          select: USER_BASIC_DETAILS,
-        });
-      } catch (error) {
-        throw new InternalServerErrorException('Failed to update user');
-      }
-    };
+    const { userId } = getUserDetails(user);
     if (id !== userId) {
-      switch (role.name) {
-        case 'super-admin': {
-          updateUser();
-        }
-        case 'admin':
-          try {
-            const userData = await this.prisma.user.findUnique({
-              where: {
-                id,
-              },
-              select: {
-                id: true,
-                orgs: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            });
-          } catch (error) {}
-        default: {
-          throw new ForbiddenException('Not enough permissions to update the user details');
-        }
-      }
-    } else {
-      updateUser();
+      throw new ForbiddenException('Not enough permissions to update the user details');
+    }
+    try {
+      return await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data,
+        select: USER_BASIC_DETAILS,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to update user');
     }
   }
 
   async deleteUser(id: string, user: UserPayload) {
-    const { userId, role, org } = getUserDetails(user);
+    const { role, org } = getUserDetails(user);
     let userData;
     try {
       userData = await this.prisma.user.findUnique({

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import * as dotenv from 'dotenv';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { getUserDetails } from '../core/utils/payload.util';
 
 dotenv.config();
 
@@ -23,7 +24,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: unknown): unknown {
+  validate(payload: any): any {
+    const { userId, org } = getUserDetails(payload);
+    if (userId == null && org == null) {
+      throw new UnauthorizedException('Token not valid');
+    }
     return payload;
   }
 }

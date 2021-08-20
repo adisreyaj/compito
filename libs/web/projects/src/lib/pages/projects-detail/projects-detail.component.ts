@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { DataLoading, Project, User } from '@compito/api-interfaces';
+import { CardEvent, DataLoading, Project, User } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
@@ -87,12 +87,35 @@ export class ProjectsDetailComponent implements OnInit {
   }
 
   removeMember(memberId: string) {
-    this.store.dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'modify', remove: [memberId] }));
+    const user = this.selectedMembers.get(memberId) as User;
+    this.selectedMembers.delete(memberId);
+    this.store
+      .dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'modify', remove: [memberId] }))
+      .subscribe(
+        () => {
+          return;
+        },
+        () => {
+          this.selectedMembers.set(memberId, user);
+        },
+      );
   }
 
   updateMembers() {
     const members = [...this.selectedMembers.keys()];
     this.store.dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'set', set: members }));
+  }
+
+  handleUserSelectEvent({ type, payload }: CardEvent, hide: () => void) {
+    switch (type) {
+      case 'toggle':
+        this.toggleMembers(payload);
+        break;
+      case 'save':
+        this.updateMembers();
+        hide();
+        break;
+    }
   }
 
   private get projectId() {

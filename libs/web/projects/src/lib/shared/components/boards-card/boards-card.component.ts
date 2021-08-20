@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Board } from '@compito/api-interfaces';
 
 @Component({
@@ -31,10 +31,6 @@ import { Board } from '@compito/api-interfaces';
           Created
           <span class="font-medium text-gray-600">{{ data?.createdAt | timeAgo }}</span>
         </p>
-        <p>
-          Tasks
-          <span class="font-medium text-gray-600">{{ data?.tasks?.length ?? '0' }}</span>
-        </p>
       </footer>
     </article>
 
@@ -46,9 +42,6 @@ import { Board } from '@compito/api-interfaces';
     </ng-template>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BoardsCardComponent implements OnInit {
+export class BoardsCardComponent {
   @Input() data: Board | null = null;
-  constructor() {}
-
-  ngOnInit(): void {}
 }

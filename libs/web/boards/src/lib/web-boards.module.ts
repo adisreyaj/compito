@@ -3,7 +3,15 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { IconModule, PageHeaderModule, TaskSharedModule, TimeAgoModule, UserAvatarGroupModule } from '@compito/web/ui';
+import {
+  ButtonModule,
+  IconModule,
+  PageHeaderModule,
+  TaskSharedModule,
+  TimeAgoModule,
+  UserAvatarGroupModule,
+  UserSelectModule,
+} from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
 import { BoardsComponent } from './boards.component';
 import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
@@ -22,6 +30,7 @@ import { TaskDetailModalComponent } from './shared/components/task-detail-modal/
     ]),
     PageHeaderModule,
     IconModule,
+    ButtonModule,
     DragDropModule,
     UserAvatarGroupModule,
     TippyModule,
@@ -29,6 +38,7 @@ import { TaskDetailModalComponent } from './shared/components/task-detail-modal/
     ReactiveFormsModule,
     TimeAgoModule,
     TaskSharedModule,
+    UserSelectModule,
   ],
   declarations: [BoardsComponent, TaskDetailModalComponent],
 })

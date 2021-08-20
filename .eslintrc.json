@@ -30,7 +30,8 @@
             ]
           }
         ],
-        "@angular-eslint/directive-selector": "off"
+        "@angular-eslint/directive-selector": "off",
+        "@typescript-eslint/no-namespace": "off"
       }
     },
     {

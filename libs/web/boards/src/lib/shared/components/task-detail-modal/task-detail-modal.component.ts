@@ -1,8 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BoardList, Task, User } from '@compito/api-interfaces';
-import { UserAvatarGroupData } from '@compito/web/ui';
+import { BoardList, CardEvent, Task, User } from '@compito/api-interfaces';
+import { UserAvatarGroupData, userMapToArray } from '@compito/web/ui';
 import { DialogRef } from '@ngneat/dialog';
 import { Store } from '@ngxs/store';
 import produce from 'immer';
@@ -35,8 +35,9 @@ import { BoardsAction } from '../../../state/boards.actions';
           <div class="flex items-center">
             <compito-user-avatar-group [data]="assignedUsers$ | async"></compito-user-avatar-group>
             <div [style.height.px]="48" [style.width.px]="48" class="p-1">
-              <div
-                class="rounded-full w-full h-full bg-primary-gradient cursor-pointer flex justify-center items-center text-white"
+              <button
+                type="button"
+                class="btn btn--primary rounded-full outline-none w-full h-full bg-primary-gradient cursor-pointer flex justify-center items-center text-white"
                 [style.marginLeft.rem]="0.3"
                 [tippy]="addAssignees"
                 [zIndex]="9999"
@@ -44,7 +45,7 @@ import { BoardsAction } from '../../../state/boards.actions';
                 variation="menu"
               >
                 <rmx-icon name="add-line"></rmx-icon>
-              </div>
+              </button>
             </div>
           </div>
         </section>
@@ -111,52 +112,12 @@ import { BoardsAction } from '../../../state/boards.actions';
     </ng-template>
 
     <ng-template #addAssignees let-hide>
-      <div class="flex flex-col w-64 p-1" cdkTrapFocus>
-        <div class="form-group mb-0">
-          <input type="text" class="w-full" autofocus />
-        </div>
-        <ul class="space-y-2 max-h-60 overflow-y-auto">
-          <ng-container *ngFor="let user of ref.data.users | async">
-            <li
-              class="flex space-x-2 items-center rounded-md p-2 hover:bg-gray-100 cursor-pointer"
-              (click)="toggleAssignee(user)"
-            >
-              <div>
-                <ng-container *ngIf="!selectedAssignees.has(user.id); else userAdded">
-                  <img
-                    [src]="user?.image ?? 'https://avatar.tobi.sh/' + user.email"
-                    [alt]="user.firstName"
-                    width="40"
-                    height="40"
-                    class="rounded-full"
-                  />
-                </ng-container>
-                <ng-template #userAdded>
-                  <div
-                    class="bg-primary-translucent text-primary rounded-full grid place-items-center"
-                    [style.height.px]="40"
-                    [style.width.px]="40"
-                  >
-                    <rmx-icon name="check-line"></rmx-icon>
-                  </div>
-                </ng-template>
-              </div>
-              <div>
-                <p>
-                  {{ user.firstName }}
-                </p>
-                <p class="text-sm text-gray-600">
-                  {{ user.email }}
-                </p>
-              </div>
-            </li>
-          </ng-container>
-        </ul>
-        <footer class="flex pt-2 items-center space-x-2">
-          <button btn size="sm" (click)="updateAssignees(); hide()">Save</button>
-          <button btn size="sm" variant="secondary" (click)="hide()">Cancel</button>
-        </footer>
-      </div>
+      <compito-user-select
+        [hide]="hide"
+        [users]="ref.data.users$ | async"
+        [selectedMembers]="selectedAssignees"
+        (clicked)="handleUserSelectEvent($event, hide)"
+      ></compito-user-select>
     </ng-template>
   `,
   styles: [
@@ -197,7 +158,7 @@ export class TaskDetailModalComponent implements OnInit {
     public ref: DialogRef<{
       task: Task;
       list: BoardList;
-      users: Observable<User[]>;
+      users$: Observable<User[]>;
       priorities$: Observable<string[]>;
     }>,
     private store: Store,
@@ -212,7 +173,7 @@ export class TaskDetailModalComponent implements OnInit {
     assignees.forEach((assignee) => {
       this.selectedAssignees.set(assignee.id, assignee);
     });
-    this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
+    this.assignedUsersSubject.next(userMapToArray(this.selectedAssignees));
     this.priority.valueChanges
       .pipe(
         switchMap((priority) =>
@@ -225,7 +186,7 @@ export class TaskDetailModalComponent implements OnInit {
   updateAssignees() {
     const assignees = [...this.selectedAssignees.keys()];
     this.store.dispatch(new BoardsAction.UpdateAssignees(this.listId, this.taskId, assignees));
-    this.assignedUsersSubject.next(this.mapToArray(this.selectedAssignees));
+    this.assignedUsersSubject.next(userMapToArray(this.selectedAssignees));
   }
 
   updateDescription() {
@@ -239,15 +200,6 @@ export class TaskDetailModalComponent implements OnInit {
           this.cdr.markForCheck();
         });
     }
-  }
-
-  mapToArray(map: Map<any, User>) {
-    return [...map.values()].map(({ email, image, firstName }) => {
-      return {
-        image: image ?? `https://avatar.tobi.sh/${email}`,
-        name: firstName,
-      };
-    });
   }
 
   revertDescription() {
@@ -267,6 +219,17 @@ export class TaskDetailModalComponent implements OnInit {
     }
   }
 
+  handleUserSelectEvent({ type, payload }: CardEvent, hide: () => void) {
+    switch (type) {
+      case 'toggle':
+        this.toggleAssignee(payload);
+        break;
+      case 'save':
+        this.updateAssignees();
+        hide();
+        break;
+    }
+  }
   get priorities() {
     return this.ref.data.priorities$ as Observable<string[]>;
   }
