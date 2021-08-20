@@ -116,7 +116,7 @@ import { BoardsAction } from '../../../state/boards.actions';
         [hide]="hide"
         [users]="ref.data.users$ | async"
         [selectedMembers]="selectedAssignees"
-        (clicked)="handleUserSelectEvent($event)"
+        (clicked)="handleUserSelectEvent($event, hide)"
       ></compito-user-select>
     </ng-template>
   `,
@@ -219,13 +219,14 @@ export class TaskDetailModalComponent implements OnInit {
     }
   }
 
-  handleUserSelectEvent({ type, payload }: CardEvent) {
+  handleUserSelectEvent({ type, payload }: CardEvent, hide: () => void) {
     switch (type) {
       case 'toggle':
         this.toggleAssignee(payload);
         break;
       case 'save':
         this.updateAssignees();
+        hide();
         break;
     }
   }

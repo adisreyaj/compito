@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Organization } from '@compito/api-interfaces';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Organization, UserDetails } from '@compito/api-interfaces';
 @Component({
   selector: 'compito-orgs-card',
   template: `<article
       *ngIf="data"
-      class="p-4 relative rounded-md border transition-all hover:shadow-lg duration-200 ease-in
-      border-gray-100 bg-white shadow-sm hover:border-gray-200"
+      class="p-4 relative rounded-md border transition-all hover:shadow-lg duration-200 ease-in hover:border-gray-200
+      border-gray-100 bg-white shadow-sm"
     >
       <button
+        *ngIf="data?.createdById === user?.userId"
         [tippy]="moreOptions"
         placement="bottom-start"
         variation="menu"
@@ -15,14 +16,13 @@ import { Organization } from '@compito/api-interfaces';
       >
         <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
       </button>
-      <header class="flex items-center justify-between">
-        <div>
-          <div class="flex items-center justify-between">
-            <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/orgs', data.id]">
-              {{ data?.name }}
-            </p>
-          </div>
-        </div>
+      <header>
+        <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/orgs', data.id]">
+          {{ data?.name }}
+        </p>
+        <p class="text-xs text-gray-400 ">
+          Assigned role <span class="font-medium text-gray-600">{{ data?.userRoleOrg?.[0]?.role?.label }}</span>
+        </p>
       </header>
       <div class="my-4">
         <compito-user-avatar-group [data]="[]"></compito-user-avatar-group>
@@ -32,10 +32,12 @@ import { Organization } from '@compito/api-interfaces';
           Created
           <span class="font-medium text-gray-600">{{ data?.createdAt | timeAgo }}</span>
         </p>
-        <p>
-          Projects
-          <span class="font-medium text-gray-600">19</span>
-        </p>
+        <div [tippy]="data?.createdById === user?.userId ? 'Own Org' : 'Invited Org'">
+          <rmx-icon
+            class="icon-sm"
+            [name]="data?.createdById === user?.userId ? 'user-settings-line' : 'user-shared-2-line'"
+          ></rmx-icon>
+        </div>
       </footer>
     </article>
 
@@ -45,12 +47,10 @@ import { Organization } from '@compito/api-interfaces';
         <div class="text-red-600 dropdown-item" (click)="hide()">Delete</div>
       </div>
     </ng-template>`,
-
+  styles: [``],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrgsCardComponent implements OnInit {
+export class OrgsCardComponent {
   @Input() data: Organization | null = null;
-  constructor() {}
-
-  ngOnInit(): void {}
+  @Input() user: UserDetails | null = null;
 }

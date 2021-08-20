@@ -72,7 +72,7 @@
 </ng-container>
 <ng-template #addAssignees let-hide>
   <compito-user-select [hide]="hide" [users]="(users$ | async)" [selectedMembers]="selectedMembers"
-                       (clicked)="handleUserSelectEvent($event)"></compito-user-select>
+                       (clicked)="handleUserSelectEvent($event, hide)"></compito-user-select>
 </ng-template>
 
 <ng-template #addBoard>

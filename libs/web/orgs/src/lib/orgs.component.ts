@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
-import { Breadcrumb, ToastService } from '@compito/web/ui';
+import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable, of, throwError } from 'rxjs';
@@ -12,7 +13,7 @@ import { OrgsState } from './state/orgs.state';
 @Component({
   selector: 'compito-orgs',
   template: ` <compito-page-header title="Orgs" [breadcrumbs]="breadcrumbs"></compito-page-header>
-    <section class="orgs__container">
+    <section class="orgs__container" *ngIf="user$ | async as user">
       <div class="orgs__list px-8">
         <article
           (click)="createNew()"
@@ -31,7 +32,7 @@ import { OrgsState } from './state/orgs.state';
         <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let org of orgs$ | async">
-              <compito-orgs-card [data]="org"></compito-orgs-card>
+              <compito-orgs-card [data]="org" [user]="user"></compito-orgs-card>
             </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">
@@ -74,7 +75,14 @@ export class OrgsComponent implements OnInit {
   orgsLoading$!: Observable<DataLoading>;
   @Select(OrgsState.orgsFetched)
   orgsFetched$!: Observable<DataLoading>;
-  constructor(private store: Store, private dialog: DialogService, private toast: ToastService) {}
+
+  user$ = this.auth.user$.pipe(formatUser());
+  constructor(
+    private store: Store,
+    private dialog: DialogService,
+    private toast: ToastService,
+    private auth: AuthService,
+  ) {}
 
   uiView$: Observable<DataLoading> = this.orgsLoading$.pipe(
     withLatestFrom(this.orgsFetched$),

@@ -72,13 +72,34 @@ export class TaskService {
   }
 
   async findAll(query: RequestParams, where: Prisma.TaskWhereInput = {}, user: UserPayload) {
-    const { org, role, projects } = getUserDetails(user);
+    const { org, role, userId } = getUserDetails(user);
     const { skip, limit, sort = 'updatedAt', order = 'asc' } = parseQuery(query);
     where.orgId = org;
     switch (role.name as Roles) {
       case 'user':
       case 'project-admin':
-        where.projectId = { in: projects };
+        {
+          let projects = [];
+          try {
+            const user = await this.prisma.user.findUnique({
+              where: {
+                id: userId,
+              },
+              select: {
+                projects: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            });
+            projects = user.projects.map(({ id }) => id);
+          } catch (error) {
+            this.logger.error('Failed to fetch user details');
+            throw new InternalServerErrorException('Failed to fetch users');
+          }
+          where.projectId = { in: projects };
+        }
         break;
       default:
         break;
@@ -142,19 +163,20 @@ export class TaskService {
       if (task) {
         switch (role.name as Roles) {
           case 'user':
-          case 'project-admin':
+          case 'project-admin': {
             const taskBelongsToAccessibleProject = projects.findIndex((id) => id === task.projectId) >= 0;
             if (!taskBelongsToAccessibleProject) {
               throw new ForbiddenException('No access to view task!');
             }
             break;
-
-          default:
+          }
+          default: {
             const taskBelongsToAccessibleOrg = org === task.orgId;
             if (!taskBelongsToAccessibleOrg) {
               throw new ForbiddenException('No access to view task!');
             }
             break;
+          }
         }
         return task;
       }
@@ -166,8 +188,8 @@ export class TaskService {
   }
 
   async update(id: string, data: TaskRequest, user: UserPayload) {
-    const { org, role, projects } = getUserDetails(user);
-    await this.canUpdateTask(id, role, projects, org);
+    const { org, role, userId } = getUserDetails(user);
+    await this.canUpdateTask(id, role, org, userId);
     try {
       const { assignees, priority, tags, ...rest } = data;
       let taskData: Prisma.TaskUpdateInput = {
@@ -228,7 +250,7 @@ export class TaskService {
     }
   }
 
-  private async canUpdateTask(id: string, role: Role, projects: string[], org: string) {
+  private async canUpdateTask(id: string, role: Role, org: string, userId: string) {
     let taskData;
     try {
       taskData = await this.prisma.task.findUnique({
@@ -251,10 +273,24 @@ export class TaskService {
       case 'user':
       case 'project-admin':
         try {
+          const user = await this.prisma.user.findUnique({
+            where: {
+              id: userId,
+            },
+            select: {
+              projects: {
+                select: {
+                  id: true,
+                },
+              },
+            },
+          });
+          const projects = user.projects.map(({ id }) => id);
           if (projects.findIndex((id) => id === taskData.projectId) < 0) {
             throw new ForbiddenException('Not enough permissions to update the task!');
           }
         } catch (error) {
+          this.logger.error('Task Update', error);
           throw new InternalServerErrorException('Failed to update task!');
         }
         break;
@@ -268,8 +304,8 @@ export class TaskService {
   }
 
   async remove(id: string, user: UserPayload) {
-    const { org, projects, role } = getUserDetails(user);
-    await this.canUpdateTask(id, role, projects, org);
+    const { org, role, userId } = getUserDetails(user);
+    await this.canUpdateTask(id, role, org, userId);
     try {
       const task = await this.prisma.task.delete({
         where: {

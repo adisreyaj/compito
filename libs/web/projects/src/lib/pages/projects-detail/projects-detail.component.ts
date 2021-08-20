@@ -87,7 +87,18 @@ export class ProjectsDetailComponent implements OnInit {
   }
 
   removeMember(memberId: string) {
-    this.store.dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'modify', remove: [memberId] }));
+    const user = this.selectedMembers.get(memberId) as User;
+    this.selectedMembers.delete(memberId);
+    this.store
+      .dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'modify', remove: [memberId] }))
+      .subscribe(
+        () => {
+          return;
+        },
+        () => {
+          this.selectedMembers.set(memberId, user);
+        },
+      );
   }
 
   updateMembers() {
@@ -95,13 +106,14 @@ export class ProjectsDetailComponent implements OnInit {
     this.store.dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'set', set: members }));
   }
 
-  handleUserSelectEvent({ type, payload }: CardEvent) {
+  handleUserSelectEvent({ type, payload }: CardEvent, hide: () => void) {
     switch (type) {
       case 'toggle':
         this.toggleMembers(payload);
         break;
       case 'save':
         this.updateMembers();
+        hide();
         break;
     }
   }
