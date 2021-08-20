@@ -24,6 +24,10 @@ export class UsersService {
     return this.http.get<any[]>(this.invitesAPI);
   }
 
+  cancelInvite(id: string) {
+    return this.http.post<any>(`${this.invitesAPI}/${id}/cancel`, {});
+  }
+
   getAll() {
     return this.http.get<MultiDocPayload<User>>(this.usersAPI);
   }

@@ -1,5 +1,6 @@
 export * from './components/board-card';
 export * from './components/button';
+export * from './components/default-modals';
 export * from './components/header';
 export * from './components/icon/icon.module';
 export * from './components/loading-card/loading-card.module';

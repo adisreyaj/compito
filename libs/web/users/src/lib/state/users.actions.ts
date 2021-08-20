@@ -4,6 +4,7 @@ export namespace UsersAction {
     static readonly type = '[Users] Get Invites';
     constructor() {}
   }
+
   export class InviteUser {
     static readonly type = '[Users] Invite User';
     constructor(public payload: InviteRequest) {}
@@ -15,5 +16,10 @@ export namespace UsersAction {
   export class GetAll {
     static readonly type = '[Users] Fetch All';
     constructor(public payload: any) {}
+  }
+
+  export class CancelInvite {
+    static readonly type = '[Users] Cancel invite';
+    constructor(public id: string) {}
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'compito-user-invite-card',
@@ -44,8 +44,8 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 
     <ng-template #moreOptions let-hide>
       <div class="flex flex-col w-44">
-        <div class="dropdown-item" (click)="hide()">Edit</div>
-        <div class="text-red-600 dropdown-item" (click)="hide()">Delete</div>
+        <div class="dropdown-item" (click)="clicked.emit({ type: 'edit' }); hide()">Edit</div>
+        <div class="text-red-600 dropdown-item" (click)="clicked.emit({ type: 'delete' }); hide()">Delete</div>
       </div>
     </ng-template>
   `,
@@ -54,6 +54,8 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 })
 export class UserInviteCardComponent implements OnInit {
   @Input() data: any;
+
+  @Output() clicked = new EventEmitter<{ type: string; data?: any }>();
   constructor() {}
 
   ngOnInit(): void {
