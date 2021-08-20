@@ -169,9 +169,21 @@ export class UserService {
           select: {
             id: true,
             email: true,
+            role: {
+              select: {
+                label: true,
+              },
+            },
+            org: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             invitedBy: {
               select: USER_BASIC_DETAILS,
             },
+            createdAt: true,
           },
         }),
       ]);

@@ -19,8 +19,7 @@ export class ProjectController {
     return this.projectService.create(project, req.user);
   }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('org-admin')
+  @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.project.read)
   @Get()
   findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {

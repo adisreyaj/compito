@@ -86,17 +86,13 @@ export class InviteService {
   async accept(id: string, userId: string, email: string) {
     let invite;
     try {
-      invite = this.prisma.userInvite.findUnique({
+      invite = await this.prisma.userInvite.findUnique({
         where: { id },
         select: {
           id: true,
           email: true,
           orgId: true,
-          role: {
-            select: {
-              id: true,
-            },
-          },
+          roleId: true,
         },
         rejectOnNotFound: true,
       });
@@ -124,8 +120,16 @@ export class InviteService {
             },
             roles: {
               create: {
-                orgId: invite.orgId,
-                roleId: invite.roleId,
+                org: {
+                  connect: {
+                    id: invite.orgId,
+                  },
+                },
+                role: {
+                  connect: {
+                    id: invite.roleId,
+                  },
+                },
               },
             },
           },
@@ -146,7 +150,7 @@ export class InviteService {
   async reject(id: string, userId: string, email: string) {
     let invite;
     try {
-      invite = this.prisma.userInvite.findUnique({
+      invite = await this.prisma.userInvite.findUnique({
         where: { id },
         select: {
           id: true,

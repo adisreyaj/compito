@@ -19,8 +19,7 @@ export class OrganizationController {
     return this.organizationService.create(organization, req.user);
   }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('admin')
+  @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.org.read)
   @Get()
   findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {

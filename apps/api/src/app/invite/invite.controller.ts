@@ -14,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
+import { Public } from '../core/decorators/public.decorator';
 import { Role } from '../core/decorators/roles.decorator';
 import { PermissionsGuard } from '../core/guards/permissions.guard';
 import { RolesGuard } from '../core/guards/roles.guard';
@@ -40,6 +41,7 @@ export class InviteController {
     return this.inviteService.getInvites(req.user);
   }
 
+  @Public()
   @Post('/pre-auth/:id/accept')
   acceptInvitePreAuth(@Param('id') id: string, @Req() req: RequestWithUser) {
     const sessionToken = req.headers['x-session-token'] as string;
@@ -64,6 +66,8 @@ export class InviteController {
     }
     return this.inviteService.accept(id, userId, email);
   }
+
+  @Public()
   @Post('/pre-auth/:id/reject')
   rejectInvitePreAuth(@Param('id') id: string, @Req() req: RequestWithUser) {
     const sessionToken = req.headers['x-session-token'] as string;
@@ -80,6 +84,7 @@ export class InviteController {
       throw new ForbiddenException('Session not valid. Please login again!');
     }
   }
+
   @Post(':id/reject')
   rejectInvite(@Param('id') id: string, @Req() req: RequestWithUser) {
     const { userId, email } = getUserDetails(req.user);

@@ -19,8 +19,7 @@ export class BoardsController {
     return this.boardService.create(board, req.user);
   }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('project-admin')
+  @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.board.read)
   @Get()
   findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
