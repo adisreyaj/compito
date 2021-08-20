@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  baseURL: 'https://compito.adi.so',
   api: 'https://compito-api.adi.so/api',
   auth: {
     audience: 'compito-api',
