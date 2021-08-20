@@ -67,6 +67,14 @@ export class InviteController {
     return this.inviteService.accept(id, userId, email);
   }
 
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('org-admin')
+  @Permissions(PERMISSIONS.user.create)
+  @Post(':id/cancel')
+  cancelInvite(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return this.inviteService.cancel(id, req.user);
+  }
+
   @Public()
   @Post('/pre-auth/:id/reject')
   rejectInvitePreAuth(@Param('id') id: string, @Req() req: RequestWithUser) {
