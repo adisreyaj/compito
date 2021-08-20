@@ -50,7 +50,7 @@ export class OrganizationService {
       } else {
         members.push({ id: userId });
       }
-      let orgData: Prisma.OrganizationCreateInput = {
+      const orgData: Prisma.OrganizationCreateInput = {
         name: data.name,
         slug: data.slug,
         createdBy: {
@@ -81,7 +81,7 @@ export class OrganizationService {
   async findAll(query: RequestParams, user: UserPayload) {
     const { userId, role } = getUserDetails(user);
     const { skip, limit } = parseQuery(query);
-    let where: Prisma.OrganizationWhereInput = {
+    const where: Prisma.OrganizationWhereInput = {
       OR: [
         {
           createdById: userId,
@@ -103,6 +103,20 @@ export class OrganizationService {
         where,
         skip,
         take: limit,
+        include: {
+          userRoleOrg: {
+            where: {
+              userId,
+            },
+            select: {
+              role: {
+                select: {
+                  label: true,
+                },
+              },
+            },
+          },
+        },
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -118,8 +132,8 @@ export class OrganizationService {
   }
 
   async findOne(id: string, user: UserPayload) {
-    const { userId, role, org } = getUserDetails(user);
-    let findOptions: Prisma.OrganizationFindFirstArgs = {
+    const { userId, role } = getUserDetails(user);
+    const findOptions: Prisma.OrganizationFindFirstArgs = {
       where: {
         id,
       },
@@ -132,7 +146,13 @@ export class OrganizationService {
         },
         boards: true,
         name: true,
-        projects: true,
+        projects: {
+          include: {
+            members: {
+              select: USER_BASIC_DETAILS,
+            },
+          },
+        },
         slug: true,
         tags: true,
         tasks: true,
@@ -148,6 +168,7 @@ export class OrganizationService {
             },
             select: {
               projects: {
+                where: {},
                 select: {
                   id: true,
                   members: {
@@ -178,12 +199,10 @@ export class OrganizationService {
               },
             ],
           };
-          findOptions.select.projects = {
-            where: {
-              members: {
-                some: {
-                  id: userId,
-                },
+          (findOptions.select.projects as Prisma.ProjectFindManyArgs).where = {
+            members: {
+              some: {
+                id: userId,
               },
             },
           };
@@ -236,7 +255,7 @@ export class OrganizationService {
 
   async update(id: string, data: OrganizationRequest, user: UserPayload) {
     const { userId, role } = getUserDetails(user);
-    let where: Prisma.OrganizationWhereUniqueInput = {
+    const where: Prisma.OrganizationWhereUniqueInput = {
       id,
     };
     await this.canUpdateOrg(userId, id, role.name as Roles);
@@ -373,6 +392,7 @@ export class OrganizationService {
         if (orgData.createdById !== userId || orgData.members.findIndex(({ id }) => id === userId) < 0) {
           throw new ForbiddenException('No permission to update the org');
         }
+        break;
       }
       /**
        * Can update the org if:
@@ -383,6 +403,7 @@ export class OrganizationService {
         if (orgData.createdById !== userId) {
           throw new ForbiddenException('No permission to update the org');
         }
+        break;
       }
     }
     return orgData;
@@ -421,6 +442,7 @@ export class OrganizationService {
         if (orgData.createdById !== userId || orgData.members.findIndex(({ id }) => id === userId) < 0) {
           throw new ForbiddenException('No permission to delete the org');
         }
+        break;
       }
       /**
        * Can delete the org if:
@@ -430,6 +452,7 @@ export class OrganizationService {
         if (orgData.createdById !== userId) {
           throw new ForbiddenException('No permission to delete the org');
         }
+        break;
     }
     return orgData;
   };
