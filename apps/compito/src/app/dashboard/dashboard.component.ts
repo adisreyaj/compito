@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
   selector: 'compito-dashboard',
   template: ` <main class="h-screen grid">
     <compito-header></compito-header>
-    <section style="min-height: calc(100vh - 64px);">
+    <section style="min-height: calc(100vh - 64px);" class="overflow-y-auto">
       <router-outlet></router-outlet>
     </section>
   </main>`,

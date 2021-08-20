@@ -59,7 +59,7 @@ import { BoardListWithTasks, Task } from '@compito/api-interfaces';
       }
       .task-list__container {
         @apply overflow-y-auto;
-        max-height: calc(100vh - var(--header-height) - 64px - 140px);
+        max-height: calc(100vh - var(--header-height) - 64px - 154px);
       }
       .task-card.cdk-drag-preview {
         @apply shadow-xl;
