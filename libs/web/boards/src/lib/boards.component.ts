@@ -3,15 +3,14 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { Board, BoardList, BoardListWithTasks, DataLoading, Task, User } from '@compito/api-interfaces';
-import { TasksCreateModalComponent } from '@compito/web/tasks';
-import { Breadcrumb, formatUser } from '@compito/web/ui';
+import { Breadcrumb, formatUser, TasksCreateModalComponent } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import produce from 'immer';
-import { TaskDetailModalComponent } from 'libs/web/tasks/src/lib/shared/components/task-detail-modal/task-detail-modal.component';
 import { forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, map, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
+import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
 import { BoardsAction } from './state/boards.actions';
 import { BoardsState } from './state/boards.state';
 @Component({

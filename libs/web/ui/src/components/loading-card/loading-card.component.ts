@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'compito-loading-card',
@@ -9,9 +9,6 @@ import { Component, Input, OnInit } from '@angular/core';
   `,
   styles: [],
 })
-export class LoadingCardComponent implements OnInit {
+export class LoadingCardComponent {
   @Input() height = '';
-  constructor() {}
-
-  ngOnInit(): void {}
 }

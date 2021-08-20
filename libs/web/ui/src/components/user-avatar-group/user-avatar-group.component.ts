@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 export interface UserAvatarGroupData {
   name: string;
@@ -32,12 +32,8 @@ export interface UserAvatarGroupData {
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserAvatarGroupComponent implements OnInit {
+export class UserAvatarGroupComponent {
   @Input() data: UserAvatarGroupData[] | null = [];
   @Input() size = 40;
   @Input() itemsToShow = 5;
-
-  constructor() {}
-
-  ngOnInit(): void {}
 }

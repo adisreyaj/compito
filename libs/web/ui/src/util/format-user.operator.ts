@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export function formatUser() {
-  return function <T>(source: Observable<any>): Observable<UserDetails | null> {
+  return function (source: Observable<any>): Observable<UserDetails | null> {
     return source.pipe(
       map((data: any) => {
         if (data == null) {

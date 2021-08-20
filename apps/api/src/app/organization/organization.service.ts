@@ -81,34 +81,20 @@ export class OrganizationService {
   async findAll(query: RequestParams, user: UserPayload) {
     const { userId, role } = getUserDetails(user);
     const { skip, limit } = parseQuery(query);
-    let where: Prisma.OrganizationWhereInput = {};
-    switch (role.name) {
-      case 'super-admin':
-        where = {};
-        break;
-      /**
-       * Admin can view all orgs created by him
-       * and all orgs he is member of
-       */
-      case 'admin':
-        where = {
-          OR: [
-            {
-              createdById: userId,
+    let where: Prisma.OrganizationWhereInput = {
+      OR: [
+        {
+          createdById: userId,
+        },
+        {
+          members: {
+            some: {
+              id: userId,
             },
-            {
-              members: {
-                some: {
-                  id: userId,
-                },
-              },
-            },
-          ],
-        };
-        break;
-      default:
-        throw new ForbiddenException('Not enough permissions');
-    }
+          },
+        },
+      ],
+    };
     try {
       const count$ = this.prisma.organization.count({
         where,
@@ -179,12 +165,27 @@ export class OrganizationService {
            */
           findOptions.where = {
             id,
-            members: {
-              some: {
-                id: userId,
+            OR: [
+              {
+                members: {
+                  some: {
+                    id: userId,
+                  },
+                },
+              },
+              {
+                createdById: userId,
+              },
+            ],
+          };
+          findOptions.select.projects = {
+            where: {
+              members: {
+                some: {
+                  id: userId,
+                },
               },
             },
-            createdById: userId,
           };
           /**
            * Return only members of projects the user is part of
@@ -192,12 +193,8 @@ export class OrganizationService {
           findOptions.select.members = {
             select: USER_BASIC_DETAILS,
             where: {
-              orgs: {
-                some: {
-                  id: {
-                    in: membersOfProjectsUserHaveAccessTo,
-                  },
-                },
+              id: {
+                in: membersOfProjectsUserHaveAccessTo,
               },
             },
           };
@@ -210,12 +207,18 @@ export class OrganizationService {
            */
           findOptions.where = {
             id,
-            createdById: userId,
-            members: {
-              some: {
-                id: userId,
+            OR: [
+              {
+                members: {
+                  some: {
+                    id: userId,
+                  },
+                },
               },
-            },
+              {
+                createdById: userId,
+              },
+            ],
           };
           break;
         }

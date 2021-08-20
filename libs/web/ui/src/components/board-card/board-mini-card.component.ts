@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Board } from '@compito/api-interfaces';
 
 @Component({
@@ -41,10 +41,6 @@ import { Board } from '@compito/api-interfaces';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BoardMiniCardComponent implements OnInit {
+export class BoardMiniCardComponent {
   @Input() data: Board | null = null;
-
-  constructor() {}
-
-  ngOnInit(): void {}
 }

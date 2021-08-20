@@ -3,8 +3,7 @@ import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/cor
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserSignupRequest } from '@compito/api-interfaces';
-import { API_TOKEN } from '@compito/web/ui';
-
+import { API_TOKEN } from '@compito/web/ui/tokens';
 @Component({
   selector: 'compito-signup',
   template: `

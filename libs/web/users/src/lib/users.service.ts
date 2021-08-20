@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { InviteRequest, MultiDocPayload, Role, User } from '@compito/api-interfaces';
-import { API_TOKEN } from '@compito/web/ui';
+import { API_TOKEN } from '@compito/web/ui/tokens';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +22,10 @@ export class UsersService {
 
   getInvites() {
     return this.http.get<any[]>(this.invitesAPI);
+  }
+
+  cancelInvite(id: string) {
+    return this.http.post<any>(`${this.invitesAPI}/${id}/cancel`, {});
   }
 
   getAll() {

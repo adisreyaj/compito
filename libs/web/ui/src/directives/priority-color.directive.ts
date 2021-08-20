@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Directive, HostBinding, Input, NgModule } from '@angular/core';
-import { Priority } from 'libs/api-interfaces/src/lib/priority.interface';
+import { Priority } from '@compito/api-interfaces';
 
 @Directive({
   selector: '[priorityColor]',

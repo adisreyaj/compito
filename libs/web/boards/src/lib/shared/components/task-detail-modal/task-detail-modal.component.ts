@@ -2,13 +2,13 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BoardList, Task, User } from '@compito/api-interfaces';
-import { BoardsAction } from '@compito/web/boards/state';
 import { UserAvatarGroupData } from '@compito/web/ui';
 import { DialogRef } from '@ngneat/dialog';
 import { Store } from '@ngxs/store';
 import produce from 'immer';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { BoardsAction } from '../../../state/boards.actions';
 @Component({
   selector: 'compito-task-detail-modal',
   template: `

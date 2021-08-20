@@ -8,9 +8,9 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { InviteModule } from './invite/invite.module';
 import { OrganizationModule } from './organization/organization.module';
 import { ProjectModule } from './project/project.module';
+import { RoleModule } from './role/role.module';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
-import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [

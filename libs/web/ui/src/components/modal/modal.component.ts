@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ContentChild, Input, OnInit } from '@angular/core';
 import { DialogRef } from '@ngneat/dialog';
-import { ModalActionsDirective } from 'libs/web/ui/src/components/modal/modal-actions/modal-actions.directive';
+import { ModalActionsDirective } from './modal-actions/modal-actions.directive';
 @Component({
   selector: 'compito-modal',
   template: `<div class="p-4 flex flex-col">
@@ -37,7 +37,6 @@ export class ModalComponent implements OnInit {
   @Input() ref: DialogRef | null = null;
   @ContentChild(ModalActionsDirective)
   modalActions: ModalActionsDirective | null = null;
-  constructor() {}
 
   ngOnInit(): void {
     if (this.ref === null) {

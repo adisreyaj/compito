@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Task } from '@compito/api-interfaces';
-import { UserAvatarGroupData } from '../user-avatar-group';
+import { UserAvatarGroupData } from '../../user-avatar-group';
 
 @Component({
   selector: 'compito-task-card',
@@ -39,12 +39,9 @@ import { UserAvatarGroupData } from '../user-avatar-group';
   styles: [``],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TaskCardComponent implements OnInit {
+export class TaskCardComponent {
   @Input() task: Task | null = null;
   @Input() assignees: UserAvatarGroupData[] = [];
 
   @Output() clicked = new EventEmitter<Task>();
-  constructor() {}
-
-  ngOnInit(): void {}
 }

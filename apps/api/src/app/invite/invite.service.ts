@@ -32,6 +32,7 @@ export class InviteService {
           roleId: data.role,
         },
         select: {
+          id: true,
           email: true,
           org: {
             select: {
@@ -39,6 +40,16 @@ export class InviteService {
               name: true,
             },
           },
+          invitedBy: {
+            select: USER_BASIC_DETAILS,
+          },
+          role: {
+            select: {
+              label: true,
+              id: true,
+            },
+          },
+          createdAt: true,
         },
       });
       return invite;
@@ -48,6 +59,42 @@ export class InviteService {
     }
   }
 
+  async cancel(id: string, user: UserPayload) {
+    const { org, userId, role } = getUserDetails(user);
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin':
+        throw new ForbiddenException('No permission to invite user');
+      default:
+        break;
+    }
+    try {
+      const invite = await this.prisma.userInvite.findUnique({
+        where: { id },
+        select: {
+          orgId: true,
+        },
+        rejectOnNotFound: true,
+      });
+      if (org !== invite.orgId) {
+        this.logger.error(`Org doesn't match`);
+        throw new ForbiddenException('No permission to revoke invite');
+      }
+      await this.prisma.userInvite.delete({
+        where: {
+          id,
+        },
+      });
+      return { message: 'Invite revoked successfully!' };
+    } catch (error) {
+      if (error?.name === 'NotFoundError') {
+        this.logger.error('Invite not found');
+        throw new NotFoundException('Invite not found');
+      }
+      this.logger.error('Failed to revoke the invite', error);
+      throw new InternalServerErrorException('Failed to revoke the invite');
+    }
+  }
   async getInvites(user: UserPayload) {
     const { org, role } = getUserDetails(user);
     switch (role.name as Roles) {
@@ -86,17 +133,13 @@ export class InviteService {
   async accept(id: string, userId: string, email: string) {
     let invite;
     try {
-      invite = this.prisma.userInvite.findUnique({
+      invite = await this.prisma.userInvite.findUnique({
         where: { id },
         select: {
           id: true,
           email: true,
           orgId: true,
-          role: {
-            select: {
-              id: true,
-            },
-          },
+          roleId: true,
         },
         rejectOnNotFound: true,
       });
@@ -124,8 +167,16 @@ export class InviteService {
             },
             roles: {
               create: {
-                orgId: invite.orgId,
-                roleId: invite.roleId,
+                org: {
+                  connect: {
+                    id: invite.orgId,
+                  },
+                },
+                role: {
+                  connect: {
+                    id: invite.roleId,
+                  },
+                },
               },
             },
           },
@@ -146,7 +197,7 @@ export class InviteService {
   async reject(id: string, userId: string, email: string) {
     let invite;
     try {
-      invite = this.prisma.userInvite.findUnique({
+      invite = await this.prisma.userInvite.findUnique({
         where: { id },
         select: {
           id: true,

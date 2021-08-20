@@ -25,9 +25,8 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @UseGuards(RolesGuard, PermissionsGuard)
+  @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.read)
-  @Role('project-admin')
   @Get('')
   findAll(@Query() query: RequestParams & { projectId?: string }, @Req() req: RequestWithUser) {
     return this.userService.findAll(query, req.user);

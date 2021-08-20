@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Project } from '@compito/api-interfaces';
 
 @Component({
@@ -60,9 +60,6 @@ import { Project } from '@compito/api-interfaces';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProjectCardComponent implements OnInit {
+export class ProjectCardComponent {
   @Input() data: Project | null = null;
-  constructor() {}
-
-  ngOnInit(): void {}
 }

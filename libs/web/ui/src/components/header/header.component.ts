@@ -1,5 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
+import { UserDetails } from '@compito/api-interfaces';
+import { Observable } from 'rxjs';
+import { formatUser } from '../../util/format-user.operator';
 
 @Component({
   selector: 'compito-header',
@@ -42,7 +45,7 @@ import { AuthService } from '@auth0/auth0-angular';
         </div>
         <!-- <div class="text-xs text-gray-500">Org: <span class="font-medium text-sm text-gray-700">Sreyaj</span></div> -->
         <div
-          *ngIf="auth.user$ | async as user"
+          *ngIf="user$ | async as user"
           class="flex items-center space-x-2 cursor-pointer"
           [tippy]="userDropdown"
           placement="bottom-start"
@@ -58,8 +61,8 @@ import { AuthService } from '@auth0/auth0-angular';
           />
           <div class="flex items-center space-x-2">
             <div class="flex flex-col items-end">
-              <p class="text-sm font-medium">{{ user.given_name }}</p>
-              <p class="text-xs text-gray-500">Admin</p>
+              <p class="text-sm font-medium">{{ user?.family_name }}</p>
+              <p class="text-xs text-gray-500">{{ user.role?.label }}</p>
             </div>
             <rmx-icon class="text-gray-400" style="width: 16px;height: 16px;" name="arrow-down-s-line"></rmx-icon>
           </div>
@@ -91,7 +94,7 @@ import { AuthService } from '@auth0/auth0-angular';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   menu = [
     {
       label: 'My Tasks',
@@ -110,7 +113,6 @@ export class HeaderComponent implements OnInit {
       link: '/users',
     },
   ];
+  user$: Observable<UserDetails | null> = this.auth.user$.pipe(formatUser());
   constructor(public auth: AuthService) {}
-
-  ngOnInit(): void {}
 }

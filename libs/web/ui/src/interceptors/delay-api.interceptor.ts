@@ -1,15 +1,16 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { environment } from '../../../../../apps/compito/src/environments/environment';
+import { ENV_TOKEN } from '../tokens';
 
 @Injectable()
 export class DelayInterceptor implements HttpInterceptor {
+  constructor(@Inject(ENV_TOKEN) private environment: any) {}
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (environment.production) {
+    if (this.environment.production) {
       return next.handle(request);
     }
-    return next.handle(request).pipe(delay(1000));
+    return next.handle(request).pipe(delay(0));
   }
 }

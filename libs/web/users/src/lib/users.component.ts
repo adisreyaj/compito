@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { DataLoading, Role, User } from '@compito/api-interfaces';
-import { Breadcrumb, ToastService } from '@compito/web/ui';
+import { Breadcrumb, ConfirmModalComponent, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable, of, throwError } from 'rxjs';
@@ -64,7 +64,10 @@ import { UsersState } from './state/users.state';
         <ng-container [ngSwitch]="(invitesLoading$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let invite of invites$ | async">
-              <compito-user-invite-card [data]="invite"></compito-user-invite-card>
+              <compito-user-invite-card
+                [data]="invite"
+                (clicked)="handleInviteCardEvent($event, invite)"
+              ></compito-user-invite-card>
             </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">
@@ -151,5 +154,30 @@ export class UsersComponent implements OnInit {
         }),
       )
       .subscribe();
+  }
+
+  handleInviteCardEvent({ type }: { type: string }, invite: any) {
+    switch (type) {
+      case 'delete':
+        {
+          const ref = this.dialog.open(ConfirmModalComponent, {
+            size: 'sm',
+            data: {
+              body: 'Clicking on delete would revoke the invitation. This action cannot be undone.',
+              primaryAction: 'Delete',
+              primaryActionType: 'warn',
+            },
+          });
+          ref.afterClosed$.subscribe((confirmed) => {
+            if (confirmed) {
+              this.store.dispatch(new UsersAction.CancelInvite(invite.id));
+            }
+          });
+        }
+        break;
+
+      default:
+        break;
+    }
   }
 }

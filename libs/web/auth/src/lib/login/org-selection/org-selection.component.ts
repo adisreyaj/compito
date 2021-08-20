@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, DataLoadingState } from '@compito/api-interfaces';
 import { ToastService } from '@compito/web/ui';
+import { ENV_TOKEN } from '@compito/web/ui/tokens';
 import { BehaviorSubject } from 'rxjs';
 import { pluck } from 'rxjs/operators';
-import { environment } from '../../../../../../../apps/compito/src/environments/environment';
 import { OrgSelectionService } from './org-selection.service';
 
 @Component({
@@ -53,6 +54,7 @@ export class OrgSelectionComponent implements OnInit {
     private auth: AuthService,
     private toast: ToastService,
     private router: Router,
+    @Inject(ENV_TOKEN) private environment: any,
   ) {}
 
   ngOnInit(): void {
@@ -68,7 +70,13 @@ export class OrgSelectionComponent implements OnInit {
           }
           this.loadingDetailsState.next({ type: DataLoadingState.success });
         },
-        () => {
+        (err) => {
+          if (err instanceof HttpErrorResponse) {
+            if (err.status === 400) {
+              this.toast.error(err.error?.message);
+              this.router.navigate(['/auth', 'login']);
+            }
+          }
           this.loadingDetailsState.next({ type: DataLoadingState.error, error: new Error() });
         },
       );
@@ -79,7 +87,26 @@ export class OrgSelectionComponent implements OnInit {
   }
 
   loginToOrg(orgId: string) {
-    window.location.href = `https://${environment.auth.domain}/continue?state=${this.state}&orgId=${orgId}`;
+    window.location.href = `https://${this.environment.auth.domain}/continue?state=${this.state}&orgId=${orgId}`;
+  }
+
+  handleInvite(type: 'accept' | 'reject', id: string, orgId: string) {
+    switch (type) {
+      case 'accept':
+        this.orgService.accept(id, this.sessionToken).subscribe(() => {
+          this.loginToOrg(orgId);
+        });
+        break;
+      case 'reject':
+        this.orgService.reject(id, this.sessionToken).subscribe(() => {
+          const existingOrgs = this.orgSubject.value;
+          this.orgSubject.next(existingOrgs.filter(({ id: orgId }) => orgId !== id));
+        });
+        break;
+
+      default:
+        break;
+    }
   }
 
   private get sessionToken() {
