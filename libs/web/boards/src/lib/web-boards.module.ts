@@ -1,9 +1,12 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { IconModule, PageHeaderModule, TaskListModule } from '@compito/web/ui';
+import { IconModule, PageHeaderModule, TaskSharedModule, TimeAgoModule, UserAvatarGroupModule } from '@compito/web/ui';
+import { TippyModule } from '@ngneat/helipopper';
 import { BoardsComponent } from './boards.component';
+import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -20,8 +23,13 @@ import { BoardsComponent } from './boards.component';
     PageHeaderModule,
     IconModule,
     DragDropModule,
-    TaskListModule,
+    UserAvatarGroupModule,
+    TippyModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TimeAgoModule,
+    TaskSharedModule,
   ],
-  declarations: [BoardsComponent],
+  declarations: [BoardsComponent, TaskDetailModalComponent],
 })
 export class WebBoardsModule {}

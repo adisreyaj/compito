@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Task } from '@compito/api-interfaces';
 
 @Component({
@@ -46,9 +46,6 @@ import { Task } from '@compito/api-interfaces';
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MyTaskCardComponent implements OnInit {
+export class MyTaskCardComponent {
   @Input() data: Task | null = null;
-  constructor() {}
-
-  ngOnInit(): void {}
 }

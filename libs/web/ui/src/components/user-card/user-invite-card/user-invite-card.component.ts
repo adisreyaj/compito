@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'compito-user-invite-card',
@@ -52,13 +52,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserInviteCardComponent implements OnInit {
+export class UserInviteCardComponent {
   @Input() data: any;
 
   @Output() clicked = new EventEmitter<{ type: string; data?: any }>();
-  constructor() {}
-
-  ngOnInit(): void {
-    console.log(this.data);
-  }
 }

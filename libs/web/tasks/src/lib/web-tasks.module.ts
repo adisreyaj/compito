@@ -11,17 +11,15 @@ import {
   ModalModule,
   PageHeaderModule,
   PriorityColorDirectiveModule,
+  TaskSharedModule,
   TimeAgoModule,
   UserAvatarGroupModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
-import { MyTaskCardComponent } from './shared/components/my-task-card/my-task-card.component';
-import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
-import { TasksCreateModalComponent } from './shared/components/tasks-create-modal/tasks-create-modal.component';
 import { TasksComponent } from './tasks.component';
 
 @NgModule({
-  declarations: [TasksComponent, TasksCreateModalComponent, TaskDetailModalComponent, MyTaskCardComponent],
+  declarations: [TasksComponent],
   imports: [
     CommonModule,
     RouterModule.forChild([
@@ -43,6 +41,7 @@ import { TasksComponent } from './tasks.component';
     PriorityColorDirectiveModule,
     LoadingCardModule,
     TextFieldModule,
+    TaskSharedModule,
   ],
 })
 export class WebTasksModule {}

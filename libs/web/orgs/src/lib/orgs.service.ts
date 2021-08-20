@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { MultiDocPayload, Organization, OrganizationRequest, UpdateMembersRequest } from '@compito/api-interfaces';
-import { API_TOKEN } from '@compito/web/ui';
+import { API_TOKEN } from '@compito/web/ui/tokens';
 @Injectable({
   providedIn: 'root',
 })

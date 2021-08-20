@@ -1,12 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, DataLoadingState } from '@compito/api-interfaces';
 import { ToastService } from '@compito/web/ui';
+import { ENV_TOKEN } from '@compito/web/ui/tokens';
 import { BehaviorSubject } from 'rxjs';
 import { pluck } from 'rxjs/operators';
-import { environment } from '../../../../../../../apps/compito/src/environments/environment';
 import { OrgSelectionService } from './org-selection.service';
 
 @Component({
@@ -54,6 +54,7 @@ export class OrgSelectionComponent implements OnInit {
     private auth: AuthService,
     private toast: ToastService,
     private router: Router,
+    @Inject(ENV_TOKEN) private environment: any,
   ) {}
 
   ngOnInit(): void {
@@ -86,7 +87,7 @@ export class OrgSelectionComponent implements OnInit {
   }
 
   loginToOrg(orgId: string) {
-    window.location.href = `https://${environment.auth.domain}/continue?state=${this.state}&orgId=${orgId}`;
+    window.location.href = `https://${this.environment.auth.domain}/continue?state=${this.state}&orgId=${orgId}`;
   }
 
   handleInvite(type: 'accept' | 'reject', id: string, orgId: string) {

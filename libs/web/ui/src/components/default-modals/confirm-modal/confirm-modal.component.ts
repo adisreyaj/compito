@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DialogRef } from '@ngneat/dialog';
 
 export interface ConfirmModalData {
@@ -33,8 +33,6 @@ export interface ConfirmModalData {
     `,
   ],
 })
-export class ConfirmModalComponent implements OnInit {
+export class ConfirmModalComponent {
   constructor(public ref: DialogRef<ConfirmModalData>) {}
-
-  ngOnInit() {}
 }

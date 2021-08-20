@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
   selector: 'compito-section-header',
@@ -27,9 +27,6 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SectionHeaderComponent implements OnInit {
+export class SectionHeaderComponent {
   @Input() title = '';
-  constructor() {}
-
-  ngOnInit(): void {}
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 export interface Breadcrumb {
   label: string;
   link: string;
@@ -43,11 +43,8 @@ export interface Breadcrumb {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageHeaderComponent implements OnInit {
+export class PageHeaderComponent {
   @Input() title: string | undefined = '';
   @Input() loading = false;
   @Input() breadcrumbs: Breadcrumb[] = [];
-  constructor() {}
-
-  ngOnInit(): void {}
 }

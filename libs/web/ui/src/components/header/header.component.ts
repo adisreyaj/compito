@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserDetails } from '@compito/api-interfaces';
 import { Observable } from 'rxjs';
@@ -94,7 +94,7 @@ import { formatUser } from '../../util/format-user.operator';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   menu = [
     {
       label: 'My Tasks',
@@ -115,6 +115,4 @@ export class HeaderComponent implements OnInit {
   ];
   user$: Observable<UserDetails | null> = this.auth.user$.pipe(formatUser());
   constructor(public auth: AuthService) {}
-
-  ngOnInit(): void {}
 }
