@@ -165,12 +165,27 @@ export class OrganizationService {
            */
           findOptions.where = {
             id,
-            members: {
-              some: {
-                id: userId,
+            OR: [
+              {
+                members: {
+                  some: {
+                    id: userId,
+                  },
+                },
+              },
+              {
+                createdById: userId,
+              },
+            ],
+          };
+          findOptions.select.projects = {
+            where: {
+              members: {
+                some: {
+                  id: userId,
+                },
               },
             },
-            createdById: userId,
           };
           /**
            * Return only members of projects the user is part of
@@ -178,12 +193,8 @@ export class OrganizationService {
           findOptions.select.members = {
             select: USER_BASIC_DETAILS,
             where: {
-              orgs: {
-                some: {
-                  id: {
-                    in: membersOfProjectsUserHaveAccessTo,
-                  },
-                },
+              id: {
+                in: membersOfProjectsUserHaveAccessTo,
               },
             },
           };
@@ -196,12 +207,18 @@ export class OrganizationService {
            */
           findOptions.where = {
             id,
-            createdById: userId,
-            members: {
-              some: {
-                id: userId,
+            OR: [
+              {
+                members: {
+                  some: {
+                    id: userId,
+                  },
+                },
               },
-            },
+              {
+                createdById: userId,
+              },
+            ],
           };
           break;
         }
