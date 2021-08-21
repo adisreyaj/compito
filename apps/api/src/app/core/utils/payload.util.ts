@@ -3,7 +3,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 
 export const getUserDetails = (
   user: UserPayload | null,
-): { role: Role; org: string; projects: string[]; userId: string; email } => {
+): { role: Role; org: { id: string; name: string }; projects: string[]; userId: string; email } => {
   if (user) {
     const {
       'https://compito.adi.so/role': role,

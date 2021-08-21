@@ -6,6 +6,7 @@ import {
   IconModule,
   LoadingCardModule,
   PageHeaderModule,
+  PermissionsDirectiveModule,
   SectionHeaderModule,
   TimeAgoModule,
   UserSelectModule,
@@ -30,6 +31,7 @@ const routes: Routes = [{ path: '', component: ProjectsDetailComponent }];
     SectionHeaderModule,
     LoadingCardModule,
     UserSelectModule,
+    PermissionsDirectiveModule,
   ],
 })
 export class ProjectsDetailModule {}

@@ -9,6 +9,8 @@ import {
   LoadingCardModule,
   ModalModule,
   PageHeaderModule,
+  PermissionsDirectiveModule,
+  PermissionsPipeModule,
   SectionHeaderModule,
   TimeAgoModule,
   UserCardModule,
@@ -16,6 +18,7 @@ import {
 import { TippyModule } from '@ngneat/helipopper';
 import { UsersCreateModalComponent } from './shared/components/users-create-modal/users-create-modal.component';
 import { UsersComponent } from './users.component';
+import { UserRoleUpdateModalComponent } from './shared/components/user-role-update-modal/user-role-update-modal.component';
 export const webUsersRoutes: Route[] = [
   {
     path: '',
@@ -39,7 +42,9 @@ export const webUsersRoutes: Route[] = [
     LoadingCardModule,
     UserCardModule,
     SectionHeaderModule,
+    PermissionsDirectiveModule,
+    PermissionsPipeModule,
   ],
-  declarations: [UsersComponent, UsersCreateModalComponent],
+  declarations: [UsersComponent, UsersCreateModalComponent, UserRoleUpdateModalComponent],
 })
 export class WebUsersModule {}

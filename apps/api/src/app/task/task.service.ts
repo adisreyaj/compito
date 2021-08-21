@@ -32,7 +32,7 @@ export class TaskService {
           }
           break;
         default:
-          if (orgId !== org) {
+          if (orgId !== org.id) {
             throw new ForbiddenException('Not enough permission to create task!');
           }
           break;
@@ -74,7 +74,7 @@ export class TaskService {
   async findAll(query: RequestParams, where: Prisma.TaskWhereInput = {}, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
     const { skip, limit, sort = 'updatedAt', order = 'asc' } = parseQuery(query);
-    where.orgId = org;
+    where.orgId = org.id;
     switch (role.name as Roles) {
       case 'user':
       case 'project-admin':
@@ -171,7 +171,7 @@ export class TaskService {
             break;
           }
           default: {
-            const taskBelongsToAccessibleOrg = org === task.orgId;
+            const taskBelongsToAccessibleOrg = org.id === task.orgId;
             if (!taskBelongsToAccessibleOrg) {
               throw new ForbiddenException('No access to view task!');
             }
@@ -189,7 +189,7 @@ export class TaskService {
 
   async update(id: string, data: TaskRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
-    await this.canUpdateTask(id, role, org, userId);
+    await this.canUpdateTask(id, role, org.id, userId);
     try {
       const { assignees, priority, tags, ...rest } = data;
       let taskData: Prisma.TaskUpdateInput = {
@@ -305,7 +305,7 @@ export class TaskService {
 
   async remove(id: string, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
-    await this.canUpdateTask(id, role, org, userId);
+    await this.canUpdateTask(id, role, org.id, userId);
     try {
       const task = await this.prisma.task.delete({
         where: {

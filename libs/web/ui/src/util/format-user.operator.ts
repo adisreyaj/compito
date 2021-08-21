@@ -9,12 +9,13 @@ export function formatUser() {
         if (data == null) {
           return null;
         } else {
-          const { family_name, nickname, name, picture, updated_at, email, email_verified, sub } = data;
+          const { family_name, given_name, nickname, name, picture, updated_at, email, email_verified, sub } = data;
           return {
             role: data['https://compito.adi.so/role'],
             userId: data['https://compito.adi.so/userId'],
             org: data['https://compito.adi.so/org'],
             family_name,
+            given_name,
             nickname,
             name,
             picture,

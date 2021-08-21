@@ -1,11 +1,11 @@
-import { RequestParams, Role, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
+import { RequestParams, Role, Roles, UserPayload, UserRequest, UserSignupRequest } from '@compito/api-interfaces';
 import {
   BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
@@ -63,6 +63,7 @@ export class UserService {
                 role: {
                   select: {
                     name: true,
+                    label: true,
                     permissions: true,
                   },
                 },
@@ -83,7 +84,6 @@ export class UserService {
         throw new NotFoundException('User not found');
       }
       const { orgs = [], projects = [], roles = [] } = user;
-      const orgIds = orgs.map(({ id }) => id);
       const projectIds = projects.map(({ id }) => id);
       const inviteIds = userInvite.map(({ id }) => id);
       const rolesData = roles.reduce((acc, { role, orgId }) => {
@@ -94,22 +94,23 @@ export class UserService {
       }, {});
 
       if (token.org) {
-        if (!orgIds.includes(token.org)) {
+        if (orgs.findIndex(({ id }) => id === token.org) < 0) {
           throw new ForbiddenException('No access to org');
         }
         const projectsPartOfOrg = projects.filter(({ orgId: org }) => org === token.org).map(({ id }) => id);
+        const org = orgs.find(({ id }) => id === token.org);
         return {
-          org: token.org,
+          org,
           projects: projectsPartOfOrg,
           role: rolesData[token.org],
         };
       }
       return {
-        orgs: orgIds,
+        orgs,
         projects: projectIds,
         invites: inviteIds,
         roles: rolesData,
-        partOfMultipleOrgs: orgIds.length > 1,
+        partOfMultipleOrgs: orgs.length > 1,
         pendingInvites: inviteIds.length > 0,
       };
     } catch (error) {
@@ -426,7 +427,7 @@ export class UserService {
               {
                 orgs: {
                   some: {
-                    id: org,
+                    id: org.id,
                   },
                 },
               },
@@ -451,7 +452,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: org,
+              id: org.id,
             },
           },
         };
@@ -460,28 +461,30 @@ export class UserService {
     const { skip, limit } = parseQuery(query);
     try {
       const count$ = this.prisma.user.count({ where: whereCondition });
+      const userSelectFields = {
+        ...USER_BASIC_DETAILS,
+        createdAt: true,
+        updatedAt: true,
+        roles: {
+          where: {
+            orgId: org.id,
+          },
+          select: {
+            role: {
+              select: {
+                id: true,
+                label: true,
+              },
+            },
+          },
+        },
+        orgs: { select: { id: true, name: true } },
+      };
       const orgs$ = this.prisma.user.findMany({
         where: whereCondition,
         skip,
         take: limit,
-        select: {
-          ...USER_BASIC_DETAILS,
-          createdAt: true,
-          updatedAt: true,
-          roles: {
-            where: {
-              orgId: org,
-            },
-            select: {
-              role: {
-                select: {
-                  label: true,
-                },
-              },
-            },
-          },
-          orgs: { select: { id: true, name: true } },
-        },
+        select: userSelectFields,
       });
       const [payload, count] = await Promise.all([orgs$, count$]);
       return {
@@ -513,7 +516,7 @@ export class UserService {
               {
                 orgs: {
                   some: {
-                    id: org,
+                    id: org.id,
                   },
                 },
               },
@@ -538,7 +541,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: org,
+              id: org.id,
             },
           },
         };
@@ -574,6 +577,94 @@ export class UserService {
       });
     } catch (error) {
       throw new InternalServerErrorException('Failed to update user');
+    }
+  }
+  async updateUserRole(id: string, roleId: string, user: UserPayload) {
+    const { role, org } = getUserDetails(user);
+    let userData;
+    switch (role.name as Roles) {
+      case 'super-admin':
+      case 'org-admin':
+      case 'admin': {
+        try {
+          userData = await this.prisma.user.findUnique({
+            where: { id },
+            select: {
+              orgs: {
+                select: {
+                  id: true,
+                },
+              },
+              roles: {
+                where: {
+                  orgId: org.id,
+                },
+              },
+            },
+            rejectOnNotFound: true,
+          });
+
+          if (userData.orgs.findIndex(({ id }) => id === org.id) < 0) {
+            throw new ForbiddenException('Not enough permissions to update the role');
+          }
+          if (userData.roles?.length === 0) {
+            this.logger.error(`User doesn't have proper roles configured`);
+            throw new InternalServerErrorException();
+          }
+        } catch (error) {
+          if (error?.name === 'NotFoundError') {
+            this.logger.error('Invite not found');
+            throw new NotFoundException('Invite not found');
+          }
+          throw new InternalServerErrorException();
+        }
+        break;
+      }
+      default:
+        this.logger.error(`Role doesn't have authority to update user role`);
+        throw new ForbiddenException('Not enough permissions to update the user details');
+    }
+    try {
+      const userSelectFields = {
+        ...USER_BASIC_DETAILS,
+        createdAt: true,
+        updatedAt: true,
+        roles: {
+          where: {
+            orgId: org.id,
+          },
+          select: {
+            role: {
+              select: {
+                id: true,
+                label: true,
+              },
+            },
+          },
+        },
+        orgs: { select: { id: true, name: true } },
+      };
+      return await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          roles: {
+            update: {
+              where: {
+                id: userData.roles[0].id,
+              },
+              data: {
+                roleId: roleId,
+              },
+            },
+          },
+        },
+        select: userSelectFields,
+      });
+    } catch (error) {
+      this.logger.error('Failed to update role', error);
+      throw new InternalServerErrorException('Failed to update role');
     }
   }
 

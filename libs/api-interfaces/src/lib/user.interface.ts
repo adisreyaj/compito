@@ -24,6 +24,7 @@ export interface UserSignupRequest extends UserBase {
 }
 
 export interface UserRequest extends UserBase {
+  roleId: string;
   orgId: string;
   password: string;
 }
@@ -38,10 +39,11 @@ type SetMembers = { type: 'set'; set: string[] };
 export type UpdateMembersRequest = ModifyMembers | SetMembers;
 
 export interface UserDetails {
-  role: { label: string; id: string };
+  role: { label: string; id: string; permissions: string[] };
   userId: string;
-  org: string;
+  org: { id: string; name: string };
   family_name: string;
+  given_name: string;
   nickname: string;
   name: string;
   picture: string;

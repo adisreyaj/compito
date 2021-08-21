@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { User } from '@compito/api-interfaces';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CardEvent, User } from '@compito/api-interfaces';
 
 @Component({
   selector: 'compito-user-card',
@@ -9,14 +9,16 @@ import { User } from '@compito/api-interfaces';
       class="p-4 rounded-md border transition-all hover:shadow-lg duration-200 ease-in
       border-gray-100 bg-white shadow-sm hover:border-gray-200 relative"
     >
-      <button
-        [tippy]="moreOptions"
-        placement="bottom-start"
-        variation="menu"
-        class="absolute z-10 top-3 right-3 text-gray-500 hover:bg-gray-100 p-1 rounded-md"
-      >
-        <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
-      </button>
+      <ng-container *permission="'user:update'">
+        <button
+          [tippy]="moreOptions"
+          placement="bottom-start"
+          variation="menu"
+          class="absolute z-10 top-3 right-3 text-gray-500 hover:bg-gray-100 p-1 rounded-md"
+        >
+          <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
+        </button>
+      </ng-container>
       <header class="flex items-center justify-between relative">
         <div class="">
           <div class="relative">
@@ -57,8 +59,8 @@ import { User } from '@compito/api-interfaces';
 
     <ng-template #moreOptions let-hide>
       <div class="flex flex-col w-44">
-        <div class="dropdown-item" (click)="hide()">Edit</div>
-        <div class="text-red-600 dropdown-item" (click)="hide()">Delete</div>
+        <div class="dropdown-item" (click)="clicked.emit({ type: 'edit' }); hide()">Edit</div>
+        <div class="text-red-600 dropdown-item" (click)="clicked.emit({ type: 'remove' }); hide()">Remove</div>
       </div>
     </ng-template>
   `,
@@ -67,4 +69,5 @@ import { User } from '@compito/api-interfaces';
 })
 export class UserCardComponent {
   @Input() data: User | null = null;
+  @Output() clicked = new EventEmitter<CardEvent>();
 }

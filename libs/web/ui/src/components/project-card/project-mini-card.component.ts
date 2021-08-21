@@ -15,7 +15,7 @@ import { Project } from '@compito/api-interfaces';
           <p class="text-md font-medium group-hover:text-primary">
             {{ data?.name }}
           </p>
-          <p class="text-gray-400 text-sm line-clamp-2">{{ data?.description }}</p>
+          <p class="text-gray-400 text-sm line-clamp-1">{{ data?.description }}</p>
         </div>
       </header>
       <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">

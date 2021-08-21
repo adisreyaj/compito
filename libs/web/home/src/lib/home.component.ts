@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { Board, DataLoading, Project, Task } from '@compito/api-interfaces';
+import { formatUser } from '@compito/web/ui';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { HomeAction } from './state/home.actions';
@@ -47,7 +48,7 @@ export class HomeComponent implements OnInit {
   @Select(HomeState.getRecentTasks)
   recentTasks$!: Observable<Task[]>;
 
-  user$ = this.auth.user$;
+  user$ = this.auth.user$.pipe(formatUser());
 
   constructor(private store: Store, private auth: AuthService) {}
 
