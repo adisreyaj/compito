@@ -38,7 +38,7 @@ type SetMembers = { type: 'set'; set: string[] };
 export type UpdateMembersRequest = ModifyMembers | SetMembers;
 
 export interface UserDetails {
-  role: { label: string; id: string };
+  role: { label: string; id: string; permissions: string[] };
   userId: string;
   org: { id: string; name: string };
   family_name: string;

@@ -14,6 +14,7 @@ import { Board } from '@compito/api-interfaces';
             {{ data?.name }}
           </p>
           <button
+            *permission="'board:update'"
             [tippy]="moreOptions"
             placement="bottom-start"
             variation="menu"
