@@ -18,6 +18,7 @@ import { ProjectsState } from './state/projects.state';
     <section class="projects__container">
       <div class="projects__list px-8">
         <article
+          *permission="'project:create'"
           (click)="openProjectModal()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary

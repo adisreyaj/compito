@@ -7,7 +7,9 @@
     <ng-container [ngSwitch]="(projectDetailLoading$|async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
         <div class="projects__list">
-          <ng-container *ngTemplateOutlet="addBoard"></ng-container>
+          <ng-container *permission="'board:create'">
+            <ng-container *ngTemplateOutlet="addBoard"></ng-container>
+          </ng-container>
           <ng-container *ngFor="let board of (projectDetails$ | async)?.boards">
             <compito-boards-card [data]="board"></compito-boards-card>
           </ng-container>
@@ -15,7 +17,9 @@
       </ng-container>
       <ng-container *ngSwitchCase="'LOADING'">
         <div class="projects__list">
-          <ng-container *ngTemplateOutlet="addBoard"></ng-container>
+          <ng-container *permission="'board:create'">
+            <ng-container *ngTemplateOutlet="addBoard"></ng-container>
+          </ng-container>
           <compito-loading-card height="112px">
             <div class="flex flex-col justify-between h-full">
               <header class="flex flex-col space-y-1">
@@ -63,7 +67,8 @@
       </ng-container>
     </ng-container>
     <footer class="mt-4">
-      <button btn size="sm" [tippy]="addAssignees" placement="bottom-start" variation="menu" class="flex items-center">
+      <button *permission="'project:update'" btn size="sm" [tippy]="addAssignees" placement="bottom-start"
+              variation="menu" class="flex items-center">
         <rmx-icon class="icon-sm" name="add-line"></rmx-icon>
         <p class="text-sm">Add Members</p>
       </button>

@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthHttpInterceptor, AuthModule } from '@auth0/auth0-angular';
-import { DelayInterceptor, IconModule, TokenValidatorInterceptor } from '@compito/web/ui';
+import { DelayInterceptor, IconModule, ModalModule, TokenValidatorInterceptor } from '@compito/web/ui';
 import { API_TOKEN, ENV_TOKEN } from '@compito/web/ui/tokens';
 import { UsersState } from '@compito/web/users/state/users.state';
 import { DialogModule } from '@ngneat/dialog';
@@ -71,6 +71,7 @@ enableMapSet();
       developmentMode: !environment.production,
     }),
     NgxsReduxDevtoolsPluginModule.forRoot(),
+    ModalModule,
   ],
   providers: [
     {

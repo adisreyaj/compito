@@ -10,6 +10,7 @@ import { CardEvent, Project } from '@compito/api-interfaces';
       border-gray-100 bg-white shadow-sm hover:border-gray-200"
     >
       <button
+        *permission="'project:update'"
         [tippy]="moreOptions"
         placement="bottom-start"
         variation="menu"

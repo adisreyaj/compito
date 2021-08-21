@@ -9,6 +9,7 @@ import {
   LoadingCardModule,
   ModalModule,
   PageHeaderModule,
+  PermissionsDirectiveModule,
   ProjectCardModule,
   TimeAgoModule,
   UserAvatarGroupModule,
@@ -44,6 +45,7 @@ import { ProjectsCreateModalComponent } from './shared/components/projects-creat
     ProjectCardModule,
     LoadingCardModule,
     UserSelectModule,
+    PermissionsDirectiveModule,
   ],
   declarations: [ProjectsComponent, ProjectsCreateModalComponent, BoardCreateModalComponent],
 })

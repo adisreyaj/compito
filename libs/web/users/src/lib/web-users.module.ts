@@ -9,6 +9,8 @@ import {
   LoadingCardModule,
   ModalModule,
   PageHeaderModule,
+  PermissionsDirectiveModule,
+  PermissionsPipeModule,
   SectionHeaderModule,
   TimeAgoModule,
   UserCardModule,
@@ -39,6 +41,8 @@ export const webUsersRoutes: Route[] = [
     LoadingCardModule,
     UserCardModule,
     SectionHeaderModule,
+    PermissionsDirectiveModule,
+    PermissionsPipeModule,
   ],
   declarations: [UsersComponent, UsersCreateModalComponent],
 })
