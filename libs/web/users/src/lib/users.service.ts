@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { InviteRequest, MultiDocPayload, Role, User } from '@compito/api-interfaces';
+import { InviteRequest, MultiDocPayload, Role, User, UserRequest } from '@compito/api-interfaces';
 import { API_TOKEN } from '@compito/web/ui/tokens';
 
 @Injectable({
@@ -14,6 +14,12 @@ export class UsersService {
 
   inviteUser(data: InviteRequest) {
     return this.http.post<User>(this.invitesAPI, data);
+  }
+  update(id: string, data: UserRequest) {
+    return this.http.patch<User>(`${this.usersAPI}/${id}`, data);
+  }
+  updateRole(id: string, roleId: string) {
+    return this.http.patch<User>(`${this.usersAPI}/${id}/role`, { roleId });
   }
 
   getAllRoles() {

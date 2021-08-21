@@ -17,7 +17,7 @@
     <ng-container [ngSwitch]="(usersLoading$ | async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
         <ng-container *ngFor="let user of users$ | async">
-          <compito-user-card [data]="user"></compito-user-card>
+          <compito-user-card [data]="user" (clicked)="handleUserCardEvent($event, user)"></compito-user-card>
         </ng-container>
       </ng-container>
       <ng-container *ngSwitchCase="'LOADING'">

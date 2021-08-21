@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { Request } from 'express';
 import { PERMISSIONS } from '../core/config/permissions.config';
@@ -67,6 +67,12 @@ export class UserController {
     return this.userService.signup(user);
   }
 
+  @UseGuards(PermissionsGuard)
+  @Permissions(PERMISSIONS.user.update)
+  @Patch(':id/role')
+  updateRole(@Param('id') id: string, @Body() {roleId}: UserRequest, @Req() req: RequestWithUser) {
+    return this.userService.updateUserRole(id, roleId, req.user);
+  }
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.update)
   @Patch(':id')
