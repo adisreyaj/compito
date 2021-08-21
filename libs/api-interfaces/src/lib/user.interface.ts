@@ -24,6 +24,7 @@ export interface UserSignupRequest extends UserBase {
 }
 
 export interface UserRequest extends UserBase {
+  roleId: string;
   orgId: string;
   password: string;
 }

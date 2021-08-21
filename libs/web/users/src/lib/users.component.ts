@@ -5,6 +5,7 @@ import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
+import { UserRoleUpdateModalComponent } from './shared/components/user-role-update-modal/user-role-update-modal.component';
 import { UsersCreateModalComponent } from './shared/components/users-create-modal/users-create-modal.component';
 import { UsersAction } from './state/users.actions';
 import { UsersState } from './state/users.state';
@@ -98,6 +99,47 @@ export class UsersComponent implements OnInit {
         }
         break;
 
+      default:
+        break;
+    }
+  }
+  handleUserCardEvent({ type }: { type: string }, user: User) {
+    switch (type) {
+      case 'remove':
+        {
+          const ref = this.dialog.open(ConfirmModalComponent, {
+            size: 'sm',
+            data: {
+              body: 'Clicking on delete would revoke the invitation. This action cannot be undone.',
+              primaryAction: 'Delete',
+              primaryActionType: 'warn',
+            },
+          });
+          ref.afterClosed$.subscribe((confirmed) => {
+            if (confirmed) {
+              // Remove user form org
+            }
+          });
+        }
+        break;
+      case 'edit':
+        {
+          const ref = this.dialog.open(UserRoleUpdateModalComponent, {
+            size: 'sm',
+            data: {
+              roles$: this.roles$,
+              initialData: {
+                role: user.roles[0].role.id,
+              },
+            },
+          });
+          ref.afterClosed$.subscribe((data) => {
+            if (data) {
+              this.store.dispatch(new UsersAction.UpdateUserRole(user.id, data.role));
+            }
+          });
+        }
+        break;
       default:
         break;
     }

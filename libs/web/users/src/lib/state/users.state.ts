@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Role, User } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { append, patch, removeItem } from '@ngxs/store/operators';
+import { append, patch, removeItem, updateItem } from '@ngxs/store/operators';
 import { tap } from 'rxjs/operators';
 import { UsersService } from '../users.service';
 import { UsersAction } from './users.actions';
@@ -83,6 +83,31 @@ export class UsersState {
       }),
     );
   }
+  @Action(UsersAction.UpdateUser)
+  updateUser({ setState }: StateContext<UsersStateModel>, { id, payload }: UsersAction.UpdateUser) {
+    return this.userService.update(id, payload).pipe(
+      tap((data) => {
+        setState(
+          patch({
+            users: updateItem<User>((user) => user?.id === id, data),
+          }),
+        );
+      }),
+    );
+  }
+  @Action(UsersAction.UpdateUserRole)
+  updateUserRole({ setState }: StateContext<UsersStateModel>, { id, roleId }: UsersAction.UpdateUserRole) {
+    return this.userService.updateRole(id, roleId).pipe(
+      tap((data) => {
+        setState(
+          patch({
+            users: updateItem<User>((user) => user?.id === id, data),
+          }),
+        );
+      }),
+    );
+  }
+
   @Action(UsersAction.CancelInvite)
   cancelInvite({ setState }: StateContext<UsersStateModel>, { id }: UsersAction.CancelInvite) {
     return this.userService.cancelInvite(id).pipe(
