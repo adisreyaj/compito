@@ -47,12 +47,14 @@ export class BoardsService {
             throw new NotFoundException('Project not found');
           }
         }
+        break;
       }
-
-      default:
-        if (data.orgId !== org) {
+      default: {
+        if (data.orgId !== org.id) {
           throw new ForbiddenException('No permission to create board');
         }
+        break;
+      }
     }
     try {
       const boardData: Prisma.BoardUncheckedCreateInput = {
@@ -73,7 +75,7 @@ export class BoardsService {
   async findAll(query: RequestParams, user: UserPayload) {
     const { role, org, userId } = getUserDetails(user);
     let where: Prisma.BoardWhereInput = {
-      orgId: org,
+      orgId: org.id,
     };
 
     switch (role.name as Roles) {
@@ -187,7 +189,7 @@ export class BoardsService {
 
   update = async (id: string, req: BoardRequest, user: UserPayload) => {
     const { role, userId, org } = getUserDetails(user);
-    await canUpdateBoard(this.prisma, role, id, userId, org, 'update');
+    await canUpdateBoard(this.prisma, role, id, userId, org.id, 'update');
     try {
       const { lists, name, description } = req;
       const data: Prisma.BoardUncheckedUpdateInput = {
@@ -218,7 +220,7 @@ export class BoardsService {
 
   remove = async (id: string, user: UserPayload) => {
     const { role, userId, org } = getUserDetails(user);
-    await canUpdateBoard(this.prisma, role, id, userId, org, 'delete');
+    await canUpdateBoard(this.prisma, role, id, userId, org.id, 'delete');
     try {
       const board = await this.prisma.board.delete({
         where: {

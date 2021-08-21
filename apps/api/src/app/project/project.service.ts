@@ -26,7 +26,7 @@ export class ProjectService {
         break;
       case 'admin':
       case 'org-admin':
-        if (orgId !== org) {
+        if (orgId !== org.id) {
           this.logger.error(`CREATE:PROJECT-->Org doesn't match`);
           throw new ForbiddenException('No permissions to create project');
         }
@@ -80,7 +80,7 @@ export class ProjectService {
     const { skip, limit, sort = 'updatedAt', order = 'desc' } = parseQuery(query);
     const { org, role, userId } = getUserDetails(user);
     let where: Prisma.ProjectWhereInput = {
-      orgId: org,
+      orgId: org.id,
     };
     const select: Prisma.ProjectSelect = {
       id: true,

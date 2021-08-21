@@ -5,7 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
@@ -63,6 +63,7 @@ export class UserService {
                 role: {
                   select: {
                     name: true,
+                    label: true,
                     permissions: true,
                   },
                 },
@@ -83,7 +84,6 @@ export class UserService {
         throw new NotFoundException('User not found');
       }
       const { orgs = [], projects = [], roles = [] } = user;
-      const orgIds = orgs.map(({ id }) => id);
       const projectIds = projects.map(({ id }) => id);
       const inviteIds = userInvite.map(({ id }) => id);
       const rolesData = roles.reduce((acc, { role, orgId }) => {
@@ -94,22 +94,23 @@ export class UserService {
       }, {});
 
       if (token.org) {
-        if (!orgIds.includes(token.org)) {
+        if (orgs.findIndex(({ id }) => id === token.org) < 0) {
           throw new ForbiddenException('No access to org');
         }
         const projectsPartOfOrg = projects.filter(({ orgId: org }) => org === token.org).map(({ id }) => id);
+        const org = orgs.find(({ id }) => id === token.org);
         return {
-          org: token.org,
+          org,
           projects: projectsPartOfOrg,
           role: rolesData[token.org],
         };
       }
       return {
-        orgs: orgIds,
+        orgs,
         projects: projectIds,
         invites: inviteIds,
         roles: rolesData,
-        partOfMultipleOrgs: orgIds.length > 1,
+        partOfMultipleOrgs: orgs.length > 1,
         pendingInvites: inviteIds.length > 0,
       };
     } catch (error) {
@@ -426,7 +427,7 @@ export class UserService {
               {
                 orgs: {
                   some: {
-                    id: org,
+                    id: org.id,
                   },
                 },
               },
@@ -451,7 +452,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: org,
+              id: org.id,
             },
           },
         };
@@ -470,7 +471,7 @@ export class UserService {
           updatedAt: true,
           roles: {
             where: {
-              orgId: org,
+              orgId: org.id,
             },
             select: {
               role: {
@@ -513,7 +514,7 @@ export class UserService {
               {
                 orgs: {
                   some: {
-                    id: org,
+                    id: org.id,
                   },
                 },
               },
@@ -538,7 +539,7 @@ export class UserService {
           ...whereCondition,
           orgs: {
             some: {
-              id: org,
+              id: org.id,
             },
           },
         };

@@ -27,7 +27,7 @@ export class InviteService {
       const invite = await this.prisma.userInvite.create({
         data: {
           email: data.email,
-          orgId: org,
+          orgId: org.id,
           invitedById: userId,
           roleId: data.role,
         },
@@ -76,7 +76,7 @@ export class InviteService {
         },
         rejectOnNotFound: true,
       });
-      if (org !== invite.orgId) {
+      if (org.id !== invite.orgId) {
         this.logger.error(`Org doesn't match`);
         throw new ForbiddenException('No permission to revoke invite');
       }
@@ -107,7 +107,7 @@ export class InviteService {
     try {
       return await this.prisma.userInvite.findMany({
         where: {
-          orgId: org,
+          orgId: org.id,
         },
         select: {
           id: true,

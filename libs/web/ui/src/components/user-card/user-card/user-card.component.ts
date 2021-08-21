@@ -58,7 +58,7 @@ import { User } from '@compito/api-interfaces';
     <ng-template #moreOptions let-hide>
       <div class="flex flex-col w-44">
         <div class="dropdown-item" (click)="hide()">Edit</div>
-        <div class="text-red-600 dropdown-item" (click)="hide()">Delete</div>
+        <div class="text-red-600 dropdown-item" (click)="hide()">Remove</div>
       </div>
     </ng-template>
   `,

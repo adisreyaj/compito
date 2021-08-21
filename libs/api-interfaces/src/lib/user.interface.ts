@@ -40,8 +40,9 @@ export type UpdateMembersRequest = ModifyMembers | SetMembers;
 export interface UserDetails {
   role: { label: string; id: string };
   userId: string;
-  org: string;
+  org: { id: string; name: string };
   family_name: string;
+  given_name: string;
   nickname: string;
   name: string;
   picture: string;

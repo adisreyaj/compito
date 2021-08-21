@@ -25,7 +25,7 @@ export type RequestParamsParsed = {
 
 export interface UserPayload {
   'https://compito.adi.so/role': Role;
-  'https://compito.adi.so/org': string;
+  'https://compito.adi.so/org': { id: string; name: string };
   'https://compito.adi.so/email': string;
   'https://compito.adi.so/projects': string[];
   'https://compito.adi.so/userId': string;
