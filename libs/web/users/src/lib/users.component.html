@@ -2,20 +2,6 @@
 <section class="mt-4 projects__container">
   <compito-section-header title="Users"></compito-section-header>
   <div class="projects__list">
-    <ng-container *ngIf="(rolesLoading$ | async)?.type === 'SUCCESS'">
-      <ng-container *permission="'user:create'">
-        <button (click)="inviteUser()"
-                class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
-                style="min-height: 226px;">
-          <div class="flex items-center space-x-2 text-gray-500">
-            <div class="bg-white border rounded-md shadow-sm ">
-              <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
-            </div>
-            <p class="text-sm">Invite User</p>
-          </div>
-        </button>
-      </ng-container>
-    </ng-container>
     <ng-container [ngSwitch]="(usersLoading$ | async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
         <ng-container *ngFor="let user of users$ | async">
@@ -48,6 +34,20 @@
 <section class="projects__container">
   <compito-section-header title="Invites Sent"></compito-section-header>
   <div class="projects__list">
+    <ng-container *ngIf="(rolesLoading$ | async)?.type === 'SUCCESS'">
+      <ng-container *permission="'user:create'">
+        <button (click)="inviteUser()"
+                class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
+                style="min-height: 122px;">
+          <div class="flex items-center space-x-2 text-gray-500">
+            <div class="bg-white border rounded-md shadow-sm ">
+              <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+            </div>
+            <p class="text-sm">Invite User</p>
+          </div>
+        </button>
+      </ng-container>
+    </ng-container>
     <ng-container [ngSwitch]="(invitesLoading$ | async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
         <ng-container *ngFor="let invite of invites$ | async">

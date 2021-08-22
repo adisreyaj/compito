@@ -2,11 +2,15 @@
 <section class="tasks__container">
   <ng-container [ngSwitch]="(uiView$ | async)?.type">
     <ng-container *ngSwitchCase="'SUCCESS'">
-      <div class="px-8 tasks__list">
-        <ng-container *ngFor="let task of (tasks$ | async)">
-          <compito-my-task-card [data]="task"></compito-my-task-card>
+      <ng-container *ngIf="(tasks$ | async) as tasks">
+        <ng-container *ngIf="tasks.length > 0;else noData">
+          <div class="px-8 tasks__list">
+            <ng-container *ngFor="let task of tasks">
+              <compito-my-task-card [data]="task"></compito-my-task-card>
+            </ng-container>
+          </div>
         </ng-container>
-      </div>
+      </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'LOADING'">
       <div class="px-8 tasks__list">
@@ -30,3 +34,11 @@
 
   </ng-container>
 </section>
+
+<ng-template #noData>
+  <div class="grid place-items-center" [style.minHeight]="'calc(100vh - 128px - 100px)'">
+    <div class="flex flex-col items-center">
+      <img src="assets/images/nothing.svg" alt="No Items" width="250" height="187.5" />
+      <p class="text-gray-600">No Tasks assigned to you</p>
+    </div>
+  </div>
