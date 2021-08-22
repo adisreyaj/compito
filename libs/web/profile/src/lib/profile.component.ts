@@ -63,7 +63,15 @@ import { Store } from '@ngxs/store';
         </div>
         <footer class="flex justify-end space-x-4 mt-4">
           <button btn type="button" variant="secondary" (click)="({})">Cancel</button>
-          <button btn type="submit" form="userForm" variant="primary" [disabled]="userForm.invalid">Update</button>
+          <button
+            btn
+            type="submit"
+            form="userForm"
+            variant="primary"
+            [disabled]="userForm.pristine || userForm.invalid"
+          >
+            Update
+          </button>
         </footer>
       </form>
     </section>
