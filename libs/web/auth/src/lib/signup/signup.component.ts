@@ -34,20 +34,20 @@ import { API_TOKEN } from '@compito/web/ui/tokens';
               </div>
               <div class="form-group">
                 <label for="lastName">Last Name</label>
-                <input class="w-full" type="text" id="lastName" formControlName="lastName" autofocus />
+                <input class="w-full" type="text" id="lastName" formControlName="lastName" />
               </div>
             </div>
             <div class="form-group">
               <label for="email">Email</label>
-              <input class="w-full" type="email" id="email" formControlName="email" autofocus />
+              <input class="w-full" type="email" id="email" formControlName="email" />
             </div>
             <div class="form-group max-w-xs">
               <label for="password">Password</label>
-              <input class="w-full" type="password" id="password" formControlName="password" autofocus />
+              <input class="w-full" type="password" id="password" formControlName="password" passwordToggle />
             </div>
             <div class="form-group max-w-xs">
               <label for="org">Org Name</label>
-              <input class="w-full" type="text" id="org" formControlName="org" autofocus />
+              <input class="w-full" type="text" id="org" formControlName="org" />
             </div>
             <footer class="flex justify-end space-x-4 mt-4">
               <button btn type="button" variant="secondary" (click)="({})">Close</button>

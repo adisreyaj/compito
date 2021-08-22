@@ -27,6 +27,7 @@ export interface UserRequest extends UserBase {
   roleId: string;
   orgId: string;
   password: string;
+  newPassword?: string;
 }
 
 export interface InviteRequest {

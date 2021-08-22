@@ -78,7 +78,7 @@ import { formatUser } from '../../util/format-user.operator';
     </header>
     <ng-template #userDropdown let-hide>
       <div class="flex flex-col w-48">
-        <div class="dropdown-item" routerLink="/profile" (click)="hide()">Preferences</div>
+        <div class="dropdown-item" routerLink="/profile" (click)="hide()">Profile</div>
         <div class="text-red-600 dropdown-item" (click)="auth.logout(); hide()">Logout</div>
       </div>
     </ng-template>

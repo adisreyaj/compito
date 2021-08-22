@@ -46,5 +46,5 @@ export interface Breadcrumb {
 export class PageHeaderComponent {
   @Input() title: string | undefined = '';
   @Input() loading = false;
-  @Input() breadcrumbs: Breadcrumb[] = [];
+  @Input() breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
 }

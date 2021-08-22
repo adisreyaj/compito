@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, Role, User } from '@compito/api-interfaces';
-import { Breadcrumb, ConfirmModalComponent, formatUser, ToastService } from '@compito/web/ui';
+import { ConfirmModalComponent, formatUser, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable, of, throwError } from 'rxjs';
@@ -30,8 +30,6 @@ import { UsersState } from './state/users.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersComponent implements OnInit {
-  breadcrumbs: Breadcrumb[] = [{ label: 'Home', link: '/' }];
-
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
 
