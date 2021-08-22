@@ -7,22 +7,25 @@ import { API_TOKEN } from '@compito/web/ui/tokens';
 @Component({
   selector: 'compito-signup',
   template: `
-    <main class="w-screen h-screen grid lg:grid-cols-2">
-      <section class="grid place-items-center">
+    <main class="w-screen h-screen grid grid-cols-1 lg:grid-cols-2">
+      <section class="place-items-center bg-primary-gradient hidden lg:grid">
         <div>
-          <div>
-            <h1 class="text-lg text-center">Welcome to Compito</h1>
-            <div class="flex space-x-2 items-center justify-center">
-              <p class="text-gray-600">Tasks done right!</p>
+          <div class="text-white">
+            <h1 class="text-lg font-bold">Welcome to Compito</h1>
+            <div class="flex space-x-2 items-center">
+              <p>Tasks done right!</p>
               <div class="rounded-full bg-green-500">
                 <rmx-icon class="icon-xxs text-white" name="check-line"></rmx-icon>
               </div>
             </div>
+            <div class="rounded-md shadow-lg mt-6">
+              <img src="assets/images/board.jpg" alt="Board" height="400" width="500" class="rounded-md" />
+            </div>
           </div>
         </div>
       </section>
-      <section class="grid place-items-center bg-gray-100">
-        <div class="max-w-lg lg:w-10/12 w-9/12">
+      <section class="grid place-items-center bg-white">
+        <div class="max-w-lg lg:w-10/12 w-9/12" cdkTrapFocus cdkTrapFocusAutoCapture>
           <header class="mb-6 flex justify-center">
             <img src="assets/images/logo-full.svg" height="65" width="200" alt="Compito" />
           </header>
@@ -30,7 +33,7 @@ import { API_TOKEN } from '@compito/web/ui/tokens';
             <div class="grid grid-cols-2 gap-4">
               <div class="form-group">
                 <label for="firstName">First Name</label>
-                <input class="w-full" type="text" id="firstName" formControlName="firstName" autofocus />
+                <input class="w-full" type="text" id="firstName" formControlName="firstName" cdkFocusInitial />
               </div>
               <div class="form-group">
                 <label for="lastName">Last Name</label>
@@ -50,7 +53,7 @@ import { API_TOKEN } from '@compito/web/ui/tokens';
               <input class="w-full" type="text" id="org" formControlName="org" />
             </div>
             <footer class="flex justify-end space-x-4 mt-4">
-              <button btn type="button" variant="secondary" (click)="({})">Close</button>
+              <button btn type="button" variant="secondary" routerLink="/auth/login">Cancel</button>
               <button btn type="submit" form="signupForm" variant="primary" [disabled]="signupForm.invalid">
                 Create Account
               </button>

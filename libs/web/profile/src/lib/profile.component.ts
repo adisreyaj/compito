@@ -10,8 +10,8 @@ import { Store } from '@ngxs/store';
   selector: 'compito-profile',
   template: `
     <compito-page-header title="Profile"></compito-page-header>
-    <section class="mt-4">
-      <form class="p-6 bg-white rounded-md max-w-xl" id="userForm" [formGroup]="userForm" (ngSubmit)="updateUser()">
+    <section class="mt-4 px-8">
+      <form class="py-6 bg-white rounded-md max-w-xl" id="userForm" [formGroup]="userForm" (ngSubmit)="updateUser()">
         <div class="mb-4">
           <img
             [src]="'https://avatar.tobi.sh/' + userForm.get('email')?.value"
@@ -33,7 +33,7 @@ import { Store } from '@ngxs/store';
           <label for="email">Email</label>
           <input class="w-full" type="email" id="email" formControlName="email" />
         </div>
-        <div class="grid grid-cols-2 gap-4 group-validation" formGroupName="passwords">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 group-validation" formGroupName="passwords">
           <div class="form-group max-w-xs">
             <label for="currentPassword">Current Password</label>
             <input
