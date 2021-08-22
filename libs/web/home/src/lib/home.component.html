@@ -10,7 +10,11 @@
     <compito-section-header title="Recent Tasks"></compito-section-header>
     <ng-container [ngSwitch]="(recentTasksLoading$ | async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
-        <compito-task-list [data]="recentTasks$ | async"></compito-task-list>
+        <ng-container *ngIf="(recentTasks$ | async) as recentTasks">
+          <ng-container *ngIf="recentTasks.length > 0;else noData">
+            <compito-task-list [data]="recentTasks"></compito-task-list>
+          </ng-container>
+        </ng-container>
       </ng-container>
       <ng-container *ngSwitchCase="'LOADING'">
         <ng-container *ngTemplateOutlet="tasksLoading"></ng-container>
@@ -24,11 +28,14 @@
     <compito-section-header title="Higher Priority Tasks"></compito-section-header>
     <ng-container [ngSwitch]="(recentTasksLoading$ | async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
-        <compito-task-list [data]="hightPriorityTasks$ | async"></compito-task-list>
+        <ng-container *ngIf="(hightPriorityTasks$ | async) as hightPriorityTasks">
+          <ng-container *ngIf="hightPriorityTasks.length > 0;else noData">
+            <compito-task-list [data]="hightPriorityTasks"></compito-task-list>
+          </ng-container>
+        </ng-container>
       </ng-container>
       <ng-container *ngSwitchCase="'LOADING'">
         <ng-container *ngTemplateOutlet="tasksLoading"></ng-container>
-
       </ng-container>
       <ng-container *ngSwitchCase="'ERROR'">
 
@@ -40,11 +47,15 @@
   <compito-section-header title="Projects"></compito-section-header>
   <ng-container [ngSwitch]="(projectsLoading$ | async)?.type">
     <ng-container *ngSwitchCase="'SUCCESS'">
-      <div class="projects__list">
-        <ng-container *ngFor="let project of projects$ | async">
-          <compito-project-mini-card [data]="project"></compito-project-mini-card>
+      <ng-container *ngIf="(projects$ | async) as projects">
+        <ng-container *ngIf="projects.length > 0;else noData">
+          <div class="projects__list">
+            <ng-container *ngFor="let project of projects">
+              <compito-project-mini-card [data]="project"></compito-project-mini-card>
+            </ng-container>
+          </div>
         </ng-container>
-      </div>
+      </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'LOADING'">
       <div class="projects__list">
@@ -73,11 +84,15 @@
   <compito-section-header title="Boards"></compito-section-header>
   <ng-container [ngSwitch]="(boardsLoading$ | async)?.type">
     <ng-container *ngSwitchCase="'SUCCESS'">
-      <div class="projects__list">
-        <ng-container *ngFor="let board of boards$ | async">
-          <compito-board-mini-card [data]="board"></compito-board-mini-card>
+      <ng-container *ngIf="(boards$ | async) as boards">
+        <ng-container *ngIf="boards.length > 0;else noData">
+          <div class="projects__list">
+            <ng-container *ngFor="let board of boards">
+              <compito-board-mini-card [data]="board"></compito-board-mini-card>
+            </ng-container>
+          </div>
         </ng-container>
-      </div>
+      </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'LOADING'">
       <div class="projects__list">
@@ -117,5 +132,14 @@
         </footer>
       </li>
     </ul>
+  </div>
+</ng-template>
+
+<ng-template #noData let-message="message">
+  <div class="flex justify-center mt-10">
+    <div class="flex flex-col items-center">
+      <img src="assets/images/nothing.svg" alt="No Items" width="250" height="187.5" />
+      <p class="text-gray-600">{{message ?? 'No items found'}}</p>
+    </div>
   </div>
 </ng-template>
