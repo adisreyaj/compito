@@ -20,19 +20,14 @@ export class ProjectService {
 
   async create(data: ProjectRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
-    const { orgId, ...rest } = data;
     switch (role.name) {
       case 'super-admin':
         break;
       case 'admin':
       case 'org-admin':
-        if (orgId !== org.id) {
-          this.logger.error(`CREATE:PROJECT-->Org doesn't match`);
-          throw new ForbiddenException('No permissions to create project');
-        }
         break;
       default:
-        this.logger.error(`CREATE:PROJECT-->Org doesn't match`);
+        this.logger.error(`CREATE:PROJECT--> Role doesn't have permission`);
         throw new ForbiddenException('No permissions to create project');
     }
     try {
@@ -46,10 +41,10 @@ export class ProjectService {
         members.push({ id: userId });
       }
       const projectData: Prisma.ProjectCreateInput = {
-        ...rest,
+        ...data,
         org: {
           connect: {
-            id: orgId,
+            id: org.id,
           },
         },
         createdBy: {
