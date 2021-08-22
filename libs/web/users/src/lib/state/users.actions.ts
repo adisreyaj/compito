@@ -10,7 +10,7 @@ export namespace UsersAction {
   }
   export class UpdateUser {
     static readonly type = '[Users] Update User';
-    constructor(public id: string, public payload: UserRequest) {}
+    constructor(public id: string, public payload: Partial<UserRequest>) {}
   }
   export class UpdateUserRole {
     static readonly type = '[Users] Update User Role';

@@ -5,12 +5,17 @@ import { kebabCase } from 'voca';
 
 @Component({
   selector: 'compito-orgs-create-modal',
-  template: ` <compito-modal title="Add New Org" [ref]="ref" cdkTrapFocus>
+  template: ` <compito-modal
+    [title]="ref.data.isUpdateMode ? 'Update Org' : 'Create New Org'"
+    [ref]="ref"
+    cdkTrapFocus
+    cdkTrapFocusAutoCapture
+  >
     <section>
       <form [formGroup]="orgForm" id="orgForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
         <div class="form-group">
           <label for="name">Name</label>
-          <input class="w-full" type="text" id="name" formControlName="name" autofocus />
+          <input class="w-full" type="text" id="name" formControlName="name" cdkFocusInitial />
         </div>
       </form>
     </section>
@@ -18,7 +23,9 @@ import { kebabCase } from 'voca';
     <ng-template compitoModalActions>
       <div class="flex justify-end space-x-4">
         <button btn type="button" variant="secondary" (click)="ref.close()">Close</button>
-        <button btn type="submit" form="orgForm" variant="primary" [disabled]="orgForm.invalid">Create</button>
+        <button btn type="submit" form="orgForm" variant="primary" [disabled]="orgForm.invalid">
+          {{ ref.data.isUpdateMode ? 'Update' : 'Create' }}
+        </button>
       </div>
     </ng-template>
   </compito-modal>`,
@@ -33,7 +40,7 @@ export class OrgsCreateModalComponent implements OnInit {
     this.initForm();
     const initialData = this.ref.data?.initialData;
     if (initialData) {
-      this.orgForm.setValue(initialData);
+      this.orgForm.patchValue(initialData);
     }
   }
 

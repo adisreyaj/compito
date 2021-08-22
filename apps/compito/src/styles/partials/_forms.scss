@@ -2,7 +2,7 @@
   @apply flex flex-col;
   @apply items-start;
   @apply relative;
-  &:not(:last-child){
+  &:not(:last-child) {
     @apply pb-4;
   }
   label {
@@ -72,5 +72,33 @@ select {
   transition: all 0.3s;
   &::placeholder {
     @apply text-gray-300;
+  }
+
+  &.ng-invalid.ng-dirty.ng-touched {
+    @apply focus:ring-1;
+    @apply focus:border-red-400;
+    @apply focus:ring-red-400;
+  }
+}
+
+.group-validation.ng-invalid.ng-dirty.ng-touched {
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select {
+    @apply ring-1;
+    @apply border-red-400;
+    @apply ring-red-400;
   }
 }
