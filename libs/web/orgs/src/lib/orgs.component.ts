@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
-import { DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
+import { CardEvent, DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -16,7 +16,7 @@ import { OrgsState } from './state/orgs.state';
     <section class="orgs__container" *ngIf="user$ | async as user">
       <div class="orgs__list px-8">
         <article
-          (click)="createNew()"
+          (click)="openProjectModal()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
@@ -32,7 +32,11 @@ import { OrgsState } from './state/orgs.state';
         <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let org of orgs$ | async">
-              <compito-orgs-card [data]="org" [user]="user"></compito-orgs-card>
+              <compito-orgs-card
+                [data]="org"
+                [user]="user"
+                (clicked)="handleProjectCardEvents($event, org)"
+              ></compito-orgs-card>
             </ng-container>
           </ng-container>
           <ng-container *ngSwitchCase="'LOADING'">
@@ -98,20 +102,24 @@ export class OrgsComponent implements OnInit {
     this.store.dispatch(new OrgsAction.GetAll());
   }
 
-  createNew(initialData = null) {
+  openProjectModal(initialData: any = null, isUpdateMode = false) {
     const ref = this.dialog.open(OrgsCreateModalComponent, {
       data: {
         initialData,
+        isUpdateMode,
       },
     });
     ref.afterClosed$
       .pipe(
         switchMap((data) => {
           if (data) {
-            return this.store.dispatch(new OrgsAction.Add(data)).pipe(
+            const action = isUpdateMode
+              ? this.store.dispatch(new OrgsAction.Update(initialData.id, data))
+              : this.store.dispatch(new OrgsAction.Add(data));
+            action.pipe(
               // Reopen the modal with the filled data if fails
               catchError(() => {
-                this.createNew(data);
+                this.openProjectModal(data);
                 this.toast.error('Failed to create org!');
                 return throwError(new Error('Failed to create org!'));
               }),
@@ -121,5 +129,21 @@ export class OrgsComponent implements OnInit {
         }),
       )
       .subscribe();
+  }
+
+  handleProjectCardEvents({ type, payload }: CardEvent, org: Organization) {
+    switch (type) {
+      case 'edit': {
+        const data = {
+          id: org.id,
+          name: org.name,
+        };
+        this.openProjectModal(data, true);
+        break;
+      }
+
+      default:
+        break;
+    }
   }
 }

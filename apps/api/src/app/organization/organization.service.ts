@@ -259,10 +259,11 @@ export class OrganizationService {
       id,
     };
     await this.canUpdateOrg(userId, id, role.name as Roles);
+    const { members, createdById, ...rest } = data;
     try {
       const org = await this.prisma.organization.update({
         where,
-        data: {},
+        data: rest,
       });
       this.logger.debug(org);
       if (org) {

@@ -13,6 +13,10 @@ export class OrgService {
     return this.http.post<Organization>(this.api, data);
   }
 
+  update(id: string, data: OrganizationRequest) {
+    return this.http.patch<Organization>(`${this.api}/${id}`, data);
+  }
+
   getAll() {
     return this.http.get<MultiDocPayload<Organization>>(this.api);
   }
