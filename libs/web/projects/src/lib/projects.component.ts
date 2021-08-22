@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { CardEvent, DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
-import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
+import { Breadcrumb, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -17,21 +17,23 @@ import { ProjectsState } from './state/projects.state';
   template: ` <compito-page-header title="Projects" [breadcrumbs]="breadcrumbs"> </compito-page-header>
     <section class="projects__container">
       <div class="projects__list px-8">
-        <article
-          *permission="'project:create'"
-          (click)="openProjectModal()"
-          class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
+        <ng-container *ngIf="(usersLoading$ | async)?.type === 'SUCCESS'">
+          <article
+            *permission="'project:create'"
+            (click)="openProjectModal()"
+            class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
           border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
           grid place-items-center"
-          style="min-height: 194px;"
-        >
-          <div class="flex items-center space-x-2 text-gray-500">
-            <div class=" border rounded-md shadow-sm bg-white">
-              <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+            style="min-height: 194px;"
+          >
+            <div class="flex items-center space-x-2 text-gray-500">
+              <div class=" border rounded-md shadow-sm bg-white">
+                <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+              </div>
+              <p class="text-sm">Add New Project</p>
             </div>
-            <p class="text-sm">Add New Project</p>
-          </div>
-        </article>
+          </article>
+        </ng-container>
         <ng-container [ngSwitch]="(uiView$ | async)?.type">
           <ng-container *ngSwitchCase="'SUCCESS'">
             <ng-container *ngFor="let project of projects$ | async">
@@ -92,6 +94,9 @@ export class ProjectsComponent implements OnInit {
   @Select(ProjectsState.projectsFetched)
   projectsFetched$!: Observable<boolean>;
 
+  @Select(UsersState.usersLoading)
+  usersLoading$!: Observable<DataLoading>;
+
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
 
@@ -150,12 +155,11 @@ export class ProjectsComponent implements OnInit {
     });
     ref.afterClosed$
       .pipe(
-        withLatestFrom(this.auth.user$.pipe(formatUser())),
-        switchMap(([data, user]) => {
+        switchMap((data) => {
           if (data) {
             const action = isUpdateMode
-              ? this.store.dispatch(new ProjectsAction.Update(initialData.id, { ...data, orgId: user?.org }))
-              : this.store.dispatch(new ProjectsAction.Add({ ...data, orgId: user?.org }));
+              ? this.store.dispatch(new ProjectsAction.Update(initialData.id, data))
+              : this.store.dispatch(new ProjectsAction.Add(data));
             action.pipe(
               // Reopen the modal with the filled data if fails
               catchError(() => {

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, Role, User } from '@compito/api-interfaces';
-import { Breadcrumb, ConfirmModalComponent, ToastService } from '@compito/web/ui';
+import { Breadcrumb, ConfirmModalComponent, formatUser, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable, of, throwError } from 'rxjs';
@@ -37,6 +38,9 @@ export class UsersComponent implements OnInit {
   @Select(UsersState.usersLoading)
   usersLoading$!: Observable<DataLoading>;
 
+  @Select(UsersState.rolesLoading)
+  rolesLoading$!: Observable<DataLoading>;
+
   @Select(UsersState.invites)
   invites$!: Observable<any[]>;
 
@@ -45,7 +49,14 @@ export class UsersComponent implements OnInit {
 
   @Select(UsersState.roles)
   roles$!: Observable<Role[]>;
-  constructor(private dialog: DialogService, private store: Store, private toast: ToastService) {}
+
+  loggedInUser$ = this.auth.user$.pipe(formatUser());
+  constructor(
+    private dialog: DialogService,
+    private store: Store,
+    private auth: AuthService,
+    private toast: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.store.dispatch(new UsersAction.GetAll({}));
