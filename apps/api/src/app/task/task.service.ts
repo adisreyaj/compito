@@ -11,6 +11,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
+import { USER_BASIC_DETAILS } from './task.config';
 
 @Injectable()
 export class TaskService {
@@ -158,6 +159,22 @@ export class TaskService {
       const task = await this.prisma.task.findUnique({
         where: {
           id,
+        },
+        include: {
+          assignees: {
+            select: USER_BASIC_DETAILS,
+          },
+          comments: {
+            select: {
+              id: true,
+              content: true,
+              createdAt: true,
+              reactions: true,
+              createdBy: {
+                select: USER_BASIC_DETAILS,
+              },
+            },
+          },
         },
       });
       if (task) {
@@ -318,6 +335,31 @@ export class TaskService {
       throw new NotFoundException();
     } catch (error) {
       this.logger.error('Failed to delete task', error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async addComment(id: string, content: string, user: UserPayload) {
+    try {
+      const { org, userId } = getUserDetails(user);
+      const comment = await this.prisma.comment.create({
+        data: {
+          content,
+          createdById: userId,
+          taskId: id,
+        },
+        select: {
+          content: true,
+          id: true,
+          createdAt: true,
+          createdBy: {
+            select: USER_BASIC_DETAILS,
+          },
+        },
+      });
+      return comment;
+    } catch (error) {
+      this.logger.error('Failed to add comment', error);
       throw new InternalServerErrorException();
     }
   }

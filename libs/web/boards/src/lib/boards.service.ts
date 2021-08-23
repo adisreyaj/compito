@@ -13,6 +13,9 @@ export class BoardsService {
   get(id: string) {
     return this.http.get<Board>(`${this.api}/${id}`);
   }
+  getTask(id: string) {
+    return this.http.get<Task>(`${this.tasksApi}/${id}`);
+  }
 
   getPriorities() {
     return this.http.get<string[]>(`${this.tasksApi}/priorities`);
@@ -27,6 +30,7 @@ export class BoardsService {
     };
     return this.http.patch<Task>(`${this.tasksApi}/${taskId}`, data);
   }
+
   updateDescription(taskId: string, description: string) {
     const data: Pick<TaskRequest, 'description'> = {
       description,
@@ -38,6 +42,10 @@ export class BoardsService {
       priority,
     };
     return this.http.patch<Task>(`${this.tasksApi}/${taskId}`, data);
+  }
+
+  addComment(taskId: string, content: string) {
+    return this.http.post<any>(`${this.tasksApi}/${taskId}/comments`, { content });
   }
 
   moveTask(taskId: string, newListId: string) {

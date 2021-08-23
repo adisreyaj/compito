@@ -1,0 +1,173 @@
+<div class="flex flex-col">
+  <ng-container [ngSwitch]="(loadingState$ |async)?.type">
+    <ng-container *ngSwitchCase="'SUCCESS'">
+      <header class="p-4" [class.shadow-lg]="isScrolledSubject | async">
+        <div>
+          <p class="text-lg font-medium text-gray-600">{{ taskDetail?.title }}</p>
+        </div>
+        <div class="flex items-center py-2 space-x-4 text-xs text-gray-500">
+          <p>
+            List: <span class="text-sm text-gray-800">{{ ref.data.list?.name }}</span>
+          </p>
+          <p>
+            Created By: <span class="text-sm text-gray-800">{{ taskDetail?.createdBy?.firstName }}</span>
+          </p>
+          <p>
+            Created: <span class="text-sm text-gray-800">{{ taskDetail?.createdAt | timeAgo }}</span>
+          </p>
+        </div>
+      </header>
+      <div class="px-8 pt-4 overflow-y-auto" [style.maxHeight]="'80vh'" #contentContainer>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Assignees' }"></ng-container>
+          <div class="flex items-center">
+            <compito-user-avatar-group [data]="assignedUsers$ | async"></compito-user-avatar-group>
+            <div [style.height.px]="48" [style.width.px]="48" class="p-1">
+              <button type="button"
+                      class="flex items-center justify-center w-full h-full text-white rounded-full outline-none cursor-pointer btn btn--primary bg-primary-gradient"
+                      [style.marginLeft.rem]="0.3" [tippy]="addAssignees" [zIndex]="9999" placement="bottom-start"
+                      variation="menu">
+                <rmx-icon name="add-line"></rmx-icon>
+              </button>
+            </div>
+          </div>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Priority' }"></ng-container>
+          <div class="form-group">
+            <select name="priority" id="priority" [formControl]="priority">
+              <ng-container *ngFor="let priority of priorities | async">
+                <option [value]="priority">{{ priority }}</option>
+              </ng-container>
+            </select>
+          </div>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
+          <div class="form-group">
+            <textarea class="w-full" type="text" id="description" rows="4" [formControl]="description"></textarea>
+            <footer class="flex items-center mt-4 space-x-2">
+              <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
+              <button btn size="sm" variant="secondary" *ngIf="description.dirty">Cancel</button>
+            </footer>
+          </div>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
+          <ul>
+            <li class="mb-8" *ngIf="ref.data.user$ | async as user">
+              <div class="flex items-start space-x-4">
+                <div>
+                  <img [src]="'https://avatar.tobi.sh/' + user?.email" [alt]="user?.given_name" width="40" height="40"
+                       class="rounded-full" />
+                </div>
+                <div class="w-full form-group">
+                  <textarea class="w-full" type="text" id="comment" [formControl]="comment" rows="3"></textarea>
+                  <footer class="flex items-center mt-4 space-x-2">
+                    <button btn size="sm" [disabled]="!comment.dirty || comment.invalid" (click)="addComment()">
+                      Add Comment
+                    </button>
+                    <button btn size="sm" variant="secondary" *ngIf="comment.dirty"
+                            (click)="clearCommentField(); $event.stopPropagation()">
+                      Cancel
+                    </button>
+                  </footer>
+                </div>
+              </div>
+            </li>
+            <ng-container *ngFor="let comment of taskDetail?.comments">
+              <li class="py-4 border-b last:mb-0 last:border-b-0">
+                <div class="flex items-start space-x-4">
+                  <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
+                       width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
+                       [alt]="comment?.createdBy?.firstName" />
+                  <div>
+                    <p>{{ comment.content }}</p>
+                    <p class="text-xs text-gray-500">{{ comment?.createdAt | timeAgo }}</p>
+                  </div>
+                </div>
+              </li>
+            </ng-container>
+          </ul>
+        </section>
+        <div class="pb-8"></div>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="'LOADING'">
+      <header class="h-24 p-4">
+        <div>
+          <shimmer height="28px" width="50%" [rounded]="true"></shimmer>
+        </div>
+        <div class="flex items-center py-2 space-x-4 text-xs text-gray-500">
+          <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
+          <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
+          <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
+        </div>
+      </header>
+      <div class="px-8 pt-4 overflow-y-auto" [style.maxHeight]="'80vh'" #contentContainer>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Assignees' }"></ng-container>
+          <div class="flex items-center my-2 -space-x-4">
+            <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
+            <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
+            <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
+          </div>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Priority' }"></ng-container>
+          <shimmer height="40px" width="150px" [rounded]="true"></shimmer>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
+          <div class="form-group">
+            <shimmer height="114px" width="100%" [rounded]="true"></shimmer>
+          </div>
+          <footer class="flex items-center mt-1 space-x-2">
+            <shimmer height="30px" width="60px" [rounded]="true"></shimmer>
+          </footer>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
+          <ul>
+            <li class="mb-8" *ngIf="ref.data.user$ | async as user">
+              <div class="flex items-start space-x-4">
+                <div>
+                  <shimmer width="40px" height="40px" borderRadius="50%"></shimmer>
+                </div>
+                <div class="w-full form-group">
+                  <shimmer height="90px" width="100%" [rounded]="true"></shimmer>
+                  <footer class="flex items-center mt-4 space-x-2">
+                    <shimmer height="30px" width="130px" [rounded]="true"></shimmer>
+                  </footer>
+                </div>
+              </div>
+            </li>
+            <ng-container *ngFor="let comment of taskDetail?.comments">
+              <li class="py-4 border-b last:mb-0 last:border-b-0">
+                <div class="flex items-start space-x-4">
+                  <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
+                       width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
+                       [alt]="comment?.createdBy?.firstName" />
+                  <div>
+                    <p>{{ comment.content }}</p>
+                    <p class="text-xs text-gray-500">{{ comment?.createdAt | timeAgo }}</p>
+                  </div>
+                </div>
+              </li>
+            </ng-container>
+          </ul>
+        </section>
+        <div class="pb-8"></div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+
+<ng-template #sectionHeader let-title>
+  <h4 class="mb-2 font-medium text-gray-500 text-md">{{ title }}</h4>
+</ng-template>
+
+<ng-template #addAssignees let-hide>
+  <compito-user-select [hide]="hide" [users]="ref.data.users$ | async" [selectedMembers]="selectedAssignees"
+                       (clicked)="handleUserSelectEvent($event, hide)"></compito-user-select>
+</ng-template>

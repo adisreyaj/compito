@@ -4,7 +4,7 @@ import { DialogRef } from '@ngneat/dialog';
 
 @Component({
   selector: 'compito-users-create-modal',
-  template: ` <compito-modal title="Add New Project" [ref]="ref" cdkTrapFocus cdkTrapFocusAutoCapture>
+  template: ` <compito-modal title="Invite a user" [ref]="ref" cdkTrapFocus cdkTrapFocusAutoCapture>
     <section>
       <form [formGroup]="userForm" id="userForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
         <div class="form-group">
@@ -25,7 +25,7 @@ import { DialogRef } from '@ngneat/dialog';
     <ng-template compitoModalActions>
       <div class="flex justify-end space-x-4">
         <button btn type="button" variant="secondary" (click)="ref.close()">Close</button>
-        <button btn type="submit" form="userForm" variant="primary" [disabled]="userForm.invalid">Create</button>
+        <button btn type="submit" form="userForm" variant="primary" [disabled]="userForm.invalid">Invite</button>
       </div>
     </ng-template>
   </compito-modal>`,

@@ -11,6 +11,7 @@ export class DelayInterceptor implements HttpInterceptor {
     if (this.environment.production) {
       return next.handle(request);
     }
-    return next.handle(request).pipe(delay(0));
+    const delayInMS = localStorage.getItem('delay');
+    return next.handle(request).pipe(delay(delayInMS ? +delayInMS : 0));
   }
 }
