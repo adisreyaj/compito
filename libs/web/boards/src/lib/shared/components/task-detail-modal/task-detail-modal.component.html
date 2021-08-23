@@ -52,10 +52,6 @@
             </footer>
           </div>
         </section>
-        <!-- <section class="task-detail__section">
-                  <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Attachments' }"></ng-container>
-                  <p>No attachments found</p>
-                </section> -->
         <section class="task-detail__section">
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
           <ul>
@@ -69,7 +65,7 @@
                   <textarea class="w-full" type="text" id="comment" [formControl]="comment" rows="3"></textarea>
                   <footer class="flex items-center mt-4 space-x-2">
                     <button btn size="sm" [disabled]="!comment.dirty || comment.invalid" (click)="addComment()">
-                      Save
+                      Add Comment
                     </button>
                     <button btn size="sm" variant="secondary" *ngIf="comment.dirty"
                             (click)="clearCommentField(); $event.stopPropagation()">
@@ -141,7 +137,7 @@
                 <div class="w-full form-group">
                   <shimmer height="90px" width="100%" [rounded]="true"></shimmer>
                   <footer class="flex items-center mt-4 space-x-2">
-                    <shimmer height="30px" width="60px" [rounded]="true"></shimmer>
+                    <shimmer height="30px" width="130px" [rounded]="true"></shimmer>
                   </footer>
                 </div>
               </div>
@@ -161,6 +157,7 @@
             </ng-container>
           </ul>
         </section>
+        <div class="pb-8"></div>
       </div>
     </ng-container>
   </ng-container>
