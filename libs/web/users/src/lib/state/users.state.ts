@@ -83,6 +83,7 @@ export class UsersState {
           patchState({
             roles: data,
             rolesLoading: { type: DataLoadingState.success },
+            rolesFetched: true,
           });
         },
         () => {
