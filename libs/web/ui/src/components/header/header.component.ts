@@ -9,8 +9,9 @@ import { formatUser } from '../../util/format-user.operator';
   template: `
     <header>
       <section class="flex items-stretch space-x-10">
-        <div class="flex items-center">
+        <div class="flex items-center relative">
           <img src="assets/images/logo.svg" alt="Compito" width="55" height="55" class="rounded-full" />
+          <p class="absolute top-0 -right-4 z-20 text-gray-500 text-sm">Beta</p>
         </div>
         <nav class="flex-1 flex items-center text-gray-400 font-medium">
           <ol class="list-none flex items-center gap-6">
@@ -44,10 +45,10 @@ import { formatUser } from '../../util/format-user.operator';
             Org: <span class="font-medium text-sm text-gray-700">{{ user?.org?.name }}</span>
           </a>
           <div class="grid grid-cols-2 gap-4 text-gray-400">
-            <button>
+            <button tippy="Coming soon">
               <rmx-icon name="add-circle-line"></rmx-icon>
             </button>
-            <button>
+            <button tippy="Coming soon">
               <rmx-icon name="notification-2-line"></rmx-icon>
             </button>
           </div>
