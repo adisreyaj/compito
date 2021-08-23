@@ -123,30 +123,6 @@ export class BoardsState {
     );
   }
 
-  private updateTaskInAList({
-    lists,
-    listId,
-    taskId,
-    keyToUpdate,
-    data,
-  }: {
-    lists: BoardListWithTasks[];
-    listId: string;
-    taskId: string;
-    keyToUpdate: TaskKeys;
-    data: Task;
-  }): BoardListWithTasks[] | undefined {
-    return produce(lists, (draft) => {
-      const list = draft.find(({ id }) => id === listId);
-      if (list) {
-        const task = list.tasks.find(({ id }) => id === taskId);
-        if (task) {
-          (task as any)[keyToUpdate] = data[keyToUpdate];
-        }
-      }
-    });
-  }
-
   @Action(BoardsAction.UpdateTaskDescription)
   updateTaskDescription(
     { patchState, getState }: StateContext<BoardsStateModel>,
@@ -161,6 +137,7 @@ export class BoardsState {
       }),
     );
   }
+
   @Action(BoardsAction.UpdateTaskPriority)
   updateTaskPriority(
     { patchState, getState }: StateContext<BoardsStateModel>,
@@ -192,7 +169,9 @@ export class BoardsState {
     patchState({ lists: updatedLists });
     return this.boardService.moveTask(taskId, to).pipe(
       tap(
-        () => {},
+        () => {
+          return;
+        },
         () => {
           patchState({ lists });
         },
@@ -228,5 +207,29 @@ export class BoardsState {
         patchState({ lists });
       }),
     );
+  }
+
+  private updateTaskInAList({
+    lists,
+    listId,
+    taskId,
+    keyToUpdate,
+    data,
+  }: {
+    lists: BoardListWithTasks[];
+    listId: string;
+    taskId: string;
+    keyToUpdate: TaskKeys;
+    data: Task;
+  }): BoardListWithTasks[] | undefined {
+    return produce(lists, (draft) => {
+      const list = draft.find(({ id }) => id === listId);
+      if (list) {
+        const task = list.tasks.find(({ id }) => id === taskId);
+        if (task) {
+          (task as any)[keyToUpdate] = data[keyToUpdate];
+        }
+      }
+    });
   }
 }

@@ -10,7 +10,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { AppMetadata, AuthenticationClient, ManagementClient, SignUpUserData, UserMetadata } from 'auth0';
-import { hashSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 import * as cuid from 'cuid';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { kebabCase } from 'voca';
@@ -567,12 +567,46 @@ export class UserService {
     if (id !== userId) {
       throw new ForbiddenException('Not enough permissions to update the user details');
     }
+    const { password, newPassword, ...rest } = data;
+    let dataToUpdate: Prisma.UserUpdateInput = { ...rest };
+    if (password !== null && newPassword !== null) {
+      if (password === newPassword) {
+        throw new BadRequestException('New password cannot be the same as your current password!');
+      }
+      try {
+        const user = await this.prisma.user.findUnique({
+          where: {
+            id,
+          },
+          select: {
+            email: true,
+            password: true,
+          },
+        });
+        const passwordMatched = compareSync(password, user.password);
+        if (!passwordMatched) {
+          this.logger.error(`Current password doesn't match`);
+          throw new ForbiddenException(`Current password doesn't match`);
+        }
+        const passwordUpdatedInAuth0 = this.updateUserPasswordInAuth0(user.email, newPassword);
+        if (passwordUpdatedInAuth0 instanceof Error) {
+          throw passwordUpdatedInAuth0;
+        }
+        dataToUpdate = {
+          ...dataToUpdate,
+          password: hashSync(newPassword, 10),
+        };
+      } catch (error) {
+        this.logger.error(`USER:PASSWORD`, error);
+        throw new InternalServerErrorException('Something went wrong!');
+      }
+    }
     try {
       return await this.prisma.user.update({
         where: {
           id,
         },
-        data,
+        data: { ...rest },
         select: USER_BASIC_DETAILS,
       });
     } catch (error) {
@@ -723,4 +757,28 @@ export class UserService {
         throw new ForbiddenException('Not enough permissions');
     }
   }
+
+  private updateUserPasswordInAuth0 = async (email: string, password: string) => {
+    try {
+      const user = await this.managementClient.getUsersByEmail(email);
+      const connection = this.config.get('AUTH0_DB');
+      if (user?.length > 0) {
+        const userId = user[0].user_id;
+        await this.managementClient.updateUser(
+          {
+            id: userId,
+          },
+          {
+            password,
+            connection,
+          },
+        );
+        return true;
+      } else {
+        return new BadRequestException('User not found');
+      }
+    } catch (error) {
+      return new InternalServerErrorException();
+    }
+  };
 }

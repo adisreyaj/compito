@@ -15,7 +15,7 @@ export class UsersService {
   inviteUser(data: InviteRequest) {
     return this.http.post<User>(this.invitesAPI, data);
   }
-  update(id: string, data: UserRequest) {
+  update(id: string, data: Partial<UserRequest>) {
     return this.http.patch<User>(`${this.usersAPI}/${id}`, data);
   }
   updateRole(id: string, roleId: string) {

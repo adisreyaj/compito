@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { CardEvent, User } from '@compito/api-interfaces';
+import { CardEvent, User, UserDetails } from '@compito/api-interfaces';
 
 @Component({
   selector: 'compito-user-card',
@@ -11,6 +11,7 @@ import { CardEvent, User } from '@compito/api-interfaces';
     >
       <ng-container *permission="'user:update'">
         <button
+          *ngIf="data.id !== user?.userId"
           [tippy]="moreOptions"
           placement="bottom-start"
           variation="menu"
@@ -69,5 +70,6 @@ import { CardEvent, User } from '@compito/api-interfaces';
 })
 export class UserCardComponent {
   @Input() data: User | null = null;
+  @Input() user!: UserDetails | null;
   @Output() clicked = new EventEmitter<CardEvent>();
 }

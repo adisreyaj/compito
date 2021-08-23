@@ -10,6 +10,8 @@ export class UsersStateModel {
   public users: User[] = [];
   public usersFetched = false;
   public roles: Role[] = [];
+  public rolesFetched = false;
+  public rolesLoading: DataLoading = { type: DataLoadingState.init };
   public usersLoading: DataLoading = { type: DataLoadingState.init };
   public invites: User[] = [];
   public invitesFetched = false;
@@ -20,6 +22,8 @@ const defaults: UsersStateModel = {
   users: [],
   usersFetched: false,
   roles: [],
+  rolesFetched: false,
+  rolesLoading: { type: DataLoadingState.init },
   usersLoading: { type: DataLoadingState.init },
   invites: [],
   invitesFetched: false,
@@ -35,6 +39,13 @@ export class UsersState {
   @Selector()
   static roles(state: UsersStateModel) {
     return state.roles;
+  }
+  @Selector()
+  static rolesLoading(state: UsersStateModel) {
+    if (state.rolesFetched && state.rolesLoading.type !== DataLoadingState.error) {
+      return { type: DataLoadingState.success };
+    }
+    return state.rolesLoading;
   }
   @Selector()
   static usersLoading(state: UsersStateModel) {
@@ -63,12 +74,24 @@ export class UsersState {
 
   @Action(UsersAction.GetRoles)
   getRoles({ patchState }: StateContext<UsersStateModel>) {
+    patchState({
+      rolesLoading: { type: DataLoadingState.loading },
+    });
     return this.userService.getAllRoles().pipe(
-      tap((data) => {
-        patchState({
-          roles: data,
-        });
-      }),
+      tap(
+        (data) => {
+          patchState({
+            roles: data,
+            rolesLoading: { type: DataLoadingState.success },
+            rolesFetched: true,
+          });
+        },
+        () => {
+          patchState({
+            rolesLoading: { type: DataLoadingState.error },
+          });
+        },
+      ),
     );
   }
   @Action(UsersAction.InviteUser)

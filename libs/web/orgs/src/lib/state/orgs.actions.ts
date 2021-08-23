@@ -5,9 +5,13 @@ export namespace OrgsAction {
     static readonly type = '[Orgs] Add org';
     constructor(public payload: OrganizationRequest) {}
   }
+
+  export class Update {
+    static readonly type = '[Orgs] Update Org';
+    constructor(public id: string, public payload: OrganizationRequest) {}
+  }
   export class GetAll {
     static readonly type = '[Orgs] Get All';
-    constructor() {}
   }
 
   export class UpdateMembers {

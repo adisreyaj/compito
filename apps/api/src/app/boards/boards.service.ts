@@ -11,6 +11,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
+import { USER_BASIC_DETAILS } from '../task/task.config';
 import { GET_SINGLE_BOARD_SELECT } from './boards.config';
 
 @Injectable()
@@ -150,6 +151,28 @@ export class BoardsService {
         },
         select: {
           ...GET_SINGLE_BOARD_SELECT,
+          tasks: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              assignees: {
+                select: USER_BASIC_DETAILS,
+              },
+
+              comments: {
+                select: { id: true },
+              },
+              priority: true,
+              board: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              list: true,
+            },
+          },
           project: {
             select: {
               id: true,

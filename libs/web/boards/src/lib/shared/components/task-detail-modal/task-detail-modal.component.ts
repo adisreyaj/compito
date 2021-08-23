@@ -1,125 +1,26 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { BoardList, CardEvent, Task, User } from '@compito/api-interfaces';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
+import { BoardList, CardEvent, DataLoading, DataLoadingState, Task, User, UserDetails } from '@compito/api-interfaces';
 import { UserAvatarGroupData, userMapToArray } from '@compito/web/ui';
 import { DialogRef } from '@ngneat/dialog';
 import { Store } from '@ngxs/store';
 import produce from 'immer';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { BoardsService } from '../../../boards.service';
 import { BoardsAction } from '../../../state/boards.actions';
 @Component({
   selector: 'compito-task-detail-modal',
-  template: `
-    <div class="p-4 flex flex-col">
-      <header class="mb-4">
-        <div>
-          <p class="font-medium text-gray-600 text-lg">{{ ref.data.task?.title }}</p>
-        </div>
-        <div class="text-xs text-gray-500 flex items-center space-x-4 py-2">
-          <p>
-            List: <span class="text-gray-800 text-sm">{{ ref.data.list?.name }}</span>
-          </p>
-          <p>
-            Created By: <span class="text-gray-800 text-sm">{{ ref.data.task?.createdBy?.firstName }}</span>
-          </p>
-          <p>
-            Created: <span class="text-gray-800 text-sm">{{ ref.data.task?.createdAt | timeAgo }}</span>
-          </p>
-        </div>
-      </header>
-      <div>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Assignees' }"></ng-container>
-          <div class="flex items-center">
-            <compito-user-avatar-group [data]="assignedUsers$ | async"></compito-user-avatar-group>
-            <div [style.height.px]="48" [style.width.px]="48" class="p-1">
-              <button
-                type="button"
-                class="btn btn--primary rounded-full outline-none w-full h-full bg-primary-gradient cursor-pointer flex justify-center items-center text-white"
-                [style.marginLeft.rem]="0.3"
-                [tippy]="addAssignees"
-                [zIndex]="9999"
-                placement="bottom-start"
-                variation="menu"
-              >
-                <rmx-icon name="add-line"></rmx-icon>
-              </button>
-            </div>
-          </div>
-        </section>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Priority' }"></ng-container>
-          <div class="form-group">
-            <select name="priority" id="priority" [formControl]="priority">
-              <ng-container *ngFor="let priority of priorities | async">
-                <option [value]="priority">{{ priority }}</option>
-              </ng-container>
-            </select>
-          </div>
-        </section>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
-          <div class="form-group">
-            <textarea class="w-3/4" type="text" id="description" rows="3" [formControl]="description"></textarea>
-            <footer class="mt-4 flex items-center space-x-2">
-              <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
-              <button btn size="sm" variant="secondary" *ngIf="description.dirty">Cancel</button>
-            </footer>
-          </div>
-        </section>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Attachments' }"></ng-container>
-          <p>No attachments found</p>
-        </section>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
-          <ul>
-            <li>
-              <div class="flex items-start space-x-4">
-                <div>
-                  <img [src]="" [alt]="" width="30" height="30" class="rounded-full" />
-                </div>
-                <div class="form-group">
-                  <textarea class="w-3/4" type="text" id="comment" [formControl]="comment" rows="2"></textarea>
-                  <footer class="mt-4 flex items-center space-x-2">
-                    <button btn size="sm" [disabled]="!comment.dirty">Save</button>
-                    <button btn size="sm" variant="secondary" *ngIf="comment.dirty">Cancel</button>
-                  </footer>
-                </div>
-              </div>
-            </li>
-            <ng-container *ngFor="let comment of ref.data.task?.comments">
-              <li>
-                <div class="flex items-start space-x-4">
-                  <div>
-                    <img [src]="comment.createdBy.image" [alt]="comment.createdBy.firstName" />
-                  </div>
-                  <div>
-                    <p>{{ comment.content }}</p>
-                  </div>
-                </div>
-              </li>
-            </ng-container>
-          </ul>
-        </section>
-      </div>
-    </div>
-
-    <ng-template #sectionHeader let-title>
-      <h4 class="text-gray-500 text-md font-medium mb-2">{{ title }}</h4>
-    </ng-template>
-
-    <ng-template #addAssignees let-hide>
-      <compito-user-select
-        [hide]="hide"
-        [users]="ref.data.users$ | async"
-        [selectedMembers]="selectedAssignees"
-        (clicked)="handleUserSelectEvent($event, hide)"
-      ></compito-user-select>
-    </ng-template>
-  `,
+  templateUrl: './task-detail-modal.component.html',
   styles: [
     `
       .task-detail {
@@ -142,38 +43,55 @@ import { BoardsAction } from '../../../state/boards.actions';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TaskDetailModalComponent implements OnInit {
+export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   selectedAssignees = new Map<string, User>();
   assignedUsersSubject = new BehaviorSubject<UserAvatarGroupData[]>([]);
   assignedUsers$ = this.assignedUsersSubject.asObservable();
 
   description = new FormControl('Default description');
   priority = new FormControl('');
-  comment = new FormControl('');
+  comment = new FormControl('', [Validators.minLength(2)]);
   initialValues = {
     description: '',
   };
 
+  taskDetail: Task | null = null;
+  isScrolledSubject = new BehaviorSubject(false);
+  loadingState$ = new BehaviorSubject<DataLoading>({ type: DataLoadingState.init });
+  @ViewChild('contentContainer') contentContainer: ElementRef<HTMLDivElement> | null = null;
+
   constructor(
     public ref: DialogRef<{
-      task: Task;
+      taskId: string;
       list: BoardList;
+      user$: Observable<UserDetails | null>;
       users$: Observable<User[]>;
       priorities$: Observable<string[]>;
     }>,
     private store: Store,
     private cdr: ChangeDetectorRef,
+    private boardService: BoardsService,
   ) {}
 
   ngOnInit(): void {
-    const assignees = this.ref.data?.task?.assignees ?? [];
-    this.description.setValue(this.ref.data.task.description ?? '');
-    this.priority.setValue(this.ref.data.task.priority ?? '');
-    this.initialValues.description = this.ref.data.task.description ?? '';
-    assignees.forEach((assignee) => {
-      this.selectedAssignees.set(assignee.id, assignee);
-    });
-    this.assignedUsersSubject.next(userMapToArray(this.selectedAssignees));
+    this.loadingState$.next({ type: DataLoadingState.loading });
+    this.boardService.getTask(this.ref.data?.taskId).subscribe(
+      (task) => {
+        this.taskDetail = task;
+        const assignees = task?.assignees ?? [];
+        this.description.setValue(task.description ?? '');
+        this.priority.setValue(task.priority ?? '');
+        this.initialValues.description = task.description ?? '';
+        assignees.forEach((assignee) => {
+          this.selectedAssignees.set(assignee.id, assignee);
+        });
+        this.assignedUsersSubject.next(userMapToArray(this.selectedAssignees));
+        this.loadingState$.next({ type: DataLoadingState.success });
+      },
+      () => {
+        this.loadingState$.next({ type: DataLoadingState.success });
+      },
+    );
     this.priority.valueChanges
       .pipe(
         switchMap((priority) =>
@@ -181,6 +99,14 @@ export class TaskDetailModalComponent implements OnInit {
         ),
       )
       .subscribe();
+  }
+  ngAfterViewInit() {
+    if (this.contentContainer) {
+      this.contentContainer.nativeElement.addEventListener('scroll', (event: Event) => {
+        const { scrollTop } = event.target as HTMLDivElement;
+        this.isScrolledSubject.next(scrollTop > 50);
+      });
+    }
   }
 
   updateAssignees() {
@@ -206,6 +132,10 @@ export class TaskDetailModalComponent implements OnInit {
     this.description.setValue(this.initialValues.description);
     this.description.markAsPristine();
   }
+  clearCommentField() {
+    this.comment.setValue('');
+    this.comment.markAsPristine();
+  }
 
   toggleAssignee(user: User) {
     if (this.selectedAssignees.has(user.id)) {
@@ -215,6 +145,18 @@ export class TaskDetailModalComponent implements OnInit {
     } else {
       this.selectedAssignees = produce(this.selectedAssignees, (draft) => {
         draft.set(user.id, user);
+      });
+    }
+  }
+
+  addComment() {
+    if (this.comment.valid) {
+      this.boardService.addComment(this.taskId, this.comment.value).subscribe((data) => {
+        this.taskDetail = produce(this.taskDetail, (draft) => {
+          draft?.comments.push(data);
+        });
+        this.clearCommentField();
+        this.cdr.markForCheck();
       });
     }
   }
@@ -235,7 +177,7 @@ export class TaskDetailModalComponent implements OnInit {
   }
 
   private get taskId() {
-    return this.ref.data.task.id;
+    return this.taskDetail?.id as string;
   }
   private get listId() {
     return this.ref.data.list.id;

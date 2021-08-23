@@ -30,7 +30,7 @@ import { UserAvatarGroupData } from '../../user-avatar-group';
           </div>
           <div class="flex items-center space-x-1">
             <rmx-icon class="icon-xs" name="attachment-2"></rmx-icon>
-            <p>7</p>
+            <p>0</p>
           </div>
         </div>
       </footer>

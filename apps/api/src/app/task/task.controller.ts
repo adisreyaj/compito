@@ -40,7 +40,7 @@ export class TaskController {
   @Get('my')
   findMyTasks(@Query() query: RequestParams & { [key: string]: string }, @Req() req: RequestWithUser) {
     const { userId } = getUserDetails(req.user);
-    let where: Prisma.TaskWhereInput = {
+    const where: Prisma.TaskWhereInput = {
       assignees: {
         some: {
           id: userId,
@@ -63,6 +63,14 @@ export class TaskController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() task: TaskRequest, @Req() req: RequestWithUser) {
     return this.taskService.update(id, task, req.user);
+  }
+
+  @UseGuards(RolesGuard, PermissionsGuard)
+  @Role('user')
+  @Permissions(PERMISSIONS.task.update)
+  @Post(':id/comments')
+  addComment(@Param('id') id: string, @Body() data: { content: string }, @Req() req: RequestWithUser) {
+    return this.taskService.addComment(id, data.content, req.user);
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)

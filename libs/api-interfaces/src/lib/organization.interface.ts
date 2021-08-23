@@ -13,7 +13,7 @@ export interface Organization extends OrganizationBase, DocDates {
   projects: Project[];
   userRoleOrg: any[];
   createdBy?: User;
-  createdById: string;
+  createdById?: string;
 }
 export interface OrganizationRequest extends OrganizationBase {
   createdById: string;
