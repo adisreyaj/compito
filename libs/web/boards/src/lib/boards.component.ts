@@ -2,7 +2,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { Board, BoardList, BoardListWithTasks, DataLoading, Task, User } from '@compito/api-interfaces';
+import { Board, BoardList, BoardListWithTasks, DataLoading, Task, User, UserDetails } from '@compito/api-interfaces';
 import { Breadcrumb, formatUser, TasksCreateModalComponent } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
@@ -104,6 +104,8 @@ export class BoardsComponent implements OnInit {
 
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
+
+  loggedInUser$: Observable<UserDetails | null> = this.auth.user$.pipe(formatUser());
 
   constructor(
     private dialog: DialogService,
@@ -211,9 +213,10 @@ export class BoardsComponent implements OnInit {
     const ref = this.dialog.open(TaskDetailModalComponent, {
       size: 'lg',
       data: {
-        task,
+        taskId: task.id,
         list,
         users$: this.users$,
+        user$: this.loggedInUser$,
         priorities$: this.priorities$,
       },
     });

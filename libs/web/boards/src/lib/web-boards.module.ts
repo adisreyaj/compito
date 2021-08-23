@@ -13,6 +13,7 @@ import {
   UserSelectModule,
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
+import { ShimmerModule } from '@sreyaj/ng-shimmer';
 import { BoardsComponent } from './boards.component';
 import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
 @NgModule({
@@ -39,6 +40,7 @@ import { TaskDetailModalComponent } from './shared/components/task-detail-modal/
     TimeAgoModule,
     TaskSharedModule,
     UserSelectModule,
+    ShimmerModule,
   ],
   declarations: [BoardsComponent, TaskDetailModalComponent],
 })

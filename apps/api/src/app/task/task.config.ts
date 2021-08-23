@@ -21,7 +21,17 @@ export const GET_SINGLE_TASK_SELECT: Prisma.TaskSelect = {
     },
   },
   list: true,
-  comments: true,
+  comments: {
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      createdBy: {
+        select: USER_BASIC_DETAILS,
+      },
+      reactions: true,
+    },
+  },
   assignedBy: { select: USER_BASIC_DETAILS },
   org: {
     select: {
