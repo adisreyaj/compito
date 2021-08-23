@@ -17,9 +17,19 @@
     ·
     <a href="https://github.com/adisreyaj/compito/issues">Request Feature</a>
   </p>
+
+  <p align="center">
+   <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white">
+   <img src="https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white">
+   <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white">
+   <img src="https://img.shields.io/badge/auth0-%23eb5424.svg?style=for-the-badge&logo=auth0&logoColor=white">
+   <img src="https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white">
+   <img src="https://img.shields.io/badge/prisma-%231a202c.svg?style=for-the-badge&logo=prisma&logoColor=white">
+   <img src="https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white">
+  </p>
 </p>
 
-<!-- ABOUT THE PROJECT -->
+<!-- ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Angular](https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white) ![Auth0](https://img.shields.io/badge/auth0-%23eb5424.svg?style=for-the-badge&logo=auth0&logoColor=white) ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Prisma](https://img.shields.io/badge/prisma-%231a202c.svg?style=for-the-badge&logo=prisma&logoColor=white) -->
 
 ## About The Project
 
