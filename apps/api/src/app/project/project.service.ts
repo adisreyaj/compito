@@ -285,6 +285,7 @@ export class ProjectService {
               boards: true,
               orgId: true,
             },
+            rejectOnNotFound: true,
           });
         } catch (error) {
           if (error?.name === 'NotFoundError') {
