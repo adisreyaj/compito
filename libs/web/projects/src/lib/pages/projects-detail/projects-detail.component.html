@@ -11,7 +11,7 @@
             <ng-container *ngTemplateOutlet="addBoard"></ng-container>
           </ng-container>
           <ng-container *ngFor="let board of (projectDetails$ | async)?.boards">
-            <compito-boards-card [data]="board"></compito-boards-card>
+            <compito-boards-card [data]="board" (clicked)="handleBoardCardEvents($event, board)"></compito-boards-card>
           </ng-container>
         </div>
       </ng-container>
@@ -81,7 +81,7 @@
 </ng-template>
 
 <ng-template #addBoard>
-  <article (click)="addNewBoard()"
+  <article (click)="openCreateBoardModal()"
            class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
            style="min-height: 112px;">
     <div class="flex items-center space-x-2 text-gray-500">

@@ -39,4 +39,7 @@ export class ProjectsService {
   createBoard(data: BoardRequest) {
     return this.http.post<Board>(this.boardsApi, data);
   }
+  updateBoard(id: string, data: Partial<BoardRequest>) {
+    return this.http.patch<Board>(`${this.boardsApi}/${id}`, data);
+  }
 }

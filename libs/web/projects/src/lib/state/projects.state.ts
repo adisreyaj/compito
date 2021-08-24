@@ -84,6 +84,24 @@ export class ProjectsState {
     );
   }
 
+  @Action(ProjectsAction.UpdateBoard)
+  updateBoard({ patchState, getState }: StateContext<ProjectsStateModel>, { id, payload }: ProjectsAction.UpdateBoard) {
+    return this.projectService.updateBoard(id, payload).pipe(
+      tap((data) => {
+        const { projectDetail } = getState();
+        const projectDetailUpdated = produce(projectDetail, (draft) => {
+          if (draft) {
+            const boardIndex = draft.boards.findIndex(({ id }) => id === id);
+            if (boardIndex >= 0) {
+              draft.boards[boardIndex] = data;
+            }
+          }
+        });
+        patchState({ projectDetail: projectDetailUpdated });
+      }),
+    );
+  }
+
   @Action(ProjectsAction.GetAll)
   getAll({ patchState }: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.GetAll) {
     patchState({
