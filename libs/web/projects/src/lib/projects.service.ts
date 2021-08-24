@@ -24,6 +24,9 @@ export class ProjectsService {
   update(id: string, data: ProjectRequest) {
     return this.http.patch<Project>(`${this.api}/${id}`, data);
   }
+  delete(id: string) {
+    return this.http.delete<Project>(`${this.api}/${id}`);
+  }
 
   getAll() {
     return this.http.get<MultiDocPayload<Project>>(this.api);

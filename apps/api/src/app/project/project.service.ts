@@ -1,5 +1,6 @@
 import { ProjectRequest, RequestParams, Role, Roles, UpdateMembersRequest, UserPayload } from '@compito/api-interfaces';
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -268,18 +269,37 @@ export class ProjectService {
   }
 
   async remove(id: string, user: UserPayload) {
-    const { role, userId, projects } = getUserDetails(user);
+    const { role, org } = getUserDetails(user);
     switch (role.name as Roles) {
       case 'user':
       case 'project-admin':
         throw new ForbiddenException('No permission to delete the project');
-      case 'super-admin':
-        break;
-      default:
-        if (!projects.includes(id)) {
+      default: {
+        let project;
+        try {
+          project = await this.prisma.project.findUnique({
+            where: {
+              id,
+            },
+            select: {
+              boards: true,
+              orgId: true,
+            },
+          });
+        } catch (error) {
+          if (error?.name === 'NotFoundError') {
+            throw new NotFoundException('Project not found');
+          }
+          throw new InternalServerErrorException('Failed to delete project');
+        }
+        if (project.orgId !== org.id) {
           throw new ForbiddenException('No permission to delete the project');
         }
+        if (project.boards.length > 0) {
+          throw new ConflictException('Cannot delete project as it contains boards.');
+        }
         break;
+      }
     }
     try {
       const project = await this.prisma.project.delete({

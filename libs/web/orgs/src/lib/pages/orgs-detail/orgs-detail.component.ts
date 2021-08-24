@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { CardEvent, DataLoading, Organization, User } from '@compito/api-interfaces';
+import { ActivatedRoute } from '@angular/router';
+import { CardEvent, DataLoading, Organization, Project, User } from '@compito/api-interfaces';
 import { ProjectsCreateModalComponent } from '@compito/web/projects';
 import { ProjectsAction } from '@compito/web/projects/state';
-import { Breadcrumb } from '@compito/web/ui';
+import { Breadcrumb, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, of, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { OrgsAction } from '../../state/orgs.actions';
 import { OrgsState } from '../../state/orgs.state';
 @Component({
@@ -49,7 +50,7 @@ export class OrgsDetailComponent implements OnInit {
     private dialog: DialogService,
     private store: Store,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -83,13 +84,63 @@ export class OrgsDetailComponent implements OnInit {
     this.store.dispatch(new OrgsAction.UpdateMembers(this.orgId, { type: 'set', set: members }));
   }
 
-  addNewProject() {
-    const ref = this.dialog.open(ProjectsCreateModalComponent);
-    ref.afterClosed$.subscribe((data) => {
-      if (data) {
-        this.store.dispatch(new ProjectsAction.Add(data));
-      }
+  openProjectModal(initialData: any = null, isUpdateMode = false) {
+    const ref = this.dialog.open(ProjectsCreateModalComponent, {
+      data: {
+        initialData,
+        isUpdateMode,
+        users$: this.users$,
+      },
     });
+    ref.afterClosed$
+      .pipe(
+        switchMap((data) => {
+          if (data) {
+            const action = isUpdateMode
+              ? this.store.dispatch(new ProjectsAction.Update(initialData.id, data))
+              : this.store.dispatch(new ProjectsAction.Add(data));
+            action.pipe(
+              // Reopen the modal with the filled data if fails
+              catchError(() => {
+                this.openProjectModal(data);
+                this.toast.error('Failed to create project!');
+                return throwError(new Error('Failed to create project!'));
+              }),
+            );
+          }
+          return of(null);
+        }),
+      )
+      .subscribe();
+  }
+
+  handleProjectCardEvents({ type, payload }: CardEvent, project: Project) {
+    switch (type) {
+      case 'edit': {
+        const data = {
+          id: project.id,
+          name: project.name,
+          description: project.description,
+          members: project.members.map(({ id }) => id),
+        };
+        this.openProjectModal(data, true);
+        break;
+      }
+      case 'delete': {
+        this.store
+          .dispatch(new ProjectsAction.Delete(project.id))
+          .pipe(
+            catchError((error) => {
+              this.toast.error(error?.error?.message ?? 'Failed to delete project');
+              return EMPTY;
+            }),
+          )
+          .subscribe();
+        break;
+      }
+      default:
+        break;
+    }
   }
 
   handleUserSelectEvent({ type, payload }: CardEvent) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { append, patch, updateItem } from '@ngxs/store/operators';
+import { append, patch, removeItem, updateItem } from '@ngxs/store/operators';
 import produce from 'immer';
 import { tap } from 'rxjs/operators';
 import { ProjectsService } from '../projects.service';
@@ -69,6 +69,28 @@ export class ProjectsState {
       tap((project) => {
         setState(patch({ projects: updateItem<Project>((item) => item?.id === id, project) }));
       }),
+    );
+  }
+  @Action(ProjectsAction.Delete)
+  delete({ setState, getState }: StateContext<ProjectsStateModel>, { id }: ProjectsAction.Delete) {
+    const projects = getState().projects;
+    const project = projects.find(({ id }) => id === id);
+    if (project) {
+      setState(patch({ projects: removeItem<Project>((item) => item?.id === id) }));
+    }
+    return this.projectService.delete(id).pipe(
+      tap(
+        () => {
+          return;
+        },
+        () => {
+          setState(
+            patch({
+              projects,
+            }),
+          );
+        },
+      ),
     );
   }
   @Action(ProjectsAction.AddBoard)

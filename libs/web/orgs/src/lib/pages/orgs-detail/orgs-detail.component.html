@@ -8,7 +8,8 @@
         <div class="orgs__list">
           <ng-container *ngTemplateOutlet="addProject"></ng-container>
           <ng-container *ngFor="let project of (orgDetails$ | async)?.projects">
-            <compito-project-card [data]="project"></compito-project-card>
+            <compito-project-card [data]="project" (clicked)="handleProjectCardEvents($event, project)">
+            </compito-project-card>
           </ng-container>
         </div>
       </ng-container>
@@ -85,7 +86,7 @@
 
 
 <ng-template #addProject>
-  <article (click)="addNewProject()"
+  <article (click)="openProjectModal()"
            class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
            style="min-height: 112px;">
     <div class="flex items-center space-x-2 text-gray-500">
