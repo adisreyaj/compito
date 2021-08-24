@@ -45,4 +45,7 @@ export class ProjectsService {
   updateBoard(id: string, data: Partial<BoardRequest>) {
     return this.http.patch<Board>(`${this.boardsApi}/${id}`, data);
   }
+  deleteBoard(id: string) {
+    return this.http.delete<Board>(`${this.boardsApi}/${id}`);
+  }
 }

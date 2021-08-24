@@ -6,7 +6,7 @@ import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
-import { Observable, throwError } from 'rxjs';
+import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, withLatestFrom } from 'rxjs/operators';
 import { BoardCreateModalComponent } from '../../shared/components/board-create-modal/board-create-modal.component';
 import { ProjectsAction } from '../../state/projects.actions';
@@ -136,7 +136,7 @@ export class ProjectsDetailComponent implements OnInit {
     }
   }
 
-  handleBoardCardEvents({ type, payload }: CardEvent, board: Board) {
+  handleBoardCardEvents({ type }: CardEvent, board: Board) {
     switch (type) {
       case 'edit': {
         const data = {
@@ -147,7 +147,17 @@ export class ProjectsDetailComponent implements OnInit {
         this.openCreateBoardModal(data, true);
         break;
       }
-
+      case 'delete':
+        this.store
+          .dispatch(new ProjectsAction.DeleteBoard(board.id))
+          .pipe(
+            catchError((error) => {
+              this.toast.error(error?.error?.message ?? 'Failed to delete board');
+              return EMPTY;
+            }),
+          )
+          .subscribe();
+        break;
       default:
         break;
     }
