@@ -1,11 +1,17 @@
 import { OrganizationRequest, RequestParams, RequestWithUser, UpdateMembersRequest } from '@compito/api-interfaces';
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { PERMISSIONS } from 'apps/api/src/app/core/config/permissions.config';
-import { Permissions } from 'apps/api/src/app/core/decorators/permissions.decorator';
-import { PermissionsGuard } from 'apps/api/src/app/core/guards/permissions.guard';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards, UsePipes } from '@nestjs/common';
+import { PERMISSIONS } from '../core/config/permissions.config';
+import { Permissions } from '../core/decorators/permissions.decorator';
 import { Role } from '../core/decorators/roles.decorator';
+import { PermissionsGuard } from '../core/guards/permissions.guard';
 import { RolesGuard } from '../core/guards/roles.guard';
+import { JoiValidationPipe } from '../core/pipes/validation/validation.pipe';
 import { OrganizationService } from './organization.service';
+import {
+  createOrgValidationSchema,
+  updateMembersValidationSchema,
+  updateOrgValidationSchema,
+} from './organization.validation';
 
 @Controller('orgs')
 export class OrganizationController {
@@ -15,6 +21,7 @@ export class OrganizationController {
   @Role('admin')
   @Permissions(PERMISSIONS.org.create)
   @Post()
+  @UsePipes(new JoiValidationPipe(createOrgValidationSchema))
   create(@Body() organization: OrganizationRequest, @Req() req: RequestWithUser) {
     return this.organizationService.create(organization, req.user);
   }
@@ -37,6 +44,7 @@ export class OrganizationController {
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id/members')
+  @UsePipes(new JoiValidationPipe(updateMembersValidationSchema))
   updateMembers(@Param('id') id: string, @Body() data: UpdateMembersRequest, @Req() req: RequestWithUser) {
     return this.organizationService.updateMembers(id, data, req.user);
   }
@@ -45,6 +53,7 @@ export class OrganizationController {
   @Role('super-admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id')
+  @UsePipes(new JoiValidationPipe(updateOrgValidationSchema))
   update(@Param('id') id: string, @Body() organization: OrganizationRequest, @Req() req: RequestWithUser) {
     return this.organizationService.update(id, organization, req.user);
   }

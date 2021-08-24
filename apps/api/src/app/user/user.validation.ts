@@ -16,9 +16,9 @@ export const roleUpdateValidationSchema = object({
 });
 
 export const userUpdateValidationSchema = object({
-  image: string().optional(),
-  firstName: string().required().min(1).max(200).optional(),
-  lastName: string().required().min(1).max(200).optional(),
-  password: string().required().min(6).max(32),
-  newPassword: string().required().min(6).max(32),
-});
+  image: string(),
+  firstName: string().min(1).max(200).optional(),
+  lastName: string().min(1).max(200).optional(),
+  password: string().min(6).max(32),
+  newPassword: string().min(6).max(32),
+}).with('password', 'newPassword');
