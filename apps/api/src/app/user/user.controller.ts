@@ -10,7 +10,8 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { PERMISSIONS } from '../core/config/permissions.config';
@@ -19,7 +20,9 @@ import { Public } from '../core/decorators/public.decorator';
 import { Role } from '../core/decorators/roles.decorator';
 import { PermissionsGuard } from '../core/guards/permissions.guard';
 import { RolesGuard } from '../core/guards/roles.guard';
+import { JoiValidationPipe } from '../core/pipes/validation/validation.pipe';
 import { UserService } from './user.service';
+import { roleUpdateValidationSchema, userSignupValidationSchema, userUpdateValidationSchema } from './user.validation';
 
 @Controller('users')
 export class UserController {
@@ -63,6 +66,7 @@ export class UserController {
 
   @Public()
   @Post('signup')
+  @UsePipes(new JoiValidationPipe(userSignupValidationSchema))
   signup(@Body() user: UserSignupRequest) {
     return this.userService.signup(user);
   }
@@ -70,12 +74,14 @@ export class UserController {
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.update)
   @Patch(':id/role')
-  updateRole(@Param('id') id: string, @Body() {roleId}: UserRequest, @Req() req: RequestWithUser) {
+  @UsePipes(new JoiValidationPipe(roleUpdateValidationSchema))
+  updateRole(@Param('id') id: string, @Body() { roleId }: UserRequest, @Req() req: RequestWithUser) {
     return this.userService.updateUserRole(id, roleId, req.user);
   }
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.update)
   @Patch(':id')
+  @UsePipes(new JoiValidationPipe(userUpdateValidationSchema))
   update(@Param('id') id: string, @Body() user: UserRequest, @Req() req: RequestWithUser) {
     return this.userService.updateUser(id, user, req.user);
   }

@@ -567,7 +567,7 @@ export class UserService {
     if (id !== userId) {
       throw new ForbiddenException('Not enough permissions to update the user details');
     }
-    const { password, newPassword, ...rest } = data;
+    const { password, newPassword, orgId, email, roleId, ...rest } = data;
     let dataToUpdate: Prisma.UserUpdateInput = { ...rest };
     if (password !== null && newPassword !== null) {
       if (password === newPassword) {
