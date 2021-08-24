@@ -7,7 +7,7 @@ import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { User } from '@prisma/client';
-import { Observable, of, throwError } from 'rxjs';
+import { EMPTY, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
 import { ProjectsAction } from './state/projects.actions';
@@ -139,7 +139,18 @@ export class ProjectsComponent implements OnInit {
         this.openProjectModal(data, true);
         break;
       }
-
+      case 'delete': {
+        this.store
+          .dispatch(new ProjectsAction.Delete(project.id))
+          .pipe(
+            catchError((error) => {
+              this.toast.error(error?.error?.message ?? 'Failed to delete project');
+              return EMPTY;
+            }),
+          )
+          .subscribe();
+        break;
+      }
       default:
         break;
     }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { append, patch, updateItem } from '@ngxs/store/operators';
+import { append, patch, removeItem, updateItem } from '@ngxs/store/operators';
 import produce from 'immer';
 import { tap } from 'rxjs/operators';
 import { ProjectsService } from '../projects.service';
@@ -71,6 +71,28 @@ export class ProjectsState {
       }),
     );
   }
+  @Action(ProjectsAction.Delete)
+  delete({ setState, getState }: StateContext<ProjectsStateModel>, { id }: ProjectsAction.Delete) {
+    const projects = getState().projects;
+    const project = projects.find(({ id }) => id === id);
+    if (project) {
+      setState(patch({ projects: removeItem<Project>((item) => item?.id === id) }));
+    }
+    return this.projectService.delete(id).pipe(
+      tap(
+        () => {
+          return;
+        },
+        () => {
+          setState(
+            patch({
+              projects,
+            }),
+          );
+        },
+      ),
+    );
+  }
   @Action(ProjectsAction.AddBoard)
   addBoard({ patchState, getState }: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.AddBoard) {
     return this.projectService.createBoard(payload).pipe(
@@ -78,6 +100,24 @@ export class ProjectsState {
         const { projectDetail } = getState();
         const projectDetailUpdated = produce(projectDetail, (draft) => {
           draft?.boards.push(data);
+        });
+        patchState({ projectDetail: projectDetailUpdated });
+      }),
+    );
+  }
+
+  @Action(ProjectsAction.UpdateBoard)
+  updateBoard({ patchState, getState }: StateContext<ProjectsStateModel>, { id, payload }: ProjectsAction.UpdateBoard) {
+    return this.projectService.updateBoard(id, payload).pipe(
+      tap((data) => {
+        const { projectDetail } = getState();
+        const projectDetailUpdated = produce(projectDetail, (draft) => {
+          if (draft) {
+            const boardIndex = draft.boards.findIndex(({ id }) => id === id);
+            if (boardIndex >= 0) {
+              draft.boards[boardIndex] = data;
+            }
+          }
         });
         patchState({ projectDetail: projectDetailUpdated });
       }),

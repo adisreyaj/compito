@@ -1,4 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
+import { config } from 'dotenv';
+config();
 const prisma = new PrismaClient();
 
 const ROLES_PERMISSIONS = [

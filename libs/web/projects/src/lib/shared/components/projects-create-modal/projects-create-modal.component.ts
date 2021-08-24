@@ -11,7 +11,7 @@ import { kebabCase } from 'voca';
   selector: 'compito-projects-create-modal',
   template: `
     <compito-modal
-      [title]="ref.data.isUpdateMode ? 'Update Project' : 'Create New Project'"
+      [title]="ref.data?.isUpdateMode ? 'Update Project' : 'Create New Project'"
       [ref]="ref"
       cdkTrapFocus
       cdkTrapFocusAutoCapture
@@ -52,7 +52,7 @@ import { kebabCase } from 'voca';
         <div class="flex justify-end space-x-4">
           <button btn type="button" variant="secondary" (click)="ref.close()">Close</button>
           <button btn type="submit" form="projectForm" variant="primary" [disabled]="projectForm.invalid">
-            {{ ref.data.isUpdateMode ? 'Update' : 'Create' }}
+            {{ ref.data?.isUpdateMode ? 'Update' : 'Create' }}
           </button>
         </div>
       </ng-template>

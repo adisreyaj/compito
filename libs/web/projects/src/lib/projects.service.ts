@@ -24,6 +24,9 @@ export class ProjectsService {
   update(id: string, data: ProjectRequest) {
     return this.http.patch<Project>(`${this.api}/${id}`, data);
   }
+  delete(id: string) {
+    return this.http.delete<Project>(`${this.api}/${id}`);
+  }
 
   getAll() {
     return this.http.get<MultiDocPayload<Project>>(this.api);
@@ -38,5 +41,8 @@ export class ProjectsService {
 
   createBoard(data: BoardRequest) {
     return this.http.post<Board>(this.boardsApi, data);
+  }
+  updateBoard(id: string, data: Partial<BoardRequest>) {
+    return this.http.patch<Board>(`${this.boardsApi}/${id}`, data);
   }
 }

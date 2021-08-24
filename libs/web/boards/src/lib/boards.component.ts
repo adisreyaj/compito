@@ -182,8 +182,8 @@ export class BoardsComponent implements OnInit {
     });
     ref.afterClosed$
       .pipe(
-        withLatestFrom(this.board$, this.auth.user$.pipe(formatUser())),
-        switchMap(([data, board, user]) => {
+        withLatestFrom(this.board$),
+        switchMap(([data, board]) => {
           if (data) {
             return this.store
               .dispatch(
@@ -192,7 +192,6 @@ export class BoardsComponent implements OnInit {
                   list: listId,
                   boardId: board?.id,
                   projectId: board?.project.id,
-                  orgId: user?.org,
                 }),
               )
               .pipe(

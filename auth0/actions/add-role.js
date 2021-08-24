@@ -39,12 +39,16 @@ exports.onExecutePostLogin = async (event, api) => {
     const namespace = event.secrets.CLAIM_NAMESPACE;
     if (event.authorization) {
       const org = orgs[0];
-      const role = roles[org];
+      const role = roles[org.id];
       api.accessToken.setCustomClaim(`${namespace}/role`, role);
       api.accessToken.setCustomClaim(`${namespace}/projects`, projects);
       api.accessToken.setCustomClaim(`${namespace}/org`, org);
       api.accessToken.setCustomClaim(`${namespace}/userId`, userId);
       api.accessToken.setCustomClaim(`${namespace}/email`, event.user.email);
+      api.idToken.setCustomClaim(`${namespace}/role`, role);
+      api.idToken.setCustomClaim(`${namespace}/projects`, projects);
+      api.idToken.setCustomClaim(`${namespace}/org`, org);
+      api.idToken.setCustomClaim(`${namespace}/userId`, userId);
     }
   } catch (e) {
     return api.access.deny(`Something went wrong`);
@@ -90,6 +94,10 @@ exports.onContinuePostLogin = async (event, api) => {
       api.accessToken.setCustomClaim(`${namespace}/org`, org);
       api.accessToken.setCustomClaim(`${namespace}/userId`, userId);
       api.accessToken.setCustomClaim(`${namespace}/email`, event.user.email);
+      api.idToken.setCustomClaim(`${namespace}/role`, role);
+      api.idToken.setCustomClaim(`${namespace}/projects`, projects);
+      api.idToken.setCustomClaim(`${namespace}/org`, org);
+      api.idToken.setCustomClaim(`${namespace}/userId`, userId);
     }
   } catch (error) {
     return api.access.deny(`Something went wrong`);

@@ -6,7 +6,12 @@ import { defaultLists } from '../../../config/boards.config';
 @Component({
   selector: 'compito-board-create-modal',
   template: `
-    <compito-modal title="Add New Board" [ref]="ref" cdkTrapFocus cdkTrapFocusAutoCapture>
+    <compito-modal
+      [title]="ref.data.isUpdateMode ? 'Update Board' : 'Create New Board'"
+      [ref]="ref"
+      cdkTrapFocus
+      cdkTrapFocusAutoCapture
+    >
       <section>
         <form [formGroup]="boardForm" id="boardForm" class="max-w-xl" (ngSubmit)="handleFormSubmit()">
           <div class="form-group">
@@ -23,7 +28,9 @@ import { defaultLists } from '../../../config/boards.config';
       <ng-template compitoModalActions>
         <div class="flex justify-end space-x-4">
           <button btn type="button" variant="secondary" (click)="ref.close()">Close</button>
-          <button btn type="submit" form="boardForm" variant="primary" [disabled]="boardForm.invalid">Create</button>
+          <button btn type="submit" form="boardForm" variant="primary" [disabled]="boardForm.invalid">
+            {{ ref.data.isUpdateMode ? 'Update' : 'Create' }}
+          </button>
         </div>
       </ng-template>
     </compito-modal>
@@ -37,6 +44,10 @@ export class BoardCreateModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    const initialData = this.ref.data?.initialData;
+    if (initialData) {
+      this.boardForm.patchValue(initialData);
+    }
   }
 
   handleFormSubmit() {

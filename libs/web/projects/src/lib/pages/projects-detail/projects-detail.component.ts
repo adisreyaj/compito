@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { CardEvent, DataLoading, Project, User } from '@compito/api-interfaces';
-import { Breadcrumb, formatUser } from '@compito/web/ui';
+import { Board, CardEvent, DataLoading, Project, User } from '@compito/api-interfaces';
+import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, withLatestFrom } from 'rxjs/operators';
 import { BoardCreateModalComponent } from '../../shared/components/board-create-modal/board-create-modal.component';
 import { ProjectsAction } from '../../state/projects.actions';
 import { ProjectsState } from '../../state/projects.state';
@@ -51,6 +51,7 @@ export class ProjectsDetailComponent implements OnInit {
     private store: Store,
     private activatedRoute: ActivatedRoute,
     private auth: AuthService,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -67,12 +68,29 @@ export class ProjectsDetailComponent implements OnInit {
     }
   }
 
-  addNewBoard() {
+  openCreateBoardModal(initialData: any | null = null, isUpdateMode = false) {
     if (this.projectId) {
-      const ref = this.dialog.open(BoardCreateModalComponent);
+      const ref = this.dialog.open(BoardCreateModalComponent, {
+        data: {
+          initialData,
+          isUpdateMode,
+        },
+      });
       ref.afterClosed$.pipe(withLatestFrom(this.auth.user$.pipe(formatUser()))).subscribe(([data, user]) => {
         if (data) {
-          this.store.dispatch(new ProjectsAction.AddBoard({ ...data, projectId: this.projectId, orgId: user?.org }));
+          const action = isUpdateMode
+            ? this.store.dispatch(new ProjectsAction.UpdateBoard(initialData?.id, data))
+            : this.store.dispatch(
+                new ProjectsAction.AddBoard({ ...data, projectId: this.projectId, orgId: user?.org }),
+              );
+          action.pipe(
+            // Reopen the modal with the filled data if fails
+            catchError(() => {
+              this.openCreateBoardModal(data);
+              this.toast.error('Failed to create project!');
+              return throwError(new Error('Failed to create project!'));
+            }),
+          );
         }
       });
     }
@@ -114,6 +132,23 @@ export class ProjectsDetailComponent implements OnInit {
       case 'save':
         this.updateMembers();
         hide();
+        break;
+    }
+  }
+
+  handleBoardCardEvents({ type, payload }: CardEvent, board: Board) {
+    switch (type) {
+      case 'edit': {
+        const data = {
+          id: board.id,
+          name: board.name,
+          description: board.description,
+        };
+        this.openCreateBoardModal(data, true);
+        break;
+      }
+
+      default:
         break;
     }
   }

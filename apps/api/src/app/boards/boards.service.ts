@@ -1,13 +1,8 @@
 import { BoardRequest, RequestParams, Role, Roles, UserPayload } from '@compito/api-interfaces';
-import {
-  ForbiddenException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { CompitoLogger } from '../core/utils/logger.util';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
@@ -16,13 +11,14 @@ import { GET_SINGLE_BOARD_SELECT } from './boards.config';
 
 @Injectable()
 export class BoardsService {
-  private logger = new Logger('BOARD');
+  private logger = new CompitoLogger('BOARD');
   constructor(private prisma: PrismaService) {}
 
   async create(data: BoardRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
     switch (role.name as Roles) {
       case 'user':
+        this.logger.error('board', 'create', 'User role cannot create board');
         throw new ForbiddenException('No permission to create board');
       case 'project-admin': {
         try {
@@ -41,25 +37,25 @@ export class BoardsService {
           });
           const userPartOfProject = projectData?.members.length > 0;
           if (!userPartOfProject) {
+            this.logger.error('board', 'create', 'User is not part of the project');
             throw new ForbiddenException('No permission to create board');
           }
         } catch (error) {
           if (error?.name === 'NotFoundError') {
+            this.logger.error('board', 'create', 'Project not found');
             throw new NotFoundException('Project not found');
           }
         }
         break;
       }
       default: {
-        if (data.orgId !== org.id) {
-          throw new ForbiddenException('No permission to create board');
-        }
         break;
       }
     }
     try {
       const boardData: Prisma.BoardUncheckedCreateInput = {
         ...data,
+        orgId: org.id,
         lists: data.lists as any[],
         createdById: userId,
       };
@@ -68,7 +64,7 @@ export class BoardsService {
       });
       return board;
     } catch (error) {
-      this.logger.error('Failed to create board', error);
+      this.logger.error('board', 'create', 'Failed to create board', error);
       throw new InternalServerErrorException();
     }
   }
@@ -137,7 +133,6 @@ export class BoardsService {
         },
       };
     } catch (error) {
-      this.logger.error('Failed to fetch orgs', error);
       throw new InternalServerErrorException();
     }
   }
@@ -205,7 +200,6 @@ export class BoardsService {
       }
       throw new NotFoundException();
     } catch (error) {
-      this.logger.error('Failed to fetch board', error);
       throw new InternalServerErrorException();
     }
   }
@@ -236,7 +230,6 @@ export class BoardsService {
           throw new NotFoundException();
         }
       }
-      this.logger.error('Failed to update board', error);
       throw new InternalServerErrorException();
     }
   };
@@ -255,7 +248,6 @@ export class BoardsService {
       }
       throw new NotFoundException();
     } catch (error) {
-      this.logger.error('Failed to delete board', error);
       throw new InternalServerErrorException();
     }
   };
