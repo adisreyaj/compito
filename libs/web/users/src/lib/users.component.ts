@@ -18,11 +18,12 @@ import { UsersState } from './state/users.state';
     `
       .projects {
         &__container {
-          @apply pb-10 px-8;
+          @apply pb-10 px-4 md:px-8;
         }
         &__list {
           @apply pt-2;
-          @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4;
+          @apply grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         }
       }
     `,

@@ -16,7 +16,7 @@ import { ProjectsState } from './state/projects.state';
   selector: 'compito-projects',
   template: ` <compito-page-header title="Projects" [breadcrumbs]="breadcrumbs"> </compito-page-header>
     <section class="projects__container">
-      <div class="projects__list px-8">
+      <div class="projects__list px-4 md:px-8">
         <ng-container *ngIf="(usersLoading$ | async)?.type === 'SUCCESS'">
           <article
             *permission="'project:create'"
@@ -75,7 +75,8 @@ import { ProjectsState } from './state/projects.state';
         }
         &__list {
           @apply pt-8;
-          @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4;
+          @apply grid gap-4;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
       }
     `,

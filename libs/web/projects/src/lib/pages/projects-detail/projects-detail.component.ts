@@ -6,7 +6,7 @@ import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
-import { Observable, throwError } from 'rxjs';
+import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, withLatestFrom } from 'rxjs/operators';
 import { BoardCreateModalComponent } from '../../shared/components/board-create-modal/board-create-modal.component';
 import { ProjectsAction } from '../../state/projects.actions';
@@ -25,7 +25,9 @@ import { ProjectsState } from '../../state/projects.state';
         }
         &__list {
           @apply pt-2;
-          @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4;
+          /* @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4; */
+          @apply grid gap-4;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
       }
     `,
@@ -80,9 +82,7 @@ export class ProjectsDetailComponent implements OnInit {
         if (data) {
           const action = isUpdateMode
             ? this.store.dispatch(new ProjectsAction.UpdateBoard(initialData?.id, data))
-            : this.store.dispatch(
-                new ProjectsAction.AddBoard({ ...data, projectId: this.projectId, orgId: user?.org }),
-              );
+            : this.store.dispatch(new ProjectsAction.AddBoard({ ...data, projectId: this.projectId }));
           action.pipe(
             // Reopen the modal with the filled data if fails
             catchError(() => {
@@ -136,7 +136,7 @@ export class ProjectsDetailComponent implements OnInit {
     }
   }
 
-  handleBoardCardEvents({ type, payload }: CardEvent, board: Board) {
+  handleBoardCardEvents({ type }: CardEvent, board: Board) {
     switch (type) {
       case 'edit': {
         const data = {
@@ -147,7 +147,17 @@ export class ProjectsDetailComponent implements OnInit {
         this.openCreateBoardModal(data, true);
         break;
       }
-
+      case 'delete':
+        this.store
+          .dispatch(new ProjectsAction.DeleteBoard(board.id))
+          .pipe(
+            catchError((error) => {
+              this.toast.error(error?.error?.message ?? 'Failed to delete board');
+              return EMPTY;
+            }),
+          )
+          .subscribe();
+        break;
       default:
         break;
     }

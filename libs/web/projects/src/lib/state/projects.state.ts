@@ -124,6 +124,24 @@ export class ProjectsState {
     );
   }
 
+  @Action(ProjectsAction.DeleteBoard)
+  deleteBoard({ patchState, getState }: StateContext<ProjectsStateModel>, { id }: ProjectsAction.DeleteBoard) {
+    return this.projectService.deleteBoard(id).pipe(
+      tap(() => {
+        const { projectDetail } = getState();
+        const projectDetailUpdated = produce(projectDetail, (draft) => {
+          if (draft) {
+            const boardsRemaining = draft.boards.filter(({ id: boardId }) => boardId !== id);
+            if (boardsRemaining) {
+              draft.boards = boardsRemaining;
+            }
+          }
+        });
+        patchState({ projectDetail: projectDetailUpdated });
+      }),
+    );
+  }
+
   @Action(ProjectsAction.GetAll)
   getAll({ patchState }: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.GetAll) {
     patchState({

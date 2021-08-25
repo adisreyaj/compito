@@ -13,6 +13,9 @@ module.exports = {
         'primary-gradient': 'var(--primary-gradient)',
       },
     },
+    minHeight: {
+      2: '40px',
+    },
   },
   variants: {
     extend: {},

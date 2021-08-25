@@ -161,6 +161,9 @@ export class TaskService {
           assignees: {
             select: USER_BASIC_DETAILS,
           },
+          createdBy: {
+            select: USER_BASIC_DETAILS,
+          },
           comments: {
             select: {
               id: true,
@@ -237,6 +240,9 @@ export class TaskService {
         },
         data: taskData,
         include: {
+          createdBy: {
+            select: USER_BASIC_DETAILS,
+          },
           assignees: {
             select: {
               id: true,

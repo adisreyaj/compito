@@ -37,6 +37,13 @@ export class BoardsService {
     };
     return this.http.patch<Task>(`${this.tasksApi}/${taskId}`, data);
   }
+
+  updateTitle(taskId: string, title: string) {
+    const data: Pick<TaskRequest, 'title'> = {
+      title,
+    };
+    return this.http.patch<Task>(`${this.tasksApi}/${taskId}`, data);
+  }
   updatePriority(taskId: string, priority: string) {
     const data: Pick<TaskRequest, 'priority'> = {
       priority,

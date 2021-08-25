@@ -21,6 +21,11 @@ export namespace ProjectsAction {
     static readonly type = '[Projects] Update a board';
     constructor(public id: string, public payload: BoardRequest) {}
   }
+
+  export class DeleteBoard {
+    static readonly type = '[Projects] Delete board';
+    constructor(public id: string) {}
+  }
   export class UpdateMembers {
     static readonly type = '[Projects] Update members';
     constructor(public id: string, public payload: UpdateMembersRequest) {}

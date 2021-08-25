@@ -14,7 +14,7 @@ import { OrgsState } from './state/orgs.state';
   selector: 'compito-orgs',
   template: ` <compito-page-header title="Orgs" [breadcrumbs]="breadcrumbs"></compito-page-header>
     <section class="orgs__container" *ngIf="user$ | async as user">
-      <div class="orgs__list px-8">
+      <div class="orgs__list px-4 md:px-8">
         <article
           (click)="openProjectModal()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
@@ -63,7 +63,8 @@ import { OrgsState } from './state/orgs.state';
         }
         &__list {
           @apply pt-8;
-          @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4;
+          @apply grid gap-4;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
       }
     `,

@@ -3,17 +3,19 @@
     <ng-container *ngSwitchCase="'SUCCESS'">
       <header class="p-4" [class.shadow-lg]="isScrolledSubject | async">
         <div>
-          <p class="text-lg font-medium text-gray-600">{{ taskDetail?.title }}</p>
+          <p class="w-10/12 pl-2 -ml-2 text-lg font-medium text-gray-600 task-title line-clamp-1" contenteditable=""
+             [formControl]="title">
+            {{ taskDetail?.title }}</p>
         </div>
         <div class="flex items-center py-2 space-x-4 text-xs text-gray-500">
           <p>
-            List: <span class="text-sm text-gray-800">{{ ref.data.list?.name }}</span>
+            List: <span class="text-sm text-gray-600">{{ ref.data.list?.name }}</span>
           </p>
           <p>
-            Created By: <span class="text-sm text-gray-800">{{ taskDetail?.createdBy?.firstName }}</span>
+            Created By: <span class="text-sm text-gray-600">{{ taskDetail?.createdBy?.firstName }}</span>
           </p>
           <p>
-            Created: <span class="text-sm text-gray-800">{{ taskDetail?.createdAt | timeAgo }}</span>
+            Created: <span class="text-sm text-gray-600">{{ taskDetail?.createdAt | timeAgo }}</span>
           </p>
         </div>
       </header>
@@ -46,10 +48,6 @@
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
           <div class="form-group">
             <textarea class="w-full" type="text" id="description" rows="4" [formControl]="description"></textarea>
-            <footer class="flex items-center mt-4 space-x-2">
-              <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
-              <button btn size="sm" variant="secondary" *ngIf="description.dirty">Cancel</button>
-            </footer>
           </div>
         </section>
         <section class="task-detail__section">
@@ -76,7 +74,7 @@
               </div>
             </li>
             <ng-container *ngFor="let comment of taskDetail?.comments">
-              <li class="py-4 border-b last:mb-0 last:border-b-0">
+              <li class="py-4 border-b last:border-b-0">
                 <div class="flex items-start space-x-4">
                   <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
                        width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
@@ -90,7 +88,6 @@
             </ng-container>
           </ul>
         </section>
-        <div class="pb-8"></div>
       </div>
     </ng-container>
     <ng-container *ngSwitchCase="'LOADING'">
@@ -122,9 +119,6 @@
           <div class="form-group">
             <shimmer height="114px" width="100%" [rounded]="true"></shimmer>
           </div>
-          <footer class="flex items-center mt-1 space-x-2">
-            <shimmer height="30px" width="60px" [rounded]="true"></shimmer>
-          </footer>
         </section>
         <section class="task-detail__section">
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
@@ -143,7 +137,7 @@
               </div>
             </li>
             <ng-container *ngFor="let comment of taskDetail?.comments">
-              <li class="py-4 border-b last:mb-0 last:border-b-0">
+              <li class="py-4 border-b last:border-b-0">
                 <div class="flex items-start space-x-4">
                   <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
                        width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
@@ -157,7 +151,6 @@
             </ng-container>
           </ul>
         </section>
-        <div class="pb-8"></div>
       </div>
     </ng-container>
   </ng-container>

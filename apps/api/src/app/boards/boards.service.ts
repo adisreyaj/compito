@@ -1,5 +1,11 @@
 import { BoardRequest, RequestParams, Role, Roles, UserPayload } from '@compito/api-interfaces';
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { CompitoLogger } from '../core/utils/logger.util';
@@ -237,6 +243,30 @@ export class BoardsService {
   remove = async (id: string, user: UserPayload) => {
     const { role, userId, org } = getUserDetails(user);
     await canUpdateBoard(this.prisma, role, id, userId, org.id, 'delete');
+    let board;
+    try {
+      board = await this.prisma.board.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          tasks: true,
+          orgId: true,
+        },
+        rejectOnNotFound: true,
+      });
+    } catch (error) {
+      if (error?.name === 'NotFoundError') {
+        throw new NotFoundException('Board not found');
+      }
+      throw new InternalServerErrorException('Failed to delete Board');
+    }
+    if (board.orgId !== org.id) {
+      throw new ForbiddenException('No permission to delete the project');
+    }
+    if (board.tasks.length > 0) {
+      throw new ConflictException('Cannot delete project as it contains tasks.');
+    }
     try {
       const board = await this.prisma.board.delete({
         where: {

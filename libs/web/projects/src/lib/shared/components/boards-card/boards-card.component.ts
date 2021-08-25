@@ -23,7 +23,7 @@ import { Board, CardEvent } from '@compito/api-interfaces';
             {{ data?.name }}
           </p>
         </div>
-        <p class="text-gray-400 text-sm line-clamp-2">{{ data?.description }}</p>
+        <p class="text-gray-400 text-sm line-clamp-2 min-h-2">{{ data?.description }}</p>
       </header>
       <div class="my-4"></div>
       <footer class="flex items-center justify-between text-xs text-gray-400 mt-4">

@@ -4,7 +4,7 @@
     <ng-container *ngSwitchCase="'SUCCESS'">
       <ng-container *ngIf="(tasks$ | async) as tasks">
         <ng-container *ngIf="tasks.length > 0;else noData">
-          <div class="px-8 tasks__list">
+          <div class="px-4 md:px-8 tasks__list">
             <ng-container *ngFor="let task of tasks">
               <compito-my-task-card [data]="task"></compito-my-task-card>
             </ng-container>
@@ -13,7 +13,7 @@
       </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'LOADING'">
-      <div class="px-8 tasks__list">
+      <div class="px-4 md:px-8 tasks__list">
         <compito-loading-card height="110px">
           <div class="flex flex-col justify-between h-full">
             <header class="flex flex-col space-y-1">

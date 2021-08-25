@@ -137,6 +137,20 @@ export class BoardsState {
       }),
     );
   }
+  @Action(BoardsAction.UpdateTaskTitle)
+  updateTaskTitle(
+    { patchState, getState }: StateContext<BoardsStateModel>,
+    { title, taskId, listId }: BoardsAction.UpdateTaskTitle,
+  ) {
+    return this.boardService.updateTitle(taskId, title).pipe(
+      tap((data) => {
+        const { lists } = getState();
+        patchState({
+          lists: this.updateTaskInAList({ lists, listId, taskId, data, keyToUpdate: 'title' }),
+        });
+      }),
+    );
+  }
 
   @Action(BoardsAction.UpdateTaskPriority)
   updateTaskPriority(
