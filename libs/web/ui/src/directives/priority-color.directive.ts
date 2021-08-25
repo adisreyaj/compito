@@ -1,3 +1,5 @@
+/* eslint-disable @angular-eslint/directive-selector */
+
 import { CommonModule } from '@angular/common';
 import { Directive, HostBinding, Input, NgModule } from '@angular/core';
 import { Priority } from '@compito/api-interfaces';
@@ -13,7 +15,6 @@ export class PriorityColorDirective {
 
   @Input() class = '';
   @Input() priorityColor: Priority | null | string = null;
-  constructor() {}
 }
 
 @NgModule({

@@ -404,7 +404,7 @@ export class UserService {
         {
           let projects = [];
           try {
-            const user = await this.prisma.user.findUnique({
+            const userData = await this.prisma.user.findUnique({
               where: {
                 id: userId,
               },
@@ -416,7 +416,7 @@ export class UserService {
                 },
               },
             });
-            projects = user.projects.map(({ id }) => id);
+            projects = userData.projects.map(({ id }) => id);
           } catch (error) {
             this.logger.error('Failed to fetch user details');
             throw new InternalServerErrorException('Failed to fetch users');
@@ -548,14 +548,14 @@ export class UserService {
         break;
     }
     try {
-      const user = await this.prisma.user.findFirst({
+      const userData = await this.prisma.user.findFirst({
         where: whereCondition,
         select: { ...USER_BASIC_DETAILS, createdAt: true, updatedAt: true, orgs: { select: { id: true, name: true } } },
       });
-      if (!user) {
+      if (!userData) {
         throw new NotFoundException('User not found');
       }
-      return user;
+      return userData;
     } catch (error) {
       this.logger.error('Failed to fetch orgs', error);
       throw new InternalServerErrorException();
@@ -574,7 +574,7 @@ export class UserService {
         throw new BadRequestException('New password cannot be the same as your current password!');
       }
       try {
-        const user = await this.prisma.user.findUnique({
+        const userData = await this.prisma.user.findUnique({
           where: {
             id,
           },
@@ -583,12 +583,12 @@ export class UserService {
             password: true,
           },
         });
-        const passwordMatched = compareSync(password, user.password);
+        const passwordMatched = compareSync(password, userData.password);
         if (!passwordMatched) {
           this.logger.error(`Current password doesn't match`);
           throw new ForbiddenException(`Current password doesn't match`);
         }
-        const passwordUpdatedInAuth0 = this.updateUserPasswordInAuth0(user.email, newPassword);
+        const passwordUpdatedInAuth0 = this.updateUserPasswordInAuth0(userData.email, newPassword);
         if (passwordUpdatedInAuth0 instanceof Error) {
           throw passwordUpdatedInAuth0;
         }
@@ -606,7 +606,7 @@ export class UserService {
         where: {
           id,
         },
-        data: { ...rest },
+        data: dataToUpdate,
         select: USER_BASIC_DETAILS,
       });
     } catch (error) {
