@@ -8,6 +8,10 @@ export namespace BoardsAction {
   export class GetPriorities {
     static readonly type = '[Boards] Get priorities';
   }
+  export class AddList {
+    static readonly type = '[Boards] Add List';
+    constructor(public boardId: string, public name: string) {}
+  }
   export class AddTask {
     static readonly type = '[Task] Add Task';
     constructor(public payload: TaskRequest) {}

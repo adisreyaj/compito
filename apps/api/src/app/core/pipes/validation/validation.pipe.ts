@@ -7,10 +7,12 @@ export class JoiValidationPipe implements PipeTransform {
   constructor(private schema: ObjectSchema) {}
 
   transform(value: any, metadata: ArgumentMetadata) {
-    const { error } = this.schema.validate(value);
-    if (error) {
-      this.logger.error(error);
-      throw new BadRequestException('Invalid request body');
+    if (metadata.type === 'body') {
+      const { error } = this.schema.validate(value);
+      if (error) {
+        this.logger.error(error);
+        throw new BadRequestException('Invalid request body');
+      }
     }
     return value;
   }

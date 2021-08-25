@@ -49,7 +49,7 @@ import { BoardListWithTasks, Task } from '@compito/api-interfaces';
         }
       }
       .task-list {
-        width: 300px;
+        @apply w-72;
         &.cdk-drop-list-dragging {
           @apply bg-gray-100 border-primary border-2;
           .task-list__container {

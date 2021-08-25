@@ -51,6 +51,13 @@ export class BoardsService {
     return this.http.patch<Task>(`${this.tasksApi}/${taskId}`, data);
   }
 
+  updateLists(boardId: string, lists: { name: string; id: string }[]) {
+    const data: Pick<BoardRequest, 'lists'> = {
+      lists,
+    };
+    return this.http.patch<Task>(`${this.api}/${boardId}`, data);
+  }
+
   addComment(taskId: string, content: string) {
     return this.http.post<any>(`${this.tasksApi}/${taskId}/comments`, { content });
   }

@@ -2,7 +2,8 @@ import { moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Injectable } from '@angular/core';
 import { Board, BoardListWithTasks, DataLoading, DataLoadingState, Task } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { patch, updateItem } from '@ngxs/store/operators';
+import { append, patch, updateItem } from '@ngxs/store/operators';
+import cuid from 'cuid';
 import produce from 'immer';
 import sortBy from 'lodash.sortby';
 import { tap } from 'rxjs/operators';
@@ -85,6 +86,39 @@ export class BoardsState {
           priorities: data,
         });
       }),
+    );
+  }
+
+  @Action(BoardsAction.AddList)
+  addList({ setState, getState }: StateContext<BoardsStateModel>, { boardId, name }: BoardsAction.AddList) {
+    const { lists } = getState();
+    const newList: BoardListWithTasks = {
+      name,
+      id: cuid(),
+      tasks: [],
+    };
+    const updatedLists = produce(lists, (draft) => {
+      draft.push(newList);
+    });
+    setState(
+      patch({
+        lists: append([newList]),
+      }),
+    );
+    const listsDataToSend = updatedLists.map((item) => ({ id: item.id, name: item.name }));
+    return this.boardService.updateLists(boardId, listsDataToSend).pipe(
+      tap(
+        () => {
+          return;
+        },
+        () => {
+          setState(
+            patch({
+              lists,
+            }),
+          );
+        },
+      ),
     );
   }
 

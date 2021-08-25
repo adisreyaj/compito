@@ -1,5 +1,6 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { Board, BoardList, BoardListWithTasks, DataLoading, Task, User, UserDetails } from '@compito/api-interfaces';
@@ -60,6 +61,29 @@ import { BoardsState } from './state/boards.state';
                 </div>
               </compito-task-list>
             </ng-container>
+            <div class="h-32 w-72 p-4 bg-gray-50 rounded-md">
+              <header class="w-64 flex items-center mb-4">
+                <div class="form-group w-full">
+                  <input
+                    class="w-full"
+                    [style.backgroundColor]="'#fff'"
+                    type="text"
+                    id="name"
+                    [formControl]="listName"
+                    placeholder="Enter list name"
+                  />
+                </div>
+              </header>
+              <button
+                [disabled]="listName.invalid"
+                btn
+                size="sm"
+                (click)="addNewList()"
+                class="text-gray-500 bg-white border rounded-md shadow-sm hover:shadow-md"
+              >
+                Create List
+              </button>
+            </div>
           </section>
         </ng-container>
       </ng-container>
@@ -107,6 +131,7 @@ export class BoardsComponent implements OnInit {
 
   loggedInUser$: Observable<UserDetails | null> = this.auth.user$.pipe(formatUser());
 
+  listName = new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(12)]);
   constructor(
     private dialog: DialogService,
     private store: Store,
@@ -220,6 +245,12 @@ export class BoardsComponent implements OnInit {
       },
     });
     return ref;
+  }
+
+  addNewList() {
+    if (this.listName.valid) {
+      this.store.dispatch(new BoardsAction.AddList(this.boardId, this.listName.value));
+    }
   }
 
   private get boardId() {
