@@ -73,7 +73,7 @@ export class ProjectService {
   }
 
   async findAll(query: RequestParams, user: UserPayload) {
-    const { skip, limit, sort = 'updatedAt', order = 'desc' } = parseQuery(query);
+    const { skip, limit, sort = 'createdAt', order = 'asc' } = parseQuery(query);
     const { org, role, userId } = getUserDetails(user);
     let where: Prisma.ProjectWhereInput = {
       orgId: org.id,

@@ -80,7 +80,7 @@ export class OrganizationService {
 
   async findAll(query: RequestParams, user: UserPayload) {
     const { userId, role } = getUserDetails(user);
-    const { skip, limit } = parseQuery(query);
+    const { skip, limit, sort = 'createdAt', order = 'asc' } = parseQuery(query);
     const where: Prisma.OrganizationWhereInput = {
       OR: [
         {
@@ -103,6 +103,9 @@ export class OrganizationService {
         where,
         skip,
         take: limit,
+        orderBy: {
+          [sort]: order,
+        },
         include: {
           userRoleOrg: {
             where: {
