@@ -79,7 +79,7 @@ export class TaskService {
         {
           let projects = [];
           try {
-            const user = await this.prisma.user.findUnique({
+            const userData = await this.prisma.user.findUnique({
               where: {
                 id: userId,
               },
@@ -91,7 +91,7 @@ export class TaskService {
                 },
               },
             });
-            projects = user.projects.map(({ id }) => id);
+            projects = userData.projects.map(({ id }) => id);
           } catch (error) {
             this.logger.error('Failed to fetch user details');
             throw new InternalServerErrorException('Failed to fetch users');
@@ -344,8 +344,8 @@ export class TaskService {
 
   async addComment(id: string, content: string, user: UserPayload) {
     try {
-      const { org, userId } = getUserDetails(user);
-      const comment = await this.prisma.comment.create({
+      const { userId } = getUserDetails(user);
+      return await this.prisma.comment.create({
         data: {
           content,
           createdById: userId,
@@ -360,7 +360,6 @@ export class TaskService {
           },
         },
       });
-      return comment;
     } catch (error) {
       this.logger.error('Failed to add comment', error);
       throw new InternalServerErrorException();

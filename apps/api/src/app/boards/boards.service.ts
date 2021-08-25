@@ -65,10 +65,9 @@ export class BoardsService {
         lists: data.lists as any[],
         createdById: userId,
       };
-      const board = await this.prisma.board.create({
+      return await this.prisma.board.create({
         data: boardData,
       });
-      return board;
     } catch (error) {
       this.logger.error('board', 'create', 'Failed to create board', error);
       throw new InternalServerErrorException();

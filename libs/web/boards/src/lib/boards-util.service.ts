@@ -5,8 +5,6 @@ import groupBy from 'lodash.groupby';
   providedIn: 'root',
 })
 export class BoardsUtilService {
-  constructor() {}
-
   getTasksGroupedByList(tasks: Task[]): BoardListTasksGrouped {
     if (tasks?.length > 0) {
       return groupBy(tasks, 'list');
