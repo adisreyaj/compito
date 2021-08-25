@@ -10,7 +10,7 @@ import { Store } from '@ngxs/store';
   selector: 'compito-profile',
   template: `
     <compito-page-header title="Profile"></compito-page-header>
-    <section class="mt-4 px-8">
+    <section class="mt-4 px-4 md:px-8">
       <form class="py-6 bg-white rounded-md max-w-xl" id="userForm" [formGroup]="userForm" (ngSubmit)="updateUser()">
         <div class="mb-4">
           <img

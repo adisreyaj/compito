@@ -14,7 +14,7 @@ import { OrgsState } from './state/orgs.state';
   selector: 'compito-orgs',
   template: ` <compito-page-header title="Orgs" [breadcrumbs]="breadcrumbs"></compito-page-header>
     <section class="orgs__container" *ngIf="user$ | async as user">
-      <div class="orgs__list px-8">
+      <div class="orgs__list px-4 md:px-8">
         <article
           (click)="openProjectModal()"
           class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in

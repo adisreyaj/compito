@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ButtonModule } from 'libs/web/ui/src/components/button';
-import { IconModule } from 'libs/web/ui/src/components/icon/icon.module';
+import { ButtonModule } from '../button';
+import { IconModule } from '../icon/icon.module';
 import { ModalActionsDirective } from './modal-actions/modal-actions.directive';
 import { ModalComponent } from './modal.component';
 

@@ -18,7 +18,7 @@ import { UsersState } from './state/users.state';
     `
       .projects {
         &__container {
-          @apply pb-10 px-8;
+          @apply pb-10 px-4 md:px-8;
         }
         &__list {
           @apply pt-2;

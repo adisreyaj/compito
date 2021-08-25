@@ -15,6 +15,7 @@ import {
   RiFolder4Line,
   RiHome5Line,
   RiInformationLine,
+  RiMenuLine,
   RiMessage3Line,
   RiMore2Fill,
   RiNotification2Line,
@@ -23,6 +24,7 @@ import {
   RiUserShared2Line,
 } from 'angular-remix-icon';
 const icons = {
+  RiMenuLine,
   RiInformationLine,
   RiNotification2Line,
   RiUserSettingsLine,

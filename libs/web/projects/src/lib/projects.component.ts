@@ -16,7 +16,7 @@ import { ProjectsState } from './state/projects.state';
   selector: 'compito-projects',
   template: ` <compito-page-header title="Projects" [breadcrumbs]="breadcrumbs"> </compito-page-header>
     <section class="projects__container">
-      <div class="projects__list px-8">
+      <div class="projects__list px-4 md:px-8">
         <ng-container *ngIf="(usersLoading$ | async)?.type === 'SUCCESS'">
           <article
             *permission="'project:create'"
