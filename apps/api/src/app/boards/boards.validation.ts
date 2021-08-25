@@ -11,6 +11,7 @@ export const createBoardValidationSchema = object({
     .required(),
   projectId: string().required(),
 });
+
 export const updateBoardValidationSchema = object({
   name: string().min(3).max(64).optional().allow(null),
   description: string().min(3).max(200).optional().allow(null),

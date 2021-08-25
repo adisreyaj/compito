@@ -9,6 +9,7 @@ import {
   Post,
   Req,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload, verify } from 'jsonwebtoken';
@@ -18,9 +19,10 @@ import { Public } from '../core/decorators/public.decorator';
 import { Role } from '../core/decorators/roles.decorator';
 import { PermissionsGuard } from '../core/guards/permissions.guard';
 import { RolesGuard } from '../core/guards/roles.guard';
+import { JoiValidationPipe } from '../core/pipes/validation/validation.pipe';
 import { getUserDetails } from '../core/utils/payload.util';
 import { InviteService } from './invite.service';
-
+import { createInviteValidationSchema } from './invite.validation';
 @Controller('invites')
 export class InviteController {
   constructor(private inviteService: InviteService, private config: ConfigService) {}
@@ -29,6 +31,7 @@ export class InviteController {
   @Role('org-admin')
   @Permissions(PERMISSIONS.user.create)
   @Post('')
+  @UsePipes(new JoiValidationPipe(createInviteValidationSchema))
   invite(@Body() data: { email: string; role: string }, @Req() req: RequestWithUser) {
     return this.inviteService.invite(data, req.user);
   }
