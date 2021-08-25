@@ -22,7 +22,7 @@ import { UsersState } from './state/users.state';
         }
         &__list {
           @apply pt-2;
-          @apply grid;
+          @apply grid gap-4;
           grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         }
       }
