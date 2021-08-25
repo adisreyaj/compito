@@ -35,7 +35,7 @@ body {
   transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
 }
 .cdk-drag-placeholder:not(compito-task-list) {
-  @apply shadow-xl rounded-md;
+  @apply rounded-md;
 }
 
 .task-list:hover:not(.cdk-drag-preview):not(.cdk-drag-dragging):not(.cdk-drop-list-dragging) {

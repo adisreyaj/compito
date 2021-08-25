@@ -17,8 +17,8 @@ export const updateBoardValidationSchema = object({
   description: string().min(3).max(200).optional().allow(null),
   lists: array()
     .items({
-      id: string(),
-      name: string(),
+      id: string().required(),
+      name: string().required(),
     })
     .optional()
     .allow(null),

@@ -21,9 +21,12 @@ import { BoardListWithTasks, Task } from '@compito/api-interfaces';
         <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
       </button>
     </header>
-    <ul *ngIf="list.tasks.length > 0; else noTask" class="task-list__container space-y-4 -mx-4 px-4 pb-2">
+    <ul *ngIf="list.tasks.length > 0; else noTask" class="task-list__container space-y-4 -mx-4 px-4 py-2">
       <ng-container *ngFor="let task of list.tasks">
-        <article cdkDrag class="task-card cursor-pointer">
+        <article cdkDrag class="relative task-card cursor-pointer">
+          <div
+            class="overview hidden rounded-md shadow-none absolute z-40 top-0 left-0 w-full h-full bg-gray-200"
+          ></div>
           <compito-task-card
             [task]="task"
             [assignees]="task.assignees | usersToAvatarGroup"
@@ -46,7 +49,7 @@ import { BoardListWithTasks, Task } from '@compito/api-interfaces';
         }
       }
       .task-list {
-        width: 300px;
+        @apply w-72;
         &.cdk-drop-list-dragging {
           @apply bg-gray-100 border-primary border-2;
           .task-list__container {
@@ -63,6 +66,11 @@ import { BoardListWithTasks, Task } from '@compito/api-interfaces';
       }
       .task-card.cdk-drag-preview {
         @apply shadow-xl;
+      }
+      .cdk-drag.task-card.cdk-drag-placeholder {
+        .overview {
+          @apply flex;
+        }
       }
     `,
   ],
