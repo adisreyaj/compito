@@ -7,7 +7,7 @@ import { formatUser } from '../../util/format-user.operator';
 @Component({
   selector: 'compito-header',
   template: `
-    <header>
+    <header class="shadow-md">
       <section class="flex items-stretch space-x-10">
         <div class="flex items-center relative">
           <img src="assets/images/logo.svg" alt="Compito" width="55" height="55" class="rounded-full" />

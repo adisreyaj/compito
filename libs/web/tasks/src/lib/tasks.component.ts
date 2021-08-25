@@ -19,7 +19,8 @@ import { TasksState } from './state/tasks.state';
         }
         &__list {
           @apply pt-8;
-          @apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-4;
+          @apply grid gap-4;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
       }
     `,
