@@ -1,11 +1,13 @@
 import { BoardRequest, RequestParams, RequestWithUser } from '@compito/api-interfaces';
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards, UsePipes } from '@nestjs/common';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
 import { Role } from '../core/decorators/roles.decorator';
 import { PermissionsGuard } from '../core/guards/permissions.guard';
 import { RolesGuard } from '../core/guards/roles.guard';
+import { JoiValidationPipe } from '../core/pipes/validation/validation.pipe';
 import { BoardsService } from './boards.service';
+import { createBoardValidationSchema, updateBoardValidationSchema } from './boards.validation';
 
 @Controller('boards')
 export class BoardsController {
@@ -15,6 +17,7 @@ export class BoardsController {
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.create)
   @Post()
+  @UsePipes(new JoiValidationPipe(createBoardValidationSchema))
   create(@Body() board: BoardRequest, @Req() req: RequestWithUser) {
     return this.boardService.create(board, req.user);
   }
@@ -37,6 +40,7 @@ export class BoardsController {
   @Role('project-admin')
   @Permissions(PERMISSIONS.board.update)
   @Patch(':id')
+  @UsePipes(new JoiValidationPipe(updateBoardValidationSchema))
   update(@Param('id') id: string, @Body() board: BoardRequest, @Req() req: RequestWithUser) {
     return this.boardService.update(id, board, req.user);
   }
