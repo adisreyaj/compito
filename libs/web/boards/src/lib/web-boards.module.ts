@@ -14,6 +14,7 @@ import {
 } from '@compito/web/ui';
 import { TippyModule } from '@ngneat/helipopper';
 import { ShimmerModule } from '@sreyaj/ng-shimmer';
+import { ContenteditableValueAccessorModule } from '@tinkoff/angular-contenteditable-accessor';
 import { BoardsComponent } from './boards.component';
 import { TaskDetailModalComponent } from './shared/components/task-detail-modal/task-detail-modal.component';
 @NgModule({
@@ -37,6 +38,7 @@ import { TaskDetailModalComponent } from './shared/components/task-detail-modal/
     TippyModule,
     FormsModule,
     ReactiveFormsModule,
+    ContenteditableValueAccessorModule,
     TimeAgoModule,
     TaskSharedModule,
     UserSelectModule,

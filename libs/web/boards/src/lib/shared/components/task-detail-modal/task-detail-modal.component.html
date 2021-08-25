@@ -3,7 +3,9 @@
     <ng-container *ngSwitchCase="'SUCCESS'">
       <header class="p-4" [class.shadow-lg]="isScrolledSubject | async">
         <div>
-          <p class="text-lg font-medium text-gray-600">{{ taskDetail?.title }}</p>
+          <p class="w-10/12 pl-2 -ml-2 text-lg font-medium text-gray-600 task-title " contenteditable=""
+             [formControl]="title">
+            {{ taskDetail?.title }}</p>
         </div>
         <div class="flex items-center py-2 space-x-4 text-xs text-gray-500">
           <p>
@@ -46,10 +48,6 @@
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
           <div class="form-group">
             <textarea class="w-full" type="text" id="description" rows="4" [formControl]="description"></textarea>
-            <footer class="flex items-center mt-4 space-x-2">
-              <button btn size="sm" [disabled]="!description.dirty" (click)="updateDescription()">Save</button>
-              <button btn size="sm" variant="secondary" *ngIf="description.dirty">Cancel</button>
-            </footer>
           </div>
         </section>
         <section class="task-detail__section">
