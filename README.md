@@ -19,9 +19,7 @@
   </p>
 </p>
 
-<!-- ABOUT THE PROJECT -->
-
-## About The Project
+![Compito Project Management](/assets/compito.jpg 'Compito Project Management')
 
 Compito is a simple and easy to use project management application with support for Multiple orgs. Each org can have multiple projects in it. Users can be then given access to the org or the project by assigning them different roles.
 
