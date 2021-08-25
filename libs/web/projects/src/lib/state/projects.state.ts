@@ -131,7 +131,7 @@ export class ProjectsState {
         const { projectDetail } = getState();
         const projectDetailUpdated = produce(projectDetail, (draft) => {
           if (draft) {
-            const boardsRemaining = draft.boards.filter(({ id }) => id !== id);
+            const boardsRemaining = draft.boards.filter(({ id: boardId }) => boardId !== id);
             if (boardsRemaining) {
               draft.boards = boardsRemaining;
             }

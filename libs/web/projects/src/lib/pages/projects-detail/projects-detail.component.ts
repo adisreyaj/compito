@@ -80,9 +80,7 @@ export class ProjectsDetailComponent implements OnInit {
         if (data) {
           const action = isUpdateMode
             ? this.store.dispatch(new ProjectsAction.UpdateBoard(initialData?.id, data))
-            : this.store.dispatch(
-                new ProjectsAction.AddBoard({ ...data, projectId: this.projectId, orgId: user?.org }),
-              );
+            : this.store.dispatch(new ProjectsAction.AddBoard({ ...data, projectId: this.projectId }));
           action.pipe(
             // Reopen the modal with the filled data if fails
             catchError(() => {
