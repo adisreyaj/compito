@@ -329,22 +329,24 @@ export class UserService {
 
     const deleteUserFromLocal = async (userId: string, orgId: string) => {
       try {
-        // await Promise.all([
-        //   this.prisma.userRoleOrg.delete({
-        //     where: {
-        //     }
-        //   })
-        //   this.prisma.organization.delete({
-        //     where: {
-        //       id: orgId,
-        //     },
-        //   }),
-        //   this.prisma.user.delete({
-        //     where: {
-        //       id: userId,
-        //     },
-        //   }),
-        // ]);
+        await Promise.all([
+          this.prisma.userRoleOrg.deleteMany({
+            where: {
+              userId,
+              orgId,
+            },
+          }),
+          this.prisma.organization.delete({
+            where: {
+              id: orgId,
+            },
+          }),
+          this.prisma.user.delete({
+            where: {
+              id: userId,
+            },
+          }),
+        ]);
       } catch (error) {
         this.logger.error('Failed to remove user from DB', error);
         throw new InternalServerErrorException('Something went wrong');
@@ -376,21 +378,16 @@ export class UserService {
         throw new InternalServerErrorException('Failed to signup');
       }
     };
-    try {
-      const userSaved = await createUserAndOrg();
-      const roles = userSaved.user.roles.reduce((acc, curr) => {
-        return {
-          ...acc,
-          [curr.orgId]: curr.role,
-        };
-      }, {});
-      const userInAuth0 = await createUserInAuth0(userSaved.user.id, userSaved.orgId, roles);
-      this.logger.debug('User created locally', userInAuth0._id);
-      return userInAuth0;
-    } catch (error) {
-      this.logger.error('Failed to create user in Auth0', error);
-      throw new InternalServerErrorException('Failed to signup user!');
-    }
+    const userSaved = await createUserAndOrg();
+    const roles = userSaved.user.roles.reduce((acc, curr) => {
+      return {
+        ...acc,
+        [curr.orgId]: curr.role,
+      };
+    }, {});
+    const userInAuth0 = await createUserInAuth0(userSaved.user.id, userSaved.orgId, roles);
+    this.logger.debug('User created locally', userInAuth0._id);
+    return userInAuth0;
   }
 
   async findAll(query: RequestParams, user: UserPayload) {
@@ -613,6 +610,7 @@ export class UserService {
       throw new InternalServerErrorException('Failed to update user');
     }
   }
+
   async updateUserRole(id: string, roleId: string, user: UserPayload) {
     const { role, org } = getUserDetails(user);
     let userData;
