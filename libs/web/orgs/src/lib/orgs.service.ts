@@ -17,6 +17,10 @@ export class OrgService {
     return this.http.patch<Organization>(`${this.api}/${id}`, data);
   }
 
+  delete(id: string) {
+    return this.http.delete<Organization>(`${this.api}/${id}`);
+  }
+
   getAll() {
     return this.http.get<MultiDocPayload<Organization>>(this.api);
   }

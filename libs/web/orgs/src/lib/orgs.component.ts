@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { CardEvent, DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
-import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
+import { Breadcrumb, ConfirmModalComponent, formatUser, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
-import { Observable, of, throwError } from 'rxjs';
+import { EMPTY, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/orgs-create-modal.component';
 import { OrgsAction } from './state/orgs.actions';
@@ -132,7 +132,7 @@ export class OrgsComponent implements OnInit {
       .subscribe();
   }
 
-  handleProjectCardEvents({ type, payload }: CardEvent, org: Organization) {
+  handleProjectCardEvents({ type }: CardEvent, org: Organization) {
     switch (type) {
       case 'edit': {
         const data = {
@@ -142,6 +142,31 @@ export class OrgsComponent implements OnInit {
         this.openProjectModal(data, true);
         break;
       }
+      case 'delete':
+        {
+          const ref = this.dialog.open(ConfirmModalComponent, {
+            size: 'sm',
+            data: {
+              body: 'Proceeding with the action will permanently delete the board. This action cannot be undone.',
+              primaryAction: 'Delete',
+              primaryActionType: 'warn',
+            },
+          });
+          ref.afterClosed$.subscribe((confirmed) => {
+            if (confirmed) {
+              this.store
+                .dispatch(new OrgsAction.Delete(org.id))
+                .pipe(
+                  catchError((error) => {
+                    this.toast.error(error?.error?.message ?? 'Failed to delete org');
+                    return EMPTY;
+                  }),
+                )
+                .subscribe();
+            }
+          });
+        }
+        break;
 
       default:
         break;

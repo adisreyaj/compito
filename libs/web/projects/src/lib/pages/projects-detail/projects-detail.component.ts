@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { Board, CardEvent, DataLoading, Project, User } from '@compito/api-interfaces';
-import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
+import { Breadcrumb, ConfirmModalComponent, formatUser, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -107,16 +107,28 @@ export class ProjectsDetailComponent implements OnInit {
   removeMember(memberId: string) {
     const user = this.selectedMembers.get(memberId) as User;
     this.selectedMembers.delete(memberId);
-    this.store
-      .dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'modify', remove: [memberId] }))
-      .subscribe(
-        () => {
-          return;
-        },
-        () => {
-          this.selectedMembers.set(memberId, user);
-        },
-      );
+    const ref = this.dialog.open(ConfirmModalComponent, {
+      size: 'sm',
+      data: {
+        body: 'The user will not be part of the project anymore. This action cannot be undone.',
+        primaryAction: 'Remove',
+        primaryActionType: 'warn',
+      },
+    });
+    ref.afterClosed$.subscribe((confirmed) => {
+      if (confirmed) {
+        this.store
+          .dispatch(new ProjectsAction.UpdateMembers(this.projectId, { type: 'modify', remove: [memberId] }))
+          .subscribe(
+            () => {
+              return;
+            },
+            () => {
+              this.selectedMembers.set(memberId, user);
+            },
+          );
+      }
+    });
   }
 
   updateMembers() {
@@ -148,15 +160,29 @@ export class ProjectsDetailComponent implements OnInit {
         break;
       }
       case 'delete':
-        this.store
-          .dispatch(new ProjectsAction.DeleteBoard(board.id))
-          .pipe(
-            catchError((error) => {
-              this.toast.error(error?.error?.message ?? 'Failed to delete board');
-              return EMPTY;
-            }),
-          )
-          .subscribe();
+        {
+          const ref = this.dialog.open(ConfirmModalComponent, {
+            size: 'sm',
+            data: {
+              body: 'Proceeding with the action will permanently delete the board. This action cannot be undone.',
+              primaryAction: 'Delete',
+              primaryActionType: 'warn',
+            },
+          });
+          ref.afterClosed$.subscribe((confirmed) => {
+            if (confirmed) {
+              this.store
+                .dispatch(new ProjectsAction.DeleteBoard(board.id))
+                .pipe(
+                  catchError((error) => {
+                    this.toast.error(error?.error?.message ?? 'Failed to delete board');
+                    return EMPTY;
+                  }),
+                )
+                .subscribe();
+            }
+          });
+        }
         break;
       default:
         break;

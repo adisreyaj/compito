@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { CardEvent, DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
-import { Breadcrumb, ToastService } from '@compito/web/ui';
+import { Breadcrumb, ConfirmModalComponent, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -76,7 +76,7 @@ export class ProjectsComponent implements OnInit {
     }
   }
 
-  handleProjectCardEvents({ type, payload }: CardEvent, project: Project) {
+  handleProjectCardEvents({ type }: CardEvent, project: Project) {
     switch (type) {
       case 'edit': {
         const data = {
@@ -89,15 +89,28 @@ export class ProjectsComponent implements OnInit {
         break;
       }
       case 'delete': {
-        this.store
-          .dispatch(new ProjectsAction.Delete(project.id))
-          .pipe(
-            catchError((error) => {
-              this.toast.error(error?.error?.message ?? 'Failed to delete project');
-              return EMPTY;
-            }),
-          )
-          .subscribe();
+        const ref = this.dialog.open(ConfirmModalComponent, {
+          size: 'sm',
+          data: {
+            body: 'Proceeding with the action will permanently delete the project. This action cannot be undone.',
+            primaryAction: 'Delete',
+            primaryActionType: 'warn',
+          },
+        });
+        ref.afterClosed$.subscribe((confirmed) => {
+          if (confirmed) {
+            this.store
+              .dispatch(new ProjectsAction.Delete(project.id))
+              .pipe(
+                catchError((error) => {
+                  this.toast.error(error?.error?.message ?? 'Failed to delete project');
+                  return EMPTY;
+                }),
+              )
+              .subscribe();
+          }
+        });
+
         break;
       }
       default:
