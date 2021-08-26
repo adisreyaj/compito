@@ -145,6 +145,9 @@ export class OrganizationService {
         id: true,
         createdAt: true,
         updatedAt: true,
+        createdBy: {
+          select: USER_BASIC_DETAILS,
+        },
         members: {
           select: USER_BASIC_DETAILS,
         },

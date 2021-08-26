@@ -43,7 +43,8 @@
       <ng-container *ngSwitchCase="'SUCCESS'">
         <div class="projects__list">
           <ng-container *ngFor="let member of (projectDetails$ | async)?.members">
-            <compito-project-member-card [data]="member" (removed)="removeMember($event)"></compito-project-member-card>
+            <compito-project-member-card [data]="member" [disabled]="[(projectDetails$ | async)?.createdBy?.id]"
+                                         (removed)="removeMember($event)"></compito-project-member-card>
           </ng-container>
         </div>
       </ng-container>
@@ -76,8 +77,9 @@
   </section>
 </ng-container>
 <ng-template #addAssignees let-hide>
-  <compito-user-select [hide]="hide" [users]="(users$ | async)" [selectedMembers]="selectedMembers"
-                       (clicked)="handleUserSelectEvent($event, hide)"></compito-user-select>
+  <compito-user-select [hide]="hide" [disabled]="[(projectDetails$ | async)?.createdBy?.id]" [users]="(users$ | async)"
+                       [selectedMembers]="selectedMembers" (clicked)="handleUserSelectEvent($event, hide)">
+  </compito-user-select>
 </ng-template>
 
 <ng-template #addBoard>

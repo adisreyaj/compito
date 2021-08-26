@@ -46,7 +46,9 @@
       <ng-container *ngSwitchCase="'SUCCESS'">
         <div class="orgs__list">
           <ng-container *ngFor="let member of (orgDetails$ | async)?.members">
-            <compito-mini-user-card [data]="member" (removed)="removeMember($event)"></compito-mini-user-card>
+            <compito-mini-user-card [data]="member" [disabled]="[(orgDetails$ | async)?.createdBy?.id]"
+                                    (removed)="removeMember($event)">
+            </compito-mini-user-card>
           </ng-container>
         </div>
       </ng-container>
@@ -80,8 +82,9 @@
 </ng-container>
 
 <ng-template #addAssignees let-hide>
-  <compito-user-select [hide]="hide" [users]="(users$ | async)" [selectedMembers]="selectedMembers"
-                       (clicked)="handleUserSelectEvent($event)"></compito-user-select>
+  <compito-user-select [hide]="hide" [disabled]="[(loggedInUser$ | async)?.userId]" [users]="(users$ | async)"
+                       [selectedMembers]="selectedMembers" (clicked)="handleUserSelectEvent($event)">
+  </compito-user-select>
 </ng-template>
 
 
