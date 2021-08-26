@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
+import { OrgsAction } from '@compito/web/orgs/state/orgs.actions';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { append, patch, removeItem, updateItem } from '@ngxs/store/operators';
 import produce from 'immer';
@@ -56,10 +57,11 @@ export class ProjectsState {
   }
   constructor(private projectService: ProjectsService) {}
   @Action(ProjectsAction.Add)
-  add({ setState }: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.Add) {
+  add({ setState, dispatch }: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.Add) {
     return this.projectService.create(payload).pipe(
       tap((project) => {
         setState(patch({ projects: append([project]) }));
+        dispatch(new OrgsAction.AddProject(project, project.org.id));
       }),
     );
   }
@@ -72,11 +74,12 @@ export class ProjectsState {
     );
   }
   @Action(ProjectsAction.Delete)
-  delete({ setState, getState }: StateContext<ProjectsStateModel>, { id }: ProjectsAction.Delete) {
+  delete({ setState, getState, dispatch }: StateContext<ProjectsStateModel>, { id }: ProjectsAction.Delete) {
     const projects = getState().projects;
     const project = projects.find(({ id }) => id === id);
     if (project) {
       setState(patch({ projects: removeItem<Project>((item) => item?.id === id) }));
+      dispatch(new OrgsAction.DeleteProject(project.id, project.org.id));
     }
     return this.projectService.delete(id).pipe(
       tap(
@@ -89,6 +92,9 @@ export class ProjectsState {
               projects,
             }),
           );
+          if (project) {
+            dispatch(new OrgsAction.AddProject(project, project.org.id));
+          }
         },
       ),
     );
