@@ -20,18 +20,22 @@ import { OrgSelectionService } from './org-selection.service';
       }
       main.org-selection {
         height: 100vh;
-        grid-template-columns: 3fr 5fr;
+        @media screen and (min-width: 1024px) {
+          grid-template-columns: 3fr 5fr;
+        }
       }
       .orgs {
         &__list {
           @apply pt-8;
-          @apply grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4;
+          @apply grid gap-4;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
       }
       .invites {
         &__list {
           @apply pt-8;
-          @apply grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4;
+          @apply grid gap-4;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
       }
     `,

@@ -2,6 +2,8 @@ import { array, object, string } from 'joi';
 
 export const createOrgValidationSchema = object({
   name: string().required().min(2).max(64),
+  slug: string().optional(),
+  members: array().optional(),
 });
 
 export const updateOrgValidationSchema = object({
