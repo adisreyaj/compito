@@ -207,6 +207,7 @@ export class TaskService {
   async update(id: string, data: TaskRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
     await this.canUpdateTask(id, role, org.id, userId);
+    let task;
     try {
       const { assignees, priority, tags, ...rest } = data;
       let taskData: Prisma.TaskUpdateInput = {
@@ -234,7 +235,7 @@ export class TaskService {
           },
         };
       }
-      const task = await this.prisma.task.update({
+      task = await this.prisma.task.update({
         where: {
           id,
         },
@@ -254,20 +255,19 @@ export class TaskService {
           },
         },
       });
-      this.logger.debug(task);
-      if (task) {
-        return task;
-      }
-      throw new NotFoundException();
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException();
+          throw new NotFoundException('Task not found');
         }
       }
       this.logger.error('Failed to update task', error);
       throw new InternalServerErrorException();
     }
+    if (task) {
+      return task;
+    }
+    throw new NotFoundException();
   }
 
   private async canUpdateTask(id: string, role: Role, org: string, userId: string) {

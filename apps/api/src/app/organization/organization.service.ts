@@ -7,6 +7,7 @@ import {
   UserPayload,
 } from '@compito/api-interfaces';
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -79,7 +80,7 @@ export class OrganizationService {
   }
 
   async findAll(query: RequestParams, user: UserPayload) {
-    const { userId, role } = getUserDetails(user);
+    const { userId } = getUserDetails(user);
     const { skip, limit, sort = 'createdAt', order = 'asc' } = parseQuery(query);
     const where: Prisma.OrganizationWhereInput = {
       OR: [
@@ -144,6 +145,9 @@ export class OrganizationService {
         id: true,
         createdAt: true,
         updatedAt: true,
+        createdBy: {
+          select: USER_BASIC_DETAILS,
+        },
         members: {
           select: USER_BASIC_DETAILS,
         },
@@ -352,15 +356,19 @@ export class OrganizationService {
     const { userId, role } = getUserDetails(user);
     await this.canDeleteOrg(userId, id, role.name as Roles);
     try {
-      const org = await this.prisma.organization.delete({
-        where: {
-          id,
-        },
-      });
-      if (org) {
-        return org;
-      }
-      throw new NotFoundException();
+      await this.prisma.$transaction([
+        this.prisma.userRoleOrg.deleteMany({
+          where: {
+            userId,
+            orgId: id,
+          },
+        }),
+        this.prisma.organization.delete({
+          where: {
+            id,
+          },
+        }),
+      ]);
     } catch (error) {
       this.logger.error('Failed to delete org', error);
       throw new InternalServerErrorException();
@@ -419,6 +427,7 @@ export class OrganizationService {
         where: { id: orgId },
         select: {
           createdById: true,
+          projects: true,
           members: {
             select: { id: true },
           },
@@ -430,7 +439,7 @@ export class OrganizationService {
         throw new NotFoundException('Org not found');
       }
     }
-    switch (role as Roles) {
+    switch (role) {
       /**
        * Can delete all orgs
        */
@@ -443,6 +452,9 @@ export class OrganizationService {
        * 2. Is part of the org
        */
       case 'admin': {
+        if (orgData.projects.length > 0) {
+          throw new ConflictException('Cannot delete org as it contains projects.');
+        }
         if (orgData.createdById !== userId || orgData.members.findIndex(({ id }) => id === userId) < 0) {
           throw new ForbiddenException('No permission to delete the org');
         }

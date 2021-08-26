@@ -138,6 +138,9 @@ export class ProjectService {
           id: true,
           name: true,
           description: true,
+          createdBy: {
+            select: USER_BASIC_DETAILS,
+          },
           createdAt: true,
           updatedAt: true,
           boards: true,

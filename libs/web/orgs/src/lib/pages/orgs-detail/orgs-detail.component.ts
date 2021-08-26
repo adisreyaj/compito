@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CardEvent, DataLoading, Organization, Project, User } from '@compito/api-interfaces';
+import { AuthService } from '@auth0/auth0-angular';
+import { CardEvent, DataLoading, Organization, Project, User, UserDetails } from '@compito/api-interfaces';
 import { ProjectsCreateModalComponent } from '@compito/web/projects';
 import { ProjectsAction } from '@compito/web/projects/state';
-import { Breadcrumb, ToastService } from '@compito/web/ui';
+import { Breadcrumb, formatUser, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
@@ -47,11 +48,14 @@ export class OrgsDetailComponent implements OnInit {
   @Select(OrgsState.orgDetailLoading)
   orgDetailLoading$!: Observable<DataLoading>;
 
+  loggedInUser$: Observable<UserDetails | null> = this.auth.user$.pipe(formatUser());
+  loggedInUser: UserDetails | null = null;
   constructor(
     private dialog: DialogService,
     private store: Store,
     private activatedRoute: ActivatedRoute,
     private toast: ToastService,
+    private auth: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -65,11 +69,14 @@ export class OrgsDetailComponent implements OnInit {
           });
         }
       });
+      this.loggedInUser$.subscribe((user) => {
+        this.loggedInUser = user;
+      });
     }
   }
 
   toggleMembers(user: User) {
-    if (this.selectedMembers.has(user.id)) {
+    if (this.selectedMembers.has(user.id) && this.loggedInUser?.userId !== user.id) {
       this.selectedMembers.delete(user.id);
     } else {
       this.selectedMembers.set(user.id, user);

@@ -186,6 +186,18 @@ export class BoardsState {
     );
   }
 
+  @Action(BoardsAction.DeleteTask)
+  deleteTask({ patchState, getState }: StateContext<BoardsStateModel>, { taskId, listId }: BoardsAction.DeleteTask) {
+    return this.boardService.deleteTask(taskId).pipe(
+      tap(() => {
+        const { lists } = getState();
+        patchState({
+          lists: this.deleteTaskInList({ lists, listId, taskId }),
+        });
+      }),
+    );
+  }
+
   @Action(BoardsAction.UpdateTaskPriority)
   updateTaskPriority(
     { patchState, getState }: StateContext<BoardsStateModel>,
@@ -277,6 +289,16 @@ export class BoardsState {
         if (task) {
           (task as any)[keyToUpdate] = data[keyToUpdate];
         }
+      }
+    });
+  }
+
+  private deleteTaskInList({ lists, listId, taskId }: { lists: BoardListWithTasks[]; listId: string; taskId: string }) {
+    return produce(lists, (draft) => {
+      const list = draft.find(({ id }) => id === listId);
+      if (list) {
+        const taskIndex = list.tasks.findIndex(({ id }) => id === taskId);
+        if (taskIndex >= 0) list.tasks.splice(taskIndex, 1);
       }
     });
   }

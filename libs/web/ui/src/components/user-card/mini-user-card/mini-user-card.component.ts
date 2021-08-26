@@ -10,6 +10,7 @@ import { User } from '@compito/api-interfaces';
       border-gray-100 bg-white shadow-sm hover:border-gray-200 relative"
     >
       <button
+        *ngIf="!disabled.includes(data.id)"
         [tippy]="moreOptions"
         placement="bottom-start"
         variation="menu"
@@ -45,6 +46,7 @@ import { User } from '@compito/api-interfaces';
 })
 export class MiniUserCardComponent {
   @Input() data: User | null = null;
+  @Input() disabled: any[] = [];
 
   @Output() removed = new EventEmitter<string>();
 }

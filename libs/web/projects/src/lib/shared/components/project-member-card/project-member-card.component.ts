@@ -9,15 +9,17 @@ import { User } from '@compito/api-interfaces';
       class="p-4 rounded-md border transition-all hover:shadow-lg duration-200 ease-in
       border-gray-100 bg-white shadow-sm hover:border-gray-200 relative"
     >
-      <button
-        *permission="'project:update'"
-        [tippy]="moreOptions"
-        placement="bottom-start"
-        variation="menu"
-        class="absolute z-10 top-3 right-3 text-gray-500 hover:bg-gray-100 p-1 rounded-md"
-      >
-        <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
-      </button>
+      <ng-container *permission="'project:update'">
+        <button
+          *ngIf="!disabled.includes(data.id)"
+          [tippy]="moreOptions"
+          placement="bottom-start"
+          variation="menu"
+          class="absolute z-10 top-3 right-3 text-gray-500 hover:bg-gray-100 p-1 rounded-md"
+        >
+          <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
+        </button>
+      </ng-container>
       <div class="flex space-x-2 items-center">
         <img
           [src]="data?.image ?? 'https://avatar.tobi.sh/' + data.email"
@@ -46,6 +48,7 @@ import { User } from '@compito/api-interfaces';
 })
 export class ProjectMemberCardComponent {
   @Input() data: User | null = null;
+  @Input() disabled: any[] = [];
 
   @Output() removed = new EventEmitter<string>();
 }

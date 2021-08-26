@@ -10,6 +10,10 @@ export namespace OrgsAction {
     static readonly type = '[Orgs] Update Org';
     constructor(public id: string, public payload: OrganizationRequest) {}
   }
+  export class Delete {
+    static readonly type = '[Orgs] Delete Org';
+    constructor(public id: string) {}
+  }
   export class GetAll {
     static readonly type = '[Orgs] Get All';
   }

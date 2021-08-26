@@ -41,7 +41,7 @@ export class OrganizationController {
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('super-admin')
+  @Role('admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id/members')
   @UsePipes(new JoiValidationPipe(updateMembersValidationSchema))
@@ -50,7 +50,7 @@ export class OrganizationController {
   }
 
   @UseGuards(PermissionsGuard)
-  @Role('super-admin')
+  @Role('admin')
   @Permissions(PERMISSIONS.org.update)
   @Patch(':id')
   @UsePipes(new JoiValidationPipe(updateOrgValidationSchema))
@@ -59,7 +59,7 @@ export class OrganizationController {
   }
 
   @UseGuards(RolesGuard, PermissionsGuard)
-  @Role('super-admin')
+  @Role('admin')
   @Permissions(PERMISSIONS.org.delete)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: RequestWithUser) {

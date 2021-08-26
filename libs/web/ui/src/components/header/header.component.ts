@@ -57,11 +57,11 @@ import { formatUser } from '../../util/format-user.operator';
           >
             Org: <span class="font-medium text-sm text-gray-700">{{ user?.org?.name }}</span>
           </a>
-          <div class="grid grid-cols-2 gap-4 text-gray-400">
-            <button tippy="Coming soon">
+          <div class="grid grid-cols-1 gap-4 text-gray-400">
+            <!-- <button tippy="Coming soon">
               <rmx-icon name="add-circle-line"></rmx-icon>
-            </button>
-            <button tippy="Coming soon">
+            </button> -->
+            <button tippy="Coming soon" aria-label="Notifications">
               <rmx-icon name="notification-2-line"></rmx-icon>
             </button>
           </div>

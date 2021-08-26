@@ -16,6 +16,10 @@ export namespace BoardsAction {
     static readonly type = '[Task] Add Task';
     constructor(public payload: TaskRequest) {}
   }
+  export class DeleteTask {
+    static readonly type = '[Task] Delete Task';
+    constructor(public taskId: string, public listId: string) {}
+  }
 
   export class UpdateAssignees {
     static readonly type = '[Task] Update assignees';

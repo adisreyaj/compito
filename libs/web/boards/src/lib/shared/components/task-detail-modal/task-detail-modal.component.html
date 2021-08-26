@@ -17,6 +17,17 @@
           <p>
             Created: <span class="text-sm text-gray-600">{{ taskDetail?.createdAt | timeAgo }}</span>
           </p>
+          <button [tippy]="deleteConfirm" [zIndex]="999999" placement="bottom-start" variation="menu"
+                  class="px-2 py-1 text-sm text-red-500 rounded-md hover:bg-red-100">
+            Delete Task
+          </button>
+          <ng-template #deleteConfirm let-hide>
+            <div class="flex flex-col w-44">
+              <div class="text-red-600 dropdown-item" (click)="deleteTask();hide()">
+                <p>Confirm Delete</p>
+              </div>
+            </div>
+          </ng-template>
         </div>
       </header>
       <div class="px-8 pt-4 overflow-y-auto" [style.maxHeight]="'80vh'" #contentContainer>
@@ -74,7 +85,7 @@
               </div>
             </li>
             <ng-container *ngFor="let comment of taskDetail?.comments">
-              <li class="py-4 border-b last:border-b-0">
+              <li class="py-4 border-b last:border-b-0 last:mb-4">
                 <div class="flex items-start space-x-4">
                   <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
                        width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
@@ -91,67 +102,7 @@
       </div>
     </ng-container>
     <ng-container *ngSwitchCase="'LOADING'">
-      <header class="h-24 p-4">
-        <div>
-          <shimmer height="28px" width="50%" [rounded]="true"></shimmer>
-        </div>
-        <div class="flex items-center py-2 space-x-4 text-xs text-gray-500">
-          <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
-          <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
-          <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
-        </div>
-      </header>
-      <div class="px-8 pt-4 overflow-y-auto" [style.maxHeight]="'80vh'" #contentContainer>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Assignees' }"></ng-container>
-          <div class="flex items-center my-2 -space-x-4">
-            <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
-            <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
-            <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
-          </div>
-        </section>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Priority' }"></ng-container>
-          <shimmer height="40px" width="150px" [rounded]="true"></shimmer>
-        </section>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
-          <div class="form-group">
-            <shimmer height="114px" width="100%" [rounded]="true"></shimmer>
-          </div>
-        </section>
-        <section class="task-detail__section">
-          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
-          <ul>
-            <li class="mb-8" *ngIf="ref.data.user$ | async as user">
-              <div class="flex items-start space-x-4">
-                <div>
-                  <shimmer width="40px" height="40px" borderRadius="50%"></shimmer>
-                </div>
-                <div class="w-full form-group">
-                  <shimmer height="90px" width="100%" [rounded]="true"></shimmer>
-                  <footer class="flex items-center mt-4 space-x-2">
-                    <shimmer height="30px" width="130px" [rounded]="true"></shimmer>
-                  </footer>
-                </div>
-              </div>
-            </li>
-            <ng-container *ngFor="let comment of taskDetail?.comments">
-              <li class="py-4 border-b last:border-b-0">
-                <div class="flex items-start space-x-4">
-                  <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
-                       width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
-                       [alt]="comment?.createdBy?.firstName" />
-                  <div>
-                    <p>{{ comment.content }}</p>
-                    <p class="text-xs text-gray-500">{{ comment?.createdAt | timeAgo }}</p>
-                  </div>
-                </div>
-              </li>
-            </ng-container>
-          </ul>
-        </section>
-      </div>
+      <ng-container *ngTemplateOutlet="loadingState"></ng-container>
     </ng-container>
   </ng-container>
 </div>
@@ -163,4 +114,69 @@
 <ng-template #addAssignees let-hide>
   <compito-user-select [hide]="hide" [users]="ref.data.users$ | async" [selectedMembers]="selectedAssignees"
                        (clicked)="handleUserSelectEvent($event, hide)"></compito-user-select>
+</ng-template>
+
+
+<ng-template #loadingState>
+  <header class="h-24 p-4">
+    <div>
+      <shimmer height="28px" width="50%" [rounded]="true"></shimmer>
+    </div>
+    <div class="flex items-center py-2 space-x-4 text-xs text-gray-500">
+      <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
+      <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
+      <shimmer height="20px" width="100px" [rounded]="true"></shimmer>
+    </div>
+  </header>
+  <div class="px-8 pt-4 overflow-y-auto" [style.maxHeight]="'80vh'" #contentContainer>
+    <section class="task-detail__section">
+      <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Assignees' }"></ng-container>
+      <div class="flex items-center my-2 -space-x-4">
+        <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
+        <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
+        <shimmer width="48px" height="48px" borderRadius="50%"></shimmer>
+      </div>
+    </section>
+    <section class="task-detail__section">
+      <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Priority' }"></ng-container>
+      <shimmer height="40px" width="150px" [rounded]="true"></shimmer>
+    </section>
+    <section class="task-detail__section">
+      <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
+      <div class="form-group">
+        <shimmer height="114px" width="100%" [rounded]="true"></shimmer>
+      </div>
+    </section>
+    <section class="task-detail__section">
+      <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
+      <ul>
+        <li class="mb-8" *ngIf="ref.data.user$ | async as user">
+          <div class="flex items-start space-x-4">
+            <div>
+              <shimmer width="40px" height="40px" borderRadius="50%"></shimmer>
+            </div>
+            <div class="w-full form-group">
+              <shimmer height="90px" width="100%" [rounded]="true"></shimmer>
+              <footer class="flex items-center mt-4 space-x-2">
+                <shimmer height="30px" width="130px" [rounded]="true"></shimmer>
+              </footer>
+            </div>
+          </div>
+        </li>
+        <ng-container *ngFor="let comment of taskDetail?.comments">
+          <li class="py-4 border-b last:border-b-0">
+            <div class="flex items-start space-x-4">
+              <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
+                   width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
+                   [alt]="comment?.createdBy?.firstName" />
+              <div>
+                <p>{{ comment.content }}</p>
+                <p class="text-xs text-gray-500">{{ comment?.createdAt | timeAgo }}</p>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+      </ul>
+    </section>
+  </div>
 </ng-template>

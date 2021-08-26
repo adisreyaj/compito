@@ -209,7 +209,7 @@ export class BoardsService {
     }
   }
 
-  update = async (id: string, req: BoardRequest, user: UserPayload) => {
+  async update(id: string, req: BoardRequest, user: UserPayload) {
     const { role, userId, org } = getUserDetails(user);
     await canUpdateBoard(this.prisma, role, id, userId, org.id, 'update');
     try {
@@ -237,9 +237,9 @@ export class BoardsService {
       }
       throw new InternalServerErrorException();
     }
-  };
+  }
 
-  remove = async (id: string, user: UserPayload) => {
+  async remove(id: string, user: UserPayload) {
     const { role, userId, org } = getUserDetails(user);
     await canUpdateBoard(this.prisma, role, id, userId, org.id, 'delete');
     let board;
@@ -261,10 +261,10 @@ export class BoardsService {
       throw new InternalServerErrorException('Failed to delete Board');
     }
     if (board.orgId !== org.id) {
-      throw new ForbiddenException('No permission to delete the project');
+      throw new ForbiddenException('No permission to delete the board');
     }
     if (board.tasks.length > 0) {
-      throw new ConflictException('Cannot delete project as it contains tasks.');
+      throw new ConflictException('Cannot delete board as it contains tasks.');
     }
     try {
       const board = await this.prisma.board.delete({
@@ -279,7 +279,7 @@ export class BoardsService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
-  };
+  }
 }
 
 const canUpdateBoard = async (

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { append, patch, updateItem } from '@ngxs/store/operators';
+import { append, patch, removeItem, updateItem } from '@ngxs/store/operators';
 import { tap } from 'rxjs/operators';
 import { OrgService } from '../orgs.service';
 import { OrgsAction } from './orgs.actions';
@@ -60,6 +60,19 @@ export class OrgsState {
         setState(
           patch({
             orgs: append([result]),
+          }),
+        );
+      }),
+    );
+  }
+
+  @Action(OrgsAction.Delete)
+  delete({ setState }: StateContext<OrgsStateModel>, { id }: OrgsAction.Delete) {
+    return this.orgService.delete(id).pipe(
+      tap(() => {
+        setState(
+          patch({
+            orgs: removeItem<Organization>((org) => org?.id === id),
           }),
         );
       }),

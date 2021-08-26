@@ -13,7 +13,8 @@ import { User } from '@prisma/client';
         <li
           role="option"
           class="flex items-center p-2 space-x-2 rounded-md cursor-pointer hover:bg-gray-100"
-          (click)="clicked.emit({ type: 'toggle', payload: user })"
+          [class.cursor-not-allowed]="disabled.includes(user.id)"
+          (click)="disabled.includes(user.id) ? {} : clicked.emit({ type: 'toggle', payload: user })"
           #user
         >
           <div>
@@ -57,6 +58,7 @@ export class UserSelectComponent implements AfterViewInit {
   @Input() selectedMembers = new Map();
   @Input() users: User[] | null = [];
   @Input() hide!: () => void;
+  @Input() disabled: any[] = [];
 
   @Output() clicked = new EventEmitter<CardEvent>();
 

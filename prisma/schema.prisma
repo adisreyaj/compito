@@ -4,7 +4,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialActions"]
 }
 
 model User {
@@ -40,7 +41,7 @@ model Organization {
   slug        String        @unique
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  createdBy   User          @relation("orgCreatedBy", fields: [createdById], references: [id])
+  createdBy   User          @relation("orgCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
   createdById String
   members     User[]
   projects    Project[]
@@ -167,9 +168,9 @@ model Role {
 
 model UserRoleOrg {
   id        String       @id @default(cuid())
-  org       Organization @relation(fields: [orgId], references: [id])
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   orgId     String
-  user      User         @relation(fields: [userId], references: [id])
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   role      Role         @relation(fields: [roleId], references: [id])
   roleId    String
