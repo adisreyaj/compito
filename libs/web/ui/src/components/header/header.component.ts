@@ -61,7 +61,7 @@ import { formatUser } from '../../util/format-user.operator';
             <!-- <button tippy="Coming soon">
               <rmx-icon name="add-circle-line"></rmx-icon>
             </button> -->
-            <button tippy="Coming soon">
+            <button tippy="Coming soon" aria-label="Notifications">
               <rmx-icon name="notification-2-line"></rmx-icon>
             </button>
           </div>

@@ -31,7 +31,7 @@ The home page gives you an overview of the tasks, and projects the user has acce
 
 There are quick links to get to projects and boards from the home page.
 
-![Compito Project Management](/assets/home.jpg 'Compito Home Page')
+![Compito Project Management](/assets/compito.gif 'Compito Home Page')
 
 ### Boards Page
 
