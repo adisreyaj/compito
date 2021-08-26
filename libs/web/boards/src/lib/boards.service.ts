@@ -75,4 +75,8 @@ export class BoardsService {
     };
     return this.http.patch<Task>(`${this.api}/${boardId}`, data);
   }
+
+  deleteTask(id: string) {
+    return this.http.delete<any>(`${this.tasksApi}/${id}`);
+  }
 }

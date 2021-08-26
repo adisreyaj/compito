@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { BoardList, CardEvent, DataLoading, DataLoadingState, Task, User, UserDetails } from '@compito/api-interfaces';
-import { UserAvatarGroupData, userMapToArray } from '@compito/web/ui';
+import { ToastService, UserAvatarGroupData, userMapToArray } from '@compito/web/ui';
 import { DialogRef } from '@ngneat/dialog';
 import { Store } from '@ngxs/store';
 import produce from 'immer';
@@ -73,6 +73,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     }>,
     private store: Store,
     private cdr: ChangeDetectorRef,
+    private toast: ToastService,
     private boardService: BoardsService,
   ) {}
 
@@ -173,6 +174,18 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
         break;
     }
   }
+
+  deleteTask() {
+    this.store.dispatch(new BoardsAction.DeleteTask(this.taskId, this.listId)).subscribe(
+      () => {
+        this.ref.close();
+      },
+      () => {
+        this.toast.error('Failed to delete task');
+      },
+    );
+  }
+
   get priorities() {
     return this.ref.data.priorities$ as Observable<string[]>;
   }
