@@ -329,24 +329,11 @@ export class UserService {
 
     const deleteUserFromLocal = async (userId: string, orgId: string) => {
       try {
-        await Promise.all([
-          this.prisma.userRoleOrg.deleteMany({
-            where: {
-              userId,
-              orgId,
-            },
-          }),
-          this.prisma.organization.delete({
-            where: {
-              id: orgId,
-            },
-          }),
-          this.prisma.user.delete({
-            where: {
-              id: userId,
-            },
-          }),
-        ]);
+        await this.prisma.user.delete({
+          where: {
+            id: userId,
+          },
+        });
       } catch (error) {
         this.logger.error('Failed to remove user from DB', error);
         throw new InternalServerErrorException('Something went wrong');
