@@ -5,7 +5,7 @@ import { Breadcrumb, ConfirmModalComponent, formatUser, ToastService } from '@co
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { EMPTY, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/orgs-create-modal.component';
 import { OrgsAction } from './state/orgs.actions';
 import { OrgsState } from './state/orgs.state';
@@ -118,6 +118,9 @@ export class OrgsComponent implements OnInit {
               ? this.store.dispatch(new OrgsAction.Update(initialData.id, data))
               : this.store.dispatch(new OrgsAction.Add(data));
             action.pipe(
+              tap(() => {
+                this.toast.success(`Org ${isUpdateMode ? 'updated' : 'created'} successfully!`);
+              }),
               // Reopen the modal with the filled data if fails
               catchError(() => {
                 this.openProjectModal(data);

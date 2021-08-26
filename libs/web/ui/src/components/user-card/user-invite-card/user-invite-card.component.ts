@@ -46,7 +46,7 @@ import { CardEvent } from '@compito/api-interfaces';
 
     <ng-template #moreOptions let-hide>
       <div class="flex flex-col w-44">
-        <div class="dropdown-item" (click)="clicked.emit({ type: 'edit' }); hide()">Edit</div>
+        <!-- <div class="dropdown-item" (click)="clicked.emit({ type: 'edit' }); hide()">Edit</div> -->
         <div class="text-red-600 dropdown-item" (click)="clicked.emit({ type: 'delete' }); hide()">Delete</div>
       </div>
     </ng-template>

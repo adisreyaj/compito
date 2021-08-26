@@ -8,7 +8,7 @@ import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { User } from '@prisma/client';
 import { EMPTY, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
 import { ProjectsAction } from './state/projects.actions';
 import { ProjectsState } from './state/projects.state';
@@ -134,6 +134,9 @@ export class ProjectsComponent implements OnInit {
               ? this.store.dispatch(new ProjectsAction.Update(initialData.id, data))
               : this.store.dispatch(new ProjectsAction.Add(data));
             action.pipe(
+              tap(() => {
+                this.toast.success(`Project ${isUpdateMode ? 'updated' : 'created'} successfully!`);
+              }),
               // Reopen the modal with the filled data if fails
               catchError(() => {
                 this.openProjectModal(data);
