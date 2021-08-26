@@ -5,7 +5,7 @@ import { ConfirmModalComponent, formatUser, ToastService } from '@compito/web/ui
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { UserRoleUpdateModalComponent } from './shared/components/user-role-update-modal/user-role-update-modal.component';
 import { UsersCreateModalComponent } from './shared/components/users-create-modal/users-create-modal.component';
 import { UsersAction } from './state/users.actions';
@@ -75,6 +75,9 @@ export class UsersComponent implements OnInit {
         switchMap((data) => {
           if (data) {
             return this.store.dispatch(new UsersAction.InviteUser(data)).pipe(
+              tap(() => {
+                this.toast.success(`Invited ${data.email} successfully!`);
+              }),
               // Reopen the modal with the filled data if fails
               catchError(() => {
                 this.inviteUser(data);
@@ -108,7 +111,8 @@ export class UsersComponent implements OnInit {
           });
         }
         break;
-
+      case 'edit':
+        break;
       default:
         break;
     }

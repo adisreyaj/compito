@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Role } from '@compito/api-interfaces';
 import { DialogRef } from '@ngneat/dialog';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'compito-users-create-modal',
@@ -35,14 +37,20 @@ import { DialogRef } from '@ngneat/dialog';
 export class UsersCreateModalComponent implements OnInit {
   userForm!: FormGroup;
 
-  constructor(public ref: DialogRef, private fb: FormBuilder) {}
+  constructor(public ref: DialogRef, private fb: FormBuilder, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.initForm();
     const initialData = this.ref.data?.initialData;
     if (initialData) {
       this.userForm.setValue(initialData);
+      this.cdr.markForCheck();
     }
+    this.roles$.subscribe((roles) => {
+      if (roles?.length > 0) {
+        this.userForm.patchValue({ role: roles[0]?.id });
+      }
+    });
   }
 
   handleFormSubmit() {
@@ -56,7 +64,7 @@ export class UsersCreateModalComponent implements OnInit {
     });
   }
 
-  get roles$() {
+  get roles$(): Observable<Role[]> {
     return this.ref.data.roles$;
   }
 }

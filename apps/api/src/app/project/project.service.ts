@@ -87,6 +87,11 @@ export class ProjectService {
       createdAt: true,
       updatedAt: true,
       boards: true,
+      org: {
+        select: {
+          id: true,
+        },
+      },
       members: { select: USER_BASIC_DETAILS },
     };
     switch (role.name as Roles) {

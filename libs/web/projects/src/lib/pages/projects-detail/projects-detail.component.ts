@@ -7,7 +7,7 @@ import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { EMPTY, Observable, throwError } from 'rxjs';
-import { catchError, withLatestFrom } from 'rxjs/operators';
+import { catchError, tap, withLatestFrom } from 'rxjs/operators';
 import { BoardCreateModalComponent } from '../../shared/components/board-create-modal/board-create-modal.component';
 import { ProjectsAction } from '../../state/projects.actions';
 import { ProjectsState } from '../../state/projects.state';
@@ -70,7 +70,7 @@ export class ProjectsDetailComponent implements OnInit {
     }
   }
 
-  openCreateBoardModal(initialData: any | null = null, isUpdateMode = false) {
+  openCreateBoardModal(initialData: any = null, isUpdateMode = false) {
     if (this.projectId) {
       const ref = this.dialog.open(BoardCreateModalComponent, {
         data: {
@@ -78,17 +78,20 @@ export class ProjectsDetailComponent implements OnInit {
           isUpdateMode,
         },
       });
-      ref.afterClosed$.pipe(withLatestFrom(this.auth.user$.pipe(formatUser()))).subscribe(([data, user]) => {
+      ref.afterClosed$.pipe(withLatestFrom(this.auth.user$.pipe(formatUser()))).subscribe(([data]) => {
         if (data) {
           const action = isUpdateMode
             ? this.store.dispatch(new ProjectsAction.UpdateBoard(initialData?.id, data))
             : this.store.dispatch(new ProjectsAction.AddBoard({ ...data, projectId: this.projectId }));
           action.pipe(
+            tap(() => {
+              this.toast.success(`Board ${isUpdateMode ? 'updated' : 'created'} successfully!`);
+            }),
             // Reopen the modal with the filled data if fails
             catchError(() => {
               this.openCreateBoardModal(data);
-              this.toast.error('Failed to create project!');
-              return throwError(new Error('Failed to create project!'));
+              this.toast.error('Failed to create board!');
+              return throwError(new Error('Failed to create board!'));
             }),
           );
         }
