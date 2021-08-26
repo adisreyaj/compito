@@ -57,15 +57,17 @@ export class ProjectService {
           connect: members,
         },
       };
-      const project = await this.prisma.project.create({
+      return await this.prisma.project.create({
         data: projectData,
         include: {
+          org: {
+            select: { id: true },
+          },
           members: {
             select: USER_BASIC_DETAILS,
           },
         },
       });
-      return project;
     } catch (error) {
       this.logger.error('Failed to create project', error);
       throw new InternalServerErrorException();

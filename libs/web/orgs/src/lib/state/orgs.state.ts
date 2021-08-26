@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { append, patch, removeItem, updateItem } from '@ngxs/store/operators';
+import produce from 'immer';
 import { tap } from 'rxjs/operators';
 import { OrgService } from '../orgs.service';
 import { OrgsAction } from './orgs.actions';
@@ -141,5 +142,31 @@ export class OrgsState {
         patchState({ orgDetail: data });
       }),
     );
+  }
+  @Action(OrgsAction.AddProject)
+  addProjectToOrg({ patchState, getState }: StateContext<OrgsStateModel>, { payload, orgId }: OrgsAction.AddProject) {
+    const orgDetail = getState().orgDetail;
+    if (orgDetail?.id === orgId) {
+      const orgDetailUpdated = produce(orgDetail, (draft) => {
+        draft?.projects.push(payload);
+      });
+      patchState({ orgDetail: orgDetailUpdated });
+    }
+  }
+  @Action(OrgsAction.DeleteProject)
+  deleteProjectFromOrg(
+    { patchState, getState }: StateContext<OrgsStateModel>,
+    { projectId, orgId }: OrgsAction.DeleteProject,
+  ) {
+    const orgDetail = getState().orgDetail;
+    if (orgDetail?.id === orgId) {
+      const orgDetailUpdated = produce(orgDetail, (draft) => {
+        const projectIndex = draft?.projects.findIndex(({ id }) => id === projectId);
+        if (projectIndex >= 0) {
+          draft?.projects.splice(projectIndex, 1);
+        }
+      });
+      patchState({ orgDetail: orgDetailUpdated });
+    }
   }
 }
