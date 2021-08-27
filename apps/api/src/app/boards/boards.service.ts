@@ -1,12 +1,14 @@
 import { BoardRequest, RequestParams, Role, Roles, UserPayload } from '@compito/api-interfaces';
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, Task } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { CompitoLogger } from '../core/utils/logger.util';
 import { getUserDetails } from '../core/utils/payload.util';
@@ -24,7 +26,7 @@ export class BoardsService {
     const { org, role, userId } = getUserDetails(user);
     switch (role.name as Roles) {
       case 'user':
-        this.logger.error('board', 'create', 'User role cannot create board');
+        this.logger.error('create', 'User role cannot create board');
         throw new ForbiddenException('No permission to create board');
       case 'project-admin': {
         try {
@@ -48,9 +50,14 @@ export class BoardsService {
           }
         } catch (error) {
           if (error?.name === 'NotFoundError') {
-            this.logger.error('board', 'create', 'Project not found');
-            throw new NotFoundException('Project not found');
+            this.logger.error('create', 'Project not found', error);
+            throw new BadRequestException('Project not found');
           }
+          if (error instanceof HttpException) {
+            throw error;
+          }
+          this.logger.error('create', 'Something went wrong', error);
+          throw new InternalServerErrorException('Something went wrong');
         }
         break;
       }
@@ -69,7 +76,7 @@ export class BoardsService {
         data: boardData,
       });
     } catch (error) {
-      this.logger.error('board', 'create', 'Failed to create board', error);
+      this.logger.error('create', 'Failed to create board', error);
       throw new InternalServerErrorException();
     }
   }
@@ -106,8 +113,11 @@ export class BoardsService {
             };
           } catch (error) {
             if (error?.name === 'NotFoundError') {
+              this.logger.error('findAll', 'Project not found', error);
               throw new NotFoundException('Project not found');
             }
+            this.logger.error('findAll', 'Something went wrong', error);
+            throw new InternalServerErrorException('Something went wrong');
           }
         }
         break;
@@ -138,7 +148,8 @@ export class BoardsService {
         },
       };
     } catch (error) {
-      throw new InternalServerErrorException();
+      this.logger.error('findAll', 'Something went wrong', error);
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 
@@ -149,6 +160,7 @@ export class BoardsService {
         where: {
           id,
         },
+        rejectOnNotFound: true,
         select: {
           ...GET_SINGLE_BOARD_SELECT,
           tasks: {
@@ -187,25 +199,28 @@ export class BoardsService {
           },
         },
       });
-      if (board) {
-        switch (role.name as Roles) {
-          case 'user':
-          case 'project-admin': {
-            const userHasAccessToBoard = board.project.members.length > 0;
-            if (!userHasAccessToBoard) {
-              throw new ForbiddenException('No access to project');
-            }
-            break;
+      switch (role.name as Roles) {
+        case 'user':
+        case 'project-admin': {
+          const userHasAccessToBoard = board.project.members.length > 0;
+          if (!userHasAccessToBoard) {
+            this.logger.error('findOne', 'Not access to the board');
+            throw new ForbiddenException('No access to project');
           }
-          default:
-            break;
+          break;
         }
-        delete board.project.members;
-        return board;
+        default:
+          break;
       }
-      throw new NotFoundException();
+      delete board.project.members;
+      return board;
     } catch (error) {
-      throw new InternalServerErrorException();
+      if (error?.name === 'NotFoundError') {
+        this.logger.error('findOne', 'Board not found');
+        throw new NotFoundException('Board not found');
+      }
+      this.logger.error('findOne', 'Something went wrong');
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 
@@ -232,34 +247,18 @@ export class BoardsService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException();
+          this.logger.error('update', 'Board not found');
+          throw new NotFoundException('Board not found');
         }
       }
+      this.logger.error('update', 'Something went wrong');
       throw new InternalServerErrorException();
     }
   }
 
   async remove(id: string, user: UserPayload) {
     const { role, userId, org } = getUserDetails(user);
-    await canUpdateBoard(this.prisma, role, id, userId, org.id, 'delete');
-    let board;
-    try {
-      board = await this.prisma.board.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          tasks: true,
-          orgId: true,
-        },
-        rejectOnNotFound: true,
-      });
-    } catch (error) {
-      if (error?.name === 'NotFoundError') {
-        throw new NotFoundException('Board not found');
-      }
-      throw new InternalServerErrorException('Failed to delete Board');
-    }
+    const board = await canUpdateBoard(this.prisma, role, id, userId, org.id, 'delete');
     if (board.orgId !== org.id) {
       throw new ForbiddenException('No permission to delete the board');
     }
@@ -290,53 +289,49 @@ const canUpdateBoard = async (
   org: string,
   operation: string,
 ) => {
+  let boardData: { orgId: string; tasks: Partial<Task>[]; project: any };
+  try {
+    boardData = await prisma.board.findUnique({
+      where: { id },
+      select: {
+        orgId: true,
+        tasks: {
+          select: {
+            id: true,
+          },
+        },
+        project: {
+          select: {
+            members: {
+              where: {
+                id: userId,
+              },
+            },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    if (error?.name === 'NotFoundError') {
+      throw new NotFoundException('Board not found');
+    }
+  }
   switch (role.name as Roles) {
     case 'user':
       throw new ForbiddenException(`No permission to ${operation} board`);
     case 'project-admin': {
-      try {
-        const boardData = await prisma.board.findUnique({
-          where: { id },
-          select: {
-            project: {
-              select: {
-                members: {
-                  where: {
-                    id: userId,
-                  },
-                },
-              },
-            },
-          },
-        });
-        const userPartOfProject = boardData?.project?.members?.length > 0;
-        if (!userPartOfProject) {
-          throw new ForbiddenException(`No permission to ${operation} board`);
-        }
-      } catch (error) {
-        if (error?.name === 'NotFoundError') {
-          throw new NotFoundException('Board not found');
-        }
+      const userPartOfProject = boardData?.project?.members?.length > 0;
+      if (!userPartOfProject) {
+        throw new ForbiddenException(`No permission to ${operation} board`);
       }
       break;
     }
     default: {
-      try {
-        const boardData = await prisma.board.findUnique({
-          where: { id },
-          select: {
-            orgId: true,
-          },
-        });
-        if (boardData.orgId !== org) {
-          throw new ForbiddenException(`No permission to ${operation} board`);
-        }
-      } catch (error) {
-        if (error?.name === 'NotFoundError') {
-          throw new NotFoundException('Board not found');
-        }
+      if (boardData.orgId !== org) {
+        throw new ForbiddenException(`No permission to ${operation} board`);
       }
       break;
     }
   }
+  return boardData;
 };
