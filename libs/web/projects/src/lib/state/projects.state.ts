@@ -13,7 +13,7 @@ export class ProjectsStateModel {
   public projectsFetched = false;
   public projectDetail: Project | null = null;
   public projectDetailFetched = false;
-  public projectLoading: DataLoading = { type: DataLoadingState.init };
+  public projectsLoading: DataLoading = { type: DataLoadingState.init };
   public projectDetailLoading: DataLoading = { type: DataLoadingState.init };
 }
 
@@ -22,7 +22,7 @@ const defaults: ProjectsStateModel = {
   projectsFetched: false,
   projectDetailFetched: false,
   projectDetail: null,
-  projectLoading: { type: DataLoadingState.init },
+  projectsLoading: { type: DataLoadingState.init },
   projectDetailLoading: { type: DataLoadingState.init },
 };
 
@@ -46,7 +46,10 @@ export class ProjectsState {
   }
   @Selector()
   static projectsLoading(state: ProjectsStateModel) {
-    return state.projectLoading;
+    if (state.projectsFetched && state.projectsLoading.type !== DataLoadingState.error) {
+      return { type: DataLoadingState.success };
+    }
+    return state.projectsLoading;
   }
   @Selector()
   static projectDetailLoading(state: ProjectsStateModel) {
@@ -77,7 +80,7 @@ export class ProjectsState {
   @Action(ProjectsAction.Delete)
   delete({ setState, getState, dispatch }: StateContext<ProjectsStateModel>, { id }: ProjectsAction.Delete) {
     const projects = getState().projects;
-    const project = projects.find(({ id }) => id === id);
+    const project = projects.find((item) => item?.id === id);
     if (project) {
       setState(patch({ projects: removeItem<Project>((item) => item?.id === id) }));
       dispatch(new OrgsAction.DeleteProject(project.id, project.org.id));
@@ -120,7 +123,7 @@ export class ProjectsState {
         const { projectDetail } = getState();
         const projectDetailUpdated = produce(projectDetail, (draft) => {
           if (draft) {
-            const boardIndex = draft.boards.findIndex(({ id }) => id === id);
+            const boardIndex = draft.boards.findIndex((item) => item?.id === id);
             if (boardIndex >= 0) {
               draft.boards[boardIndex] = data;
             }
@@ -138,7 +141,7 @@ export class ProjectsState {
         const { projectDetail } = getState();
         const projectDetailUpdated = produce(projectDetail, (draft) => {
           if (draft) {
-            const boardsRemaining = draft.boards.filter(({ id: boardId }) => boardId !== id);
+            const boardsRemaining = draft.boards.filter((item) => item?.id !== id);
             if (boardsRemaining) {
               draft.boards = boardsRemaining;
             }
@@ -150,18 +153,18 @@ export class ProjectsState {
   }
 
   @Action(ProjectsAction.GetAll)
-  getAll({ patchState }: StateContext<ProjectsStateModel>, { payload }: ProjectsAction.GetAll) {
+  getAll({ patchState }: StateContext<ProjectsStateModel>) {
     patchState({
-      projectLoading: { type: DataLoadingState.loading },
+      projectsLoading: { type: DataLoadingState.loading },
     });
     return this.projectService.getAll().pipe(
       tap(
         ({ payload: projects }) => {
-          patchState({ projects, projectLoading: { type: DataLoadingState.success }, projectsFetched: true });
+          patchState({ projects, projectsLoading: { type: DataLoadingState.success }, projectsFetched: true });
         },
         () => {
           patchState({
-            projectLoading: { type: DataLoadingState.error },
+            projectsLoading: { type: DataLoadingState.error },
           });
         },
       ),

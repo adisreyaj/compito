@@ -24,6 +24,7 @@ export class ProjectsService {
   update(id: string, data: ProjectRequest) {
     return this.http.patch<Project>(`${this.api}/${id}`, data);
   }
+
   delete(id: string) {
     return this.http.delete<Project>(`${this.api}/${id}`);
   }
@@ -35,6 +36,7 @@ export class ProjectsService {
   getSingle(id: string) {
     return this.http.get<Project>(`${this.api}/${id}`);
   }
+
   updateMembers(id: string, data: UpdateMembersRequest) {
     return this.http.patch<Project>(`${this.api}/${id}/members`, data);
   }
