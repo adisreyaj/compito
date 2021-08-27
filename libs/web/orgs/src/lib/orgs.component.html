@@ -1,0 +1,82 @@
+<compito-page-header title="Orgs" [breadcrumbs]="breadcrumbs"></compito-page-header>
+<section class="px-4 mt-10 md:px-8 orgs__container" *ngIf="user$ | async as user">
+  <compito-section-header title="Orgs"></compito-section-header>
+  <div class="orgs__list">
+    <article (click)="openProjectModal()"
+             class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
+             style="min-height: 106px;">
+      <div class="flex items-center space-x-2 text-gray-500">
+        <div class="bg-white border rounded-md shadow-sm ">
+          <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
+        </div>
+        <p class="text-sm">Create New Org</p>
+      </div>
+    </article>
+    <ng-container [ngSwitch]="(orgsLoading$ | async)?.type">
+      <ng-container *ngSwitchCase="'SUCCESS'">
+        <ng-container *ngFor="let org of orgs$ | async">
+          <compito-orgs-card [data]="org" [user]="user" (clicked)="handleProjectCardEvents($event, org)">
+          </compito-orgs-card>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngSwitchCase="'LOADING'">
+        <ng-container *ngFor="let org of [1]">
+          <compito-loading-card height="106px">
+            <div class="flex flex-col justify-between h-full">
+              <shimmer height="24px" [rounded]="true"></shimmer>
+              <footer class="flex items-center justify-between">
+                <shimmer height="12px" width="40%" [rounded]="true"></shimmer>
+                <shimmer height="12px" width="40%" [rounded]="true"></shimmer>
+              </footer>
+            </div>
+          </compito-loading-card>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+</section>
+<section class="px-4 md:px-8 orgs__container">
+  <compito-section-header title="Invites Received"></compito-section-header>
+  <div>
+    <ng-container [ngSwitch]="(invitesLoading$ | async)?.type">
+      <ng-container *ngSwitchCase="'LOADING'">
+        <div class="orgs__list">
+          <ng-container *ngFor="let item of [1, 2]">
+            <compito-loading-card height="106px">
+              <div class="flex flex-col justify-between">
+                <header>
+                  <shimmer height="24px" [rounded]="true"></shimmer>
+                  <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+                </header>
+                <shimmer height="12px" width="70%" [rounded]="true"></shimmer>
+              </div>
+            </compito-loading-card>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngSwitchCase="'SUCCESS'">
+        <ng-container *ngIf="invites$ | async as invites">
+          <ng-container *ngIf="invites.length > 0; else noItems">
+            <div class="orgs__list">
+              <ng-container *ngFor="let item of invites">
+                <compito-org-invite-card [data]="item" (clicked)="handleInvite($event, item.id)">
+                </compito-org-invite-card>
+              </ng-container>
+            </div>
+          </ng-container>
+        </ng-container>
+        <div class="flex items-center justify-center w-full">
+          <ng-template #noItems>
+            <div class="flex justify-center w-full mt-10">
+              <div class="flex flex-col items-center">
+                <img src="assets/images/nothing.svg" alt="No Items" width="250" height="187.5" />
+                <p class="text-gray-600">No Pending Invites</p>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </ng-container>
+      <ng-container *ngSwitchCase="'ERROR'"> </ng-container>
+    </ng-container>
+  </div>
+</section>

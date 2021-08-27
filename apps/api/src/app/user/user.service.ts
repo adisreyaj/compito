@@ -237,6 +237,38 @@ export class UserService {
     }
   }
 
+  async getUsersInvites(user: UserPayload) {
+    try {
+      const { email } = getUserDetails(user);
+      return await this.prisma.userInvite.findMany({
+        where: {
+          email,
+        },
+        select: {
+          id: true,
+          email: true,
+          role: {
+            select: {
+              name: true,
+              label: true,
+              id: true,
+            },
+          },
+          invitedBy: {
+            select: USER_BASIC_DETAILS,
+          },
+          org: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to get invites');
+    }
+  }
+
   async signup(data: UserSignupRequest) {
     const connection = this.config.get('AUTH0_DB');
     if (!connection) {
@@ -246,7 +278,7 @@ export class UserService {
     try {
       role = await this.prisma.role.findFirst({
         where: {
-          name: 'admin',
+          name: 'super-admin',
         },
         rejectOnNotFound: true,
       });
@@ -458,6 +490,7 @@ export class UserService {
               select: {
                 id: true,
                 label: true,
+                name: true,
               },
             },
           },
@@ -699,6 +732,18 @@ export class UserService {
               id: true,
             },
           },
+          roles: {
+            where: {
+              orgId: org.id,
+            },
+            select: {
+              role: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
         },
         rejectOnNotFound: true,
       });
@@ -707,35 +752,49 @@ export class UserService {
       if (error?.name === 'NotFoundError') {
         throw new NotFoundException();
       }
-      throw new InternalServerErrorException('Failed to delete user');
+      throw new InternalServerErrorException('Failed to remove user');
     }
     switch (role.name) {
       case 'super-admin': {
         try {
-          return await this.prisma.user.delete({
+          return await this.prisma.user.update({
             where: {
               id,
+            },
+            data: {
+              orgs: {
+                disconnect: {
+                  id: org.id,
+                },
+              },
             },
             select: USER_BASIC_DETAILS,
           });
         } catch (error) {
-          throw new InternalServerErrorException('Failed to update user');
+          throw new InternalServerErrorException('Failed to remove user');
         }
       }
       case 'admin': {
         try {
-          const userInAdminOrg = userData.orgs.findIndex(({ id }) => org === id) >= 0;
-          if (!userInAdminOrg) {
+          const userInAdminOrg = userData.orgs.findIndex(({ id: orgId }) => org === orgId) >= 0;
+          if (!userInAdminOrg || userData.roles?.[0]?.role?.name === 'super-admin') {
             throw new ForbiddenException('Not enough permissions');
           }
-          return await this.prisma.user.delete({
+          return await this.prisma.user.update({
             where: {
               id,
+            },
+            data: {
+              orgs: {
+                disconnect: {
+                  id: org.id,
+                },
+              },
             },
             select: USER_BASIC_DETAILS,
           });
         } catch (error) {
-          throw new InternalServerErrorException('Failed to update user');
+          throw new InternalServerErrorException('Failed to remove user');
         }
       }
       default:

@@ -57,6 +57,11 @@ export class UserController {
     return this.userService.getUserDetails(sessionToken);
   }
 
+  @Get('invites')
+  getInvitesForUser(@Req() req: RequestWithUser) {
+    return this.userService.getUsersInvites(req.user);
+  }
+
   @UseGuards(PermissionsGuard)
   @Permissions(PERMISSIONS.user.read)
   @Get(':id')

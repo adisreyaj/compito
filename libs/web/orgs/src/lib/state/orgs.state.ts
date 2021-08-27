@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
+import { DataLoading, DataLoadingState, Invite, Organization } from '@compito/api-interfaces';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { append, patch, removeItem, updateItem } from '@ngxs/store/operators';
 import produce from 'immer';
@@ -11,6 +11,9 @@ export class OrgsStateModel {
   public orgs: Organization[] = [];
   public orgsFetched = false;
   public orgsLoading: DataLoading = { type: DataLoadingState.init };
+  public invites: Invite[] = [];
+  public invitesFetched = false;
+  public invitesLoading: DataLoading = { type: DataLoadingState.init };
   public orgDetail: Organization | null = null;
   public orgDetailFetched = false;
   public orgDetailLoading: DataLoading = { type: DataLoadingState.init };
@@ -20,6 +23,9 @@ const defaults: OrgsStateModel = {
   orgs: [],
   orgsLoading: { type: DataLoadingState.init },
   orgsFetched: false,
+  invites: [],
+  invitesLoading: { type: DataLoadingState.init },
+  invitesFetched: false,
   orgDetail: null,
   orgDetailLoading: { type: DataLoadingState.init },
   orgDetailFetched: false,
@@ -36,7 +42,14 @@ export class OrgsState {
     return state.orgs;
   }
   @Selector()
+  static getAllInvites(state: OrgsStateModel) {
+    return state.invites;
+  }
+  @Selector()
   static orgsLoading(state: OrgsStateModel) {
+    if (state.orgsFetched && state.orgsLoading.type !== DataLoadingState.error) {
+      return { type: DataLoadingState.success };
+    }
     return state.orgsLoading;
   }
   @Selector()
@@ -52,6 +65,13 @@ export class OrgsState {
     return state.orgDetail;
   }
 
+  @Selector()
+  static invitesLoading(state: OrgsStateModel) {
+    if (state.invitesFetched && state.invitesLoading.type !== DataLoadingState.error) {
+      return { type: DataLoadingState.success };
+    }
+    return state.invitesLoading;
+  }
   constructor(private orgService: OrgService) {}
 
   @Action(OrgsAction.Add)
@@ -89,6 +109,33 @@ export class OrgsState {
     );
   }
 
+  @Action(OrgsAction.AcceptInvite)
+  acceptInvite({ setState, dispatch }: StateContext<OrgsStateModel>, { id }: OrgsAction.AcceptInvite) {
+    return this.orgService.acceptInvite(id).pipe(
+      tap(() => {
+        dispatch(new OrgsAction.GetAll());
+        setState(
+          patch({
+            invites: removeItem<Invite>((invite) => invite?.id === id),
+          }),
+        );
+      }),
+    );
+  }
+
+  @Action(OrgsAction.RejectInvite)
+  rejectInvite({ setState }: StateContext<OrgsStateModel>, { id }: OrgsAction.RejectInvite) {
+    return this.orgService.rejectInvite(id).pipe(
+      tap(() => {
+        setState(
+          patch({
+            invites: removeItem<Invite>((invite) => invite?.id === id),
+          }),
+        );
+      }),
+    );
+  }
+
   @Action(OrgsAction.GetAll)
   getAll({ patchState }: StateContext<OrgsStateModel>) {
     patchState({
@@ -106,6 +153,29 @@ export class OrgsState {
         () => {
           patchState({
             orgsLoading: { type: DataLoadingState.error },
+          });
+        },
+      ),
+    );
+  }
+
+  @Action(OrgsAction.GetInvites)
+  getInvites({ patchState }: StateContext<OrgsStateModel>) {
+    patchState({
+      invitesLoading: { type: DataLoadingState.loading },
+    });
+    return this.orgService.getAllInvites().pipe(
+      tap(
+        (result) => {
+          patchState({
+            invites: result,
+            invitesLoading: { type: DataLoadingState.success },
+            invitesFetched: true,
+          });
+        },
+        () => {
+          patchState({
+            invitesLoading: { type: DataLoadingState.error },
           });
         },
       ),
@@ -143,6 +213,7 @@ export class OrgsState {
       }),
     );
   }
+
   @Action(OrgsAction.AddProject)
   addProjectToOrg({ patchState, getState }: StateContext<OrgsStateModel>, { payload, orgId }: OrgsAction.AddProject) {
     const orgDetail = getState().orgDetail;
@@ -153,6 +224,7 @@ export class OrgsState {
       patchState({ orgDetail: orgDetailUpdated });
     }
   }
+
   @Action(OrgsAction.DeleteProject)
   deleteProjectFromOrg(
     { patchState, getState }: StateContext<OrgsStateModel>,

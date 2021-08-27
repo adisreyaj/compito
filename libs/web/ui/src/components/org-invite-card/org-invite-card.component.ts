@@ -1,9 +1,14 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, NgModule, Output } from '@angular/core';
+import { Invite } from '@compito/api-interfaces';
+import { TimeAgoModule } from '../../pipes';
+import { ButtonModule } from '../button';
 
 @Component({
   selector: 'compito-org-invite-card',
   template: `
     <article
+      *ngIf="data"
       class="p-4 relative rounded-md border transition-all duration-200 ease-in
                      border-gray-100 bg-white shadow-sm"
     >
@@ -28,7 +33,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
       <footer class="flex justify-end space-x-4 mt-6">
         <button btn size="sm" type="button" variant="secondary" (click)="clicked.emit('reject')">Reject</button>
         <button btn size="sm" type="submit" form="orgForm" variant="primary" (click)="clicked.emit('accept')">
-          Accept & Login
+          {{ displayCondition === 'pre-auth' ? 'Accept & Login' : 'Accept' }}
         </button>
       </footer>
     </article>
@@ -37,7 +42,14 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrgInviteCardComponent {
-  @Input() data: any;
-
+  @Input() data: Invite | null = null;
+  @Input() displayCondition: 'pre-auth' | 'post-auth' = 'post-auth';
   @Output() clicked = new EventEmitter<'accept' | 'reject'>();
 }
+
+@NgModule({
+  declarations: [OrgInviteCardComponent],
+  exports: [OrgInviteCardComponent],
+  imports: [CommonModule, ButtonModule, TimeAgoModule],
+})
+export class OrgInviteCardModule {}

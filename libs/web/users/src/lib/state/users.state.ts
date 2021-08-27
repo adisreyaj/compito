@@ -118,6 +118,29 @@ export class UsersState {
       }),
     );
   }
+  @Action(UsersAction.RemoveUser)
+  removeUser({ setState, getState }: StateContext<UsersStateModel>, { id }: UsersAction.RemoveUser) {
+    const users = getState().users;
+    setState(
+      patch({
+        users: removeItem<User>((user) => user?.id === id),
+      }),
+    );
+    return this.userService.removeUser(id).pipe(
+      tap(
+        () => {
+          return;
+        },
+        () => {
+          setState(
+            patch({
+              users,
+            }),
+          );
+        },
+      ),
+    );
+  }
   @Action(UsersAction.UpdateUserRole)
   updateUserRole({ setState }: StateContext<UsersStateModel>, { id, roleId }: UsersAction.UpdateUserRole) {
     return this.userService.updateRole(id, roleId).pipe(
@@ -132,15 +155,26 @@ export class UsersState {
   }
 
   @Action(UsersAction.CancelInvite)
-  cancelInvite({ setState }: StateContext<UsersStateModel>, { id }: UsersAction.CancelInvite) {
-    return this.userService.cancelInvite(id).pipe(
-      tap((data) => {
-        setState(
-          patch({
-            invites: removeItem<any>(({ id: inviteId }) => id === id),
-          }),
-        );
+  cancelInvite({ setState, getState }: StateContext<UsersStateModel>, { id }: UsersAction.CancelInvite) {
+    const invites = getState().invites;
+    setState(
+      patch({
+        invites: removeItem((invite: any) => invite?.id === id),
       }),
+    );
+    return this.userService.cancelInvite(id).pipe(
+      tap(
+        () => {
+          return;
+        },
+        () => {
+          setState(
+            patch({
+              invites,
+            }),
+          );
+        },
+      ),
     );
   }
 

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { Board, DataLoading, Project, Task } from '@compito/api-interfaces';
 import { formatUser } from '@compito/web/ui';
@@ -51,12 +52,14 @@ export class HomeComponent implements OnInit {
 
   user$ = this.auth.user$.pipe(formatUser());
 
-  constructor(private store: Store, private auth: AuthService) {}
+  constructor(private store: Store, private auth: AuthService, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.store.dispatch(new HomeAction.GetProjects());
     this.store.dispatch(new HomeAction.GetRecentTasks());
     this.store.dispatch(new HomeAction.GetHighPriorityTasks());
     this.store.dispatch(new HomeAction.GetBoards());
+
+    console.log(this.activatedRoute.snapshot.queryParams);
   }
 }

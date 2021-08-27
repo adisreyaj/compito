@@ -8,6 +8,8 @@ export const createOrgValidationSchema = object({
 
 export const updateOrgValidationSchema = object({
   name: string().min(2).max(64).optional().allow(null),
+  slug: string().optional(),
+  members: array().optional(),
 });
 
 export const updateMembersValidationSchema = object({

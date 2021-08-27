@@ -131,7 +131,7 @@ export class UsersComponent implements OnInit {
           });
           ref.afterClosed$.subscribe((confirmed) => {
             if (confirmed) {
-              // Remove user form org
+              this.store.dispatch(new UsersAction.RemoveUser(user.id));
             }
           });
         }

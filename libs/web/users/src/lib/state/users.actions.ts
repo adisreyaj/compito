@@ -4,6 +4,10 @@ export namespace UsersAction {
     static readonly type = '[Users] Get Invites';
   }
 
+  export class RemoveUser {
+    static readonly type = '[Users] Remove User';
+    constructor(public id: string) {}
+  }
   export class InviteUser {
     static readonly type = '[Users] Invite User';
     constructor(public payload: InviteRequest) {}

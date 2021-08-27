@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Injectable } from '@angular/core';
 import { DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
 import { OrgsAction } from '@compito/web/orgs/state/orgs.actions';

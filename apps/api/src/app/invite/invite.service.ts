@@ -24,7 +24,7 @@ export class InviteService {
         break;
     }
     try {
-      const invite = await this.prisma.userInvite.create({
+      return await this.prisma.userInvite.create({
         data: {
           email: data.email,
           orgId: org.id,
@@ -52,7 +52,6 @@ export class InviteService {
           createdAt: true,
         },
       });
-      return invite;
     } catch (error) {
       this.logger.error('Failed to create invite', error);
       throw new InternalServerErrorException('Failed to create invite');

@@ -3,7 +3,9 @@ import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/cor
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserSignupRequest } from '@compito/api-interfaces';
+import { ToastService } from '@compito/web/ui';
 import { API_TOKEN } from '@compito/web/ui/tokens';
+import { BehaviorSubject } from 'rxjs';
 @Component({
   selector: 'compito-signup',
   template: `
@@ -54,7 +56,13 @@ import { API_TOKEN } from '@compito/web/ui/tokens';
             </div>
             <footer class="flex justify-end space-x-4 mt-4">
               <button btn type="button" variant="secondary" routerLink="/auth/login">Cancel</button>
-              <button btn type="submit" form="signupForm" variant="primary" [disabled]="signupForm.invalid">
+              <button
+                btn
+                type="submit"
+                form="signupForm"
+                variant="primary"
+                [disabled]="signupForm.invalid || (loading$ | async)"
+              >
                 Create Account
               </button>
             </footer>
@@ -73,10 +81,12 @@ import { API_TOKEN } from '@compito/web/ui/tokens';
 })
 export class SignupComponent implements OnInit {
   signupForm!: FormGroup;
+  loading$ = new BehaviorSubject(false);
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router,
+    private toast: ToastService,
     @Inject(API_TOKEN) private apiToken: string,
   ) {}
 
@@ -93,9 +103,16 @@ export class SignupComponent implements OnInit {
   signup() {
     if (this.signupForm.valid) {
       const data: UserSignupRequest = { ...this.signupForm.value };
-      this.http.post(`${this.apiToken}/users/signup`, data).subscribe(() => {
-        this.router.navigate(['/auth/login']);
-      });
+      this.loading$.next(true);
+      this.http.post(`${this.apiToken}/users/signup`, data).subscribe(
+        () => {
+          this.toast.success('Signed up successfully! You can now login.');
+          this.router.navigate(['/auth/login']);
+        },
+        () => {
+          this.loading$.next(false);
+        },
+      );
     }
   }
 }
