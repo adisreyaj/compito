@@ -1,6 +1,8 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { TerminusModule } from '@nestjs/terminus';
 import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
@@ -12,7 +14,6 @@ import { ProjectModule } from './project/project.module';
 import { RoleModule } from './role/role.module';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,10 +23,11 @@ import { UserModule } from './user/user.module';
       pinoHttp: {
         prettyPrint: process.env.NODE_ENV !== 'production',
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn',
-        useLevelLabels: true,
         redact: ['req.headers.authorization', 'res.headers'],
       },
     }),
+    HttpModule,
+    TerminusModule,
     AuthModule,
     OrganizationModule,
     ProjectModule,
