@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { CardEvent, DataLoading, DataLoadingState, Project } from '@compito/api-interfaces';
+import { CardEvent, DataLoading, Project } from '@compito/api-interfaces';
 import { Breadcrumb, ConfirmModalComponent, ToastService } from '@compito/web/ui';
 import { UsersAction, UsersState } from '@compito/web/users/state';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { User } from '@prisma/client';
 import { EMPTY, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { ProjectsCreateModalComponent } from './shared/components/projects-create-modal/projects-create-modal.component';
 import { ProjectsAction } from './state/projects.actions';
 import { ProjectsState } from './state/projects.state';
@@ -48,16 +48,6 @@ export class ProjectsComponent implements OnInit {
 
   @Select(UsersState.getAllUsers)
   users$!: Observable<User[]>;
-
-  uiView$: Observable<DataLoading> = this.projectsLoading$.pipe(
-    withLatestFrom(this.projectsFetched$),
-    map(([loading, fetched]) => {
-      if (fetched) {
-        return { type: DataLoadingState.success };
-      }
-      return loading;
-    }),
-  );
 
   constructor(
     private dialog: DialogService,

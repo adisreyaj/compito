@@ -32,7 +32,7 @@ export class OrganizationService {
     try {
       role = await this.prisma.role.findFirst({
         where: {
-          name: 'admin',
+          name: 'super-admin',
         },
         rejectOnNotFound: true,
       });
@@ -69,10 +69,23 @@ export class OrganizationService {
           connect: members,
         },
       };
-      const org = await this.prisma.organization.create({
+      return await this.prisma.organization.create({
         data: orgData,
+        include: {
+          userRoleOrg: {
+            where: {
+              userId,
+            },
+            select: {
+              role: {
+                select: {
+                  label: true,
+                },
+              },
+            },
+          },
+        },
       });
-      return org;
     } catch (error) {
       this.logger.error('Failed to create org', error);
       throw new InternalServerErrorException();

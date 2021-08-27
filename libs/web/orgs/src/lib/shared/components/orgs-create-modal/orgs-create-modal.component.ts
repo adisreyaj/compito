@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DialogRef } from '@ngneat/dialog';
+import cuid from 'cuid';
 import { kebabCase } from 'voca';
 
 @Component({
@@ -55,7 +56,7 @@ export class OrgsCreateModalComponent implements OnInit {
       members: [[]],
     });
     this.orgForm.get('name')?.valueChanges.subscribe((data) => {
-      this.orgForm.get('slug')?.setValue(kebabCase(data));
+      this.orgForm.get('slug')?.setValue(`${kebabCase(data)}-${cuid()}`);
     });
   }
 }

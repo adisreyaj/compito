@@ -87,7 +87,21 @@ While inviting other users to the org, a role can be specified. The role will be
 - [PostgreSQL](https://www.postgresql.org/)
 - [Nx](https://nx.dev/)
 
-<!-- GETTING STARTED -->
+## Bundle Size
+
+The bundle size is pretty slim for the kind of application we have. You can also see that the styles css is around ~50KB thanks to Tailwind
+
+<p align="center">
+ <img src="assets/bundle-size.png" alt="Logo" height="500">
+</p>
+
+## Lighthouse Score
+
+The scores are pretty good too with a lot of room for improvements.
+
+<p align="center">
+ <img src="assets/light-house.png" alt="Logo" height="500">
+</p>
 
 ## Getting Started
 
@@ -134,6 +148,39 @@ To get a local copy up and running follow these simple steps.
    ```sh
    npm start api
    ```
+
+## Setting up Auth0
+
+Auth0 is used for authenticating the users. You'll need to setup few things in Auth0 before running the application.
+
+1. Login/Signup to Auth0
+1. Create two applications:
+   - A Single Page application
+   - A Machine to Machine application
+1. In the Single page application make sure to provide the urls:
+
+   - `Allowed Callback URLs`
+
+     ```sh
+     http://localhost:4200
+     ```
+
+   - `Allowed Web Origins`
+
+     ```sh
+     http://localhost:4200
+     ```
+
+   - `Allowed Logout URLs`
+
+     ```sh
+     http://localhost:4200/auth/login
+     ```
+
+1. Create an API in Auth0
+1. The identifier that of the API will be the `audience`
+1. Under the `Machine to Machine Applications` tab, make sure our M-M application is enabled.
+1. Under `Authentication` > `Database`, make sure in the `Applications` tab, both the Application has been enabled.
 
 ## Roadmap
 

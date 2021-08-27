@@ -59,7 +59,7 @@ export class OrgsComponent implements OnInit {
     this.store.dispatch(new OrgsAction.GetInvites());
   }
 
-  openProjectModal(initialData: any = null, isUpdateMode = false) {
+  openOrgModal(initialData: any = null, isUpdateMode = false) {
     const ref = this.dialog.open(OrgsCreateModalComponent, {
       data: {
         initialData,
@@ -79,7 +79,7 @@ export class OrgsComponent implements OnInit {
               }),
               // Reopen the modal with the filled data if fails
               catchError(() => {
-                this.openProjectModal(data);
+                this.openOrgModal(data);
                 this.toast.error('Failed to create org!');
                 return throwError(new Error('Failed to create org!'));
               }),
@@ -98,7 +98,7 @@ export class OrgsComponent implements OnInit {
           id: org.id,
           name: org.name,
         };
-        this.openProjectModal(data, true);
+        this.openOrgModal(data, true);
         break;
       }
       case 'delete':
@@ -140,7 +140,6 @@ export class OrgsComponent implements OnInit {
       case 'reject':
         this.store.dispatch(new OrgsAction.RejectInvite(id));
         break;
-
       default:
         break;
     }

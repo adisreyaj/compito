@@ -13,7 +13,7 @@
         </div>
       </article>
     </ng-container>
-    <ng-container [ngSwitch]="(uiView$ | async)?.type">
+    <ng-container [ngSwitch]="(projectsLoading$ | async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
         <ng-container *ngFor="let project of projects$ | async as projects">
           <div>
