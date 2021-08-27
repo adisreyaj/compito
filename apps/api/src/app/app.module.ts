@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { BoardsModule } from './boards/boards.module';
@@ -16,6 +17,11 @@ import { UserModule } from './user/user.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        prettyPrint: process.env.NODE_ENV !== 'production',
+      },
     }),
     AuthModule,
     OrganizationModule,

@@ -11,7 +11,7 @@ import { CardEvent, User, UserDetails } from '@compito/api-interfaces';
     >
       <ng-container *permission="'user:update'">
         <button
-          *ngIf="data.id !== user?.userId"
+          *ngIf="!disabled.includes(data.id)"
           [tippy]="moreOptions"
           placement="bottom-start"
           variation="menu"
@@ -71,5 +71,7 @@ import { CardEvent, User, UserDetails } from '@compito/api-interfaces';
 export class UserCardComponent {
   @Input() data: User | null = null;
   @Input() user!: UserDetails | null;
+
+  @Input() disabled: string[] = [];
   @Output() clicked = new EventEmitter<CardEvent>();
 }

@@ -1,11 +1,12 @@
 <compito-page-header title="Users"></compito-page-header>
-<section class="mt-4 projects__container">
+<section class="mt-4 projects__container" *ngIf="loggedInUser$|async as loggedInUser">
   <compito-section-header title="Users"></compito-section-header>
   <div class="projects__list">
     <ng-container [ngSwitch]="(usersLoading$ | async)?.type">
       <ng-container *ngSwitchCase="'SUCCESS'">
-        <ng-container *ngFor="let user of users$ | async">
-          <compito-user-card [data]="user" (clicked)="handleUserCardEvent($event, user)" [user]="loggedInUser$ | async">
+        <ng-container *ngFor="let user of (users$ | async) as users">
+          <compito-user-card [data]="user" [disabled]="(users | superUser).concat([loggedInUser.userId])"
+                             (clicked)="handleUserCardEvent($event, user)">
           </compito-user-card>
         </ng-container>
       </ng-container>

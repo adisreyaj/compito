@@ -5,6 +5,7 @@ export * from './header';
 export * from './icon/icon.module';
 export * from './loading-card';
 export * from './modal';
+export * from './org-invite-card/org-invite-card.component';
 export * from './page-header';
 export * from './project-card';
 export * from './section-header';

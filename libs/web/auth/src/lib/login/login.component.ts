@@ -55,6 +55,10 @@ export class LoginComponent implements OnInit {
     if (this.activatedRoute.snapshot.queryParams?.code === 'INVALID_SESSION') {
       this.toast.error('Invalid session! Please login again');
     }
+    this.auth.error$.subscribe((error) => {
+      this.toast.error(error.message ?? 'Something went wrong');
+      this.auth.logout();
+    });
   }
 
   login() {

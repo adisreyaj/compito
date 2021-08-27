@@ -22,6 +22,10 @@ export class UsersService {
     return this.http.patch<User>(`${this.usersAPI}/${id}/role`, { roleId });
   }
 
+  removeUser(id: string) {
+    return this.http.delete<User>(`${this.usersAPI}/${id}`);
+  }
+
   getAllRoles() {
     return this.http.get<Role[]>(this.rolesAPI);
   }

@@ -1,60 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
-import { CardEvent, DataLoading, DataLoadingState, Organization } from '@compito/api-interfaces';
+import { CardEvent, DataLoading, Invite, Organization } from '@compito/api-interfaces';
 import { Breadcrumb, ConfirmModalComponent, formatUser, ToastService } from '@compito/web/ui';
 import { DialogService } from '@ngneat/dialog';
 import { Select, Store } from '@ngxs/store';
 import { EMPTY, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/orgs-create-modal.component';
 import { OrgsAction } from './state/orgs.actions';
 import { OrgsState } from './state/orgs.state';
 
 @Component({
   selector: 'compito-orgs',
-  template: ` <compito-page-header title="Orgs" [breadcrumbs]="breadcrumbs"></compito-page-header>
-    <section class="orgs__container" *ngIf="user$ | async as user">
-      <div class="orgs__list px-4 md:px-8">
-        <article
-          (click)="openProjectModal()"
-          class="p-4 cursor-pointer rounded-md border-2 transition-all duration-200 ease-in
-          border-transparent border-dashed bg-gray-100 hover:bg-gray-200 shadow-sm hover:border-primary
-          grid place-items-center"
-          style="min-height: 106px;"
-        >
-          <div class="flex items-center space-x-2 text-gray-500">
-            <div class=" border rounded-md shadow-sm bg-white">
-              <rmx-icon class="w-5 h-5" name="add-line"></rmx-icon>
-            </div>
-            <p class="text-sm">Create New Org</p>
-          </div>
-        </article>
-        <ng-container [ngSwitch]="(uiView$ | async)?.type">
-          <ng-container *ngSwitchCase="'SUCCESS'">
-            <ng-container *ngFor="let org of orgs$ | async">
-              <compito-orgs-card
-                [data]="org"
-                [user]="user"
-                (clicked)="handleProjectCardEvents($event, org)"
-              ></compito-orgs-card>
-            </ng-container>
-          </ng-container>
-          <ng-container *ngSwitchCase="'LOADING'">
-            <ng-container *ngFor="let org of [1]">
-              <compito-loading-card height="106px">
-                <div class="flex flex-col justify-between h-full">
-                  <shimmer height="24px" [rounded]="true"></shimmer>
-                  <footer class="flex items-center justify-between">
-                    <shimmer height="12px" width="40%" [rounded]="true"></shimmer>
-                    <shimmer height="12px" width="40%" [rounded]="true"></shimmer>
-                  </footer>
-                </div>
-              </compito-loading-card>
-            </ng-container>
-          </ng-container>
-        </ng-container>
-      </div>
-    </section>`,
+  templateUrl: './orgs.component.html',
   styles: [
     `
       .orgs {
@@ -78,8 +36,15 @@ export class OrgsComponent implements OnInit {
 
   @Select(OrgsState.orgsLoading)
   orgsLoading$!: Observable<DataLoading>;
+
   @Select(OrgsState.orgsFetched)
   orgsFetched$!: Observable<DataLoading>;
+
+  @Select(OrgsState.getAllInvites)
+  invites$!: Observable<Invite[]>;
+
+  @Select(OrgsState.invitesLoading)
+  invitesLoading$!: Observable<DataLoading>;
 
   user$ = this.auth.user$.pipe(formatUser());
   constructor(
@@ -89,18 +54,9 @@ export class OrgsComponent implements OnInit {
     private auth: AuthService,
   ) {}
 
-  uiView$: Observable<DataLoading> = this.orgsLoading$.pipe(
-    withLatestFrom(this.orgsFetched$),
-    map(([loading, fetched]) => {
-      if (fetched) {
-        return { type: DataLoadingState.success };
-      }
-      return loading;
-    }),
-  );
-
   ngOnInit(): void {
     this.store.dispatch(new OrgsAction.GetAll());
+    this.store.dispatch(new OrgsAction.GetInvites());
   }
 
   openProjectModal(initialData: any = null, isUpdateMode = false) {
@@ -169,6 +125,20 @@ export class OrgsComponent implements OnInit {
             }
           });
         }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  handleInvite(type: 'accept' | 'reject', id: string) {
+    switch (type) {
+      case 'accept':
+        this.store.dispatch(new OrgsAction.AcceptInvite(id));
+        break;
+      case 'reject':
+        this.store.dispatch(new OrgsAction.RejectInvite(id));
         break;
 
       default:

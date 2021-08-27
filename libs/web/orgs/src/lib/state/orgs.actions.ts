@@ -5,7 +5,6 @@ export namespace OrgsAction {
     static readonly type = '[Orgs] Add org';
     constructor(public payload: OrganizationRequest) {}
   }
-
   export class AddProject {
     static readonly type = '[Orgs] Add project';
     constructor(public payload: Project, public orgId: string) {}
@@ -25,6 +24,19 @@ export namespace OrgsAction {
   }
   export class GetAll {
     static readonly type = '[Orgs] Get All';
+  }
+  export class GetInvites {
+    static readonly type = '[Orgs] Get Invites';
+  }
+
+  export class AcceptInvite {
+    static readonly type = '[Orgs] Accept Invites';
+    constructor(public id: string) {}
+  }
+
+  export class RejectInvite {
+    static readonly type = '[Orgs] Accept Invites';
+    constructor(public id: string) {}
   }
 
   export class UpdateMembers {

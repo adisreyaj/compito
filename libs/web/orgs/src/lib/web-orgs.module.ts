@@ -8,7 +8,9 @@ import {
   IconModule,
   LoadingCardModule,
   ModalModule,
+  OrgInviteCardModule,
   PageHeaderModule,
+  SectionHeaderModule,
   TimeAgoModule,
   UserAvatarGroupModule,
 } from '@compito/web/ui';
@@ -38,6 +40,8 @@ import { OrgsCreateModalComponent } from './shared/components/orgs-create-modal/
     ModalModule,
     A11yModule,
     LoadingCardModule,
+    OrgInviteCardModule,
+    SectionHeaderModule,
   ],
   declarations: [OrgsComponent, OrgsCardComponent, OrgsCreateModalComponent],
 })
