@@ -9,13 +9,14 @@ import {
 import {
   ConflictException,
   ForbiddenException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { CompitoLogger } from '../core/utils/logger.util';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
@@ -23,7 +24,7 @@ import { USER_BASIC_DETAILS } from '../task/task.config';
 
 @Injectable()
 export class OrganizationService {
-  private logger = new Logger('ORG');
+  private logger = new CompitoLogger('ORG');
   constructor(private prisma: PrismaService) {}
 
   async create(data: OrganizationRequest, user: UserPayload) {
@@ -36,9 +37,8 @@ export class OrganizationService {
         },
         rejectOnNotFound: true,
       });
-      this.logger.debug('Admin role found', role.id);
     } catch (error) {
-      this.logger.error('Failed to fetch the roles');
+      this.logger.error('create', 'Failed to fetch the roles', error);
       throw new InternalServerErrorException('Failed to create org!');
     }
     try {
@@ -87,7 +87,7 @@ export class OrganizationService {
         },
       });
     } catch (error) {
-      this.logger.error('Failed to create org', error);
+      this.logger.error('create', 'Failed to create org', error);
       throw new InternalServerErrorException();
     }
   }
@@ -143,7 +143,7 @@ export class OrganizationService {
         },
       };
     } catch (error) {
-      this.logger.error('Failed to fetch orgs', error);
+      this.logger.error('findAll', 'Failed to fetch orgs', error);
       throw new InternalServerErrorException();
     }
   }
@@ -178,10 +178,10 @@ export class OrganizationService {
         tasks: true,
       },
     };
-    try {
-      switch (role.name as Roles) {
-        case 'user':
-        case 'project-admin': {
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin': {
+        try {
           const userData = await this.prisma.user.findUnique({
             where: {
               id: userId,
@@ -199,7 +199,7 @@ export class OrganizationService {
             },
           });
           const membersOfProjectsUserHaveAccessTo = userData.projects.reduce((acc: string[], curr) => {
-            return [...acc, ...curr.members.map(({ id }) => id)];
+            return [...acc, ...curr.members.map((member) => member?.id)];
           }, []);
           /**
            * Only orgs he is part or owner of
@@ -237,38 +237,47 @@ export class OrganizationService {
               },
             },
           };
-          break;
+        } catch (error) {
+          if (error?.name === 'NotFoundError') {
+            this.logger.error('findOne', 'User not found', error);
+          }
+          this.logger.error('findOne', 'Something went wrong', error);
+          throw new InternalServerErrorException('Something went wrong');
         }
-        case 'org-admin':
-        case 'admin': {
-          /**
-           * Only orgs he is part of or owner of
-           */
-          findOptions.where = {
-            id,
-            OR: [
-              {
-                members: {
-                  some: {
-                    id: userId,
-                  },
+        break;
+      }
+      case 'org-admin':
+      case 'admin': {
+        /**
+         * Only orgs he is part of or owner of
+         */
+        findOptions.where = {
+          id,
+          OR: [
+            {
+              members: {
+                some: {
+                  id: userId,
                 },
               },
-              {
-                createdById: userId,
-              },
-            ],
-          };
-          break;
-        }
+            },
+            {
+              createdById: userId,
+            },
+          ],
+        };
+        break;
       }
+    }
+    try {
       const org = await this.prisma.organization.findFirst(findOptions);
       if (org) {
         return org;
       }
-      throw new NotFoundException();
+      this.logger.error('findOne', 'Org not found');
+      throw new NotFoundException('Org not found');
     } catch (error) {
-      this.logger.error('Failed to fetch org', error);
+      this.logger.error('findOne', 'Failed to fetch org', error);
       throw new InternalServerErrorException();
     }
   }
@@ -285,7 +294,6 @@ export class OrganizationService {
         where,
         data: rest,
       });
-      this.logger.debug(org);
       if (org) {
         return org;
       }
@@ -293,10 +301,11 @@ export class OrganizationService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
+          this.logger.error('update', 'Org not found', error);
           throw new NotFoundException();
         }
       }
-      this.logger.error('Failed to update org', error);
+      this.logger.error('update', 'Failed to update org', error);
       throw new InternalServerErrorException();
     }
   }
@@ -309,8 +318,8 @@ export class OrganizationService {
       switch (data.type) {
         case 'modify':
           {
-            const itemsToRemove = data?.remove?.length > 0 ? data.remove.map((id) => ({ id })) : [];
-            const itemsToAdd = data?.add?.length > 0 ? data.add.map((id) => ({ id })) : [];
+            const itemsToRemove = data?.remove?.length > 0 ? data.remove.map((item) => ({ id: item })) : [];
+            const itemsToAdd = data?.add?.length > 0 ? data.add.map((item) => ({ id: item })) : [];
             updateData = {
               members: {
                 disconnect: itemsToRemove,
@@ -321,7 +330,7 @@ export class OrganizationService {
           break;
         case 'set':
           {
-            const itemsToSet = data?.set.length > 0 ? data.set.map((id) => ({ id })) : [];
+            const itemsToSet = data?.set.length > 0 ? data.set.map((item) => ({ id: item })) : [];
             updateData = {
               members: {
                 set: itemsToSet,
@@ -357,10 +366,14 @@ export class OrganizationService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
+          this.logger.error('updateMembers', 'Org not found', error);
           throw new NotFoundException();
         }
       }
-      this.logger.error('Failed to update members', error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      this.logger.error('updateMembers', 'Failed to update members', error);
       throw new InternalServerErrorException();
     }
   }
@@ -389,24 +402,8 @@ export class OrganizationService {
   }
 
   private canUpdateOrg = async (userId: string, orgId: string, role: Roles) => {
-    let orgData: any = null;
-    try {
-      orgData = await this.prisma.organization.findUnique({
-        where: { id: orgId },
-        select: {
-          createdById: true,
-          members: {
-            select: { id: true },
-          },
-        },
-        rejectOnNotFound: true,
-      });
-    } catch (error) {
-      if (error?.name === 'NotFoundError') {
-        throw new NotFoundException('Org not found');
-      }
-    }
-    switch (role as Roles) {
+    const orgData = await this.getOrgDetail(orgId);
+    switch (role) {
       /**
        * Can update the org if:
        * 1. Created by the user
@@ -415,6 +412,7 @@ export class OrganizationService {
       case 'admin':
       case 'org-admin': {
         if (orgData.createdById !== userId || orgData.members.findIndex(({ id }) => id === userId) < 0) {
+          this.logger.error('canUpdate', 'User not part of the org');
           throw new ForbiddenException('No permission to update the org');
         }
         break;
@@ -426,6 +424,7 @@ export class OrganizationService {
       case 'user':
       case 'project-admin': {
         if (orgData.createdById !== userId) {
+          this.logger.error('canUpdate', 'User has not permission');
           throw new ForbiddenException('No permission to update the org');
         }
         break;
@@ -434,9 +433,40 @@ export class OrganizationService {
     return orgData;
   };
   private canDeleteOrg = async (userId: string, orgId: string, role: Roles) => {
-    let orgData: any = null;
+    const orgData = await this.getOrgDetail(orgId);
+    switch (role) {
+      /**
+       * Can delete all orgs
+       */
+      case 'super-admin':
+      case 'admin': {
+        if (orgData.projects.length > 0) {
+          this.logger.error('canDelete', 'Org contains live projects');
+          throw new ConflictException('Cannot delete org as it contains projects.');
+        }
+        if (orgData.createdById !== userId || orgData.members.findIndex(({ id }) => id === userId) < 0) {
+          this.logger.error('canDelete', 'User not owner or is part of the org');
+          throw new ForbiddenException('No permission to delete the org');
+        }
+        break;
+      }
+      /**
+       * Can delete the org if:
+       * 1. Created by the user
+       */
+      default:
+        if (orgData.createdById !== userId) {
+          this.logger.error('canDelete', 'User has no permission');
+          throw new ForbiddenException('No permission to delete the org');
+        }
+        break;
+    }
+    return orgData;
+  };
+
+  private async getOrgDetail(orgId) {
     try {
-      orgData = await this.prisma.organization.findUnique({
+      return await this.prisma.organization.findUnique({
         where: { id: orgId },
         select: {
           createdById: true,
@@ -449,40 +479,11 @@ export class OrganizationService {
       });
     } catch (error) {
       if (error?.name === 'NotFoundError') {
+        this.logger.error('getOrgDetail', 'Org not found', error);
         throw new NotFoundException('Org not found');
       }
+      this.logger.error('getOrgDetail', 'Something went wrong', error);
+      throw new InternalServerErrorException('Something went wrong');
     }
-    switch (role) {
-      /**
-       * Can delete all orgs
-       */
-      case 'super-admin': {
-        break;
-      }
-      /**
-       * Can delete the org if:
-       * 1. Created by the user
-       * 2. Is part of the org
-       */
-      case 'admin': {
-        if (orgData.projects.length > 0) {
-          throw new ConflictException('Cannot delete org as it contains projects.');
-        }
-        if (orgData.createdById !== userId || orgData.members.findIndex(({ id }) => id === userId) < 0) {
-          throw new ForbiddenException('No permission to delete the org');
-        }
-        break;
-      }
-      /**
-       * Can delete the org if:
-       * 1. Created by the user
-       */
-      default:
-        if (orgData.createdById !== userId) {
-          throw new ForbiddenException('No permission to delete the org');
-        }
-        break;
-    }
-    return orgData;
-  };
+  }
 }
