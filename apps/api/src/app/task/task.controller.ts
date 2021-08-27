@@ -26,7 +26,7 @@ export class TaskController {
   @Permissions(PERMISSIONS.task.read)
   @Get()
   findAll(@Query() query: RequestParams, @Req() req: RequestWithUser) {
-    return this.taskService.findAll(query, {}, req.user);
+    return this.taskService.findAll(query, req.user, {});
   }
 
   @Get('priorities')
@@ -47,7 +47,7 @@ export class TaskController {
         },
       },
     };
-    return this.taskService.findAll(query, where, req.user);
+    return this.taskService.findAll(query, req.user, where);
   }
 
   @UseGuards(PermissionsGuard)

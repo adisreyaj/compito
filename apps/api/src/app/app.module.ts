@@ -21,6 +21,9 @@ import { UserModule } from './user/user.module';
     LoggerModule.forRoot({
       pinoHttp: {
         prettyPrint: process.env.NODE_ENV !== 'production',
+        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn',
+        useLevelLabels: true,
+        redact: ['req.headers.authorization', 'res.headers'],
       },
     }),
     AuthModule,
