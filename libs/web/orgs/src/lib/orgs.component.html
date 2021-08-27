@@ -2,7 +2,7 @@
 <section class="px-4 mt-10 md:px-8 orgs__container" *ngIf="user$ | async as user">
   <compito-section-header title="Orgs"></compito-section-header>
   <div class="orgs__list">
-    <article (click)="openProjectModal()"
+    <article (click)="openOrgModal()"
              class="grid p-4 transition-all duration-200 ease-in bg-gray-100 border-2 border-transparent border-dashed rounded-md shadow-sm cursor-pointer hover:bg-gray-200 hover:border-primary place-items-center"
              style="min-height: 106px;">
       <div class="flex items-center space-x-2 text-gray-500">
