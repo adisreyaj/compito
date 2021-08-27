@@ -140,7 +140,6 @@ export class OrgsComponent implements OnInit {
       case 'reject':
         this.store.dispatch(new OrgsAction.RejectInvite(id));
         break;
-
       default:
         break;
     }

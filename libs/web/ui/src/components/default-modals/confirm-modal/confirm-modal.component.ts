@@ -17,8 +17,8 @@ export interface ConfirmModalData {
     <div class="flex-1 mt-4 text-sm text-gray-600">
       {{ ref?.data?.body ?? 'Confirm your action as it cannot be reversed. Are you sure that you want to proceed?' }}
     </div>
-    <footer class="flex justify-end space-x-4">
-      <button btn variant="secondary" (click)="ref.close(false)">Close</button>
+    <footer class="flex justify-end space-x-4" cdkTrapFocus cdkTrapFocusAutoCapture>
+      <button btn variant="secondary" (click)="ref.close(false)" cdkFocusInitial>Close</button>
       <button btn [variant]="ref?.data?.primaryActionType ?? 'primary'" (click)="ref.close(true)">
         {{ ref?.data?.primaryAction ?? 'Confirm' }}
       </button>

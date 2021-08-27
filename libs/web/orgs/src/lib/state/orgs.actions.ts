@@ -35,7 +35,7 @@ export namespace OrgsAction {
   }
 
   export class RejectInvite {
-    static readonly type = '[Orgs] Accept Invites';
+    static readonly type = '[Orgs] Reject Invites';
     constructor(public id: string) {}
   }
 
