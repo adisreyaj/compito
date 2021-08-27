@@ -4,11 +4,11 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { CompitoLogger } from '../core/utils/logger.util';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
@@ -16,7 +16,7 @@ import { USER_BASIC_DETAILS } from '../task/task.config';
 
 @Injectable()
 export class ProjectService {
-  private logger = new Logger('PROJECT');
+  private logger = new CompitoLogger('PROJECT');
   constructor(private prisma: PrismaService) {}
 
   async create(data: ProjectRequest, user: UserPayload) {
@@ -28,7 +28,7 @@ export class ProjectService {
       case 'org-admin':
         break;
       default:
-        this.logger.error(`CREATE:PROJECT--> Role doesn't have permission`);
+        this.logger.error('create', 'No permission to create project');
         throw new ForbiddenException('No permissions to create project');
     }
     try {
@@ -69,7 +69,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      this.logger.error('Failed to create project', error);
+      this.logger.error('create', 'Failed to create project', error);
       throw new InternalServerErrorException();
     }
   }
@@ -129,18 +129,20 @@ export class ProjectService {
         },
       };
     } catch (error) {
-      this.logger.error('Failed to fetch orgs', error);
+      this.logger.error('findAll', 'Failed to fetch orgs', error);
       throw new InternalServerErrorException();
     }
   }
 
   async findOne(id: string, user: UserPayload) {
     const { role, userId } = getUserDetails(user);
+    let project;
     try {
-      const project = await this.prisma.project.findUnique({
+      project = await this.prisma.project.findUnique({
         where: {
           id,
         },
+        rejectOnNotFound: true,
         select: {
           id: true,
           name: true,
@@ -154,26 +156,27 @@ export class ProjectService {
           members: { select: USER_BASIC_DETAILS },
         },
       });
-      if (project) {
-        switch (role.name as Roles) {
-          case 'user':
-          case 'project-admin': {
-            const isUserPartOfProject = (project.members as any[]).findIndex(({ id }) => id === userId) >= 0;
-            if (!isUserPartOfProject) {
-              throw new ForbiddenException('No access to project');
-            }
-            break;
-          }
-          default:
-            break;
-        }
-        return project;
-      }
-      throw new NotFoundException();
     } catch (error) {
-      this.logger.error('Failed to fetch project', error);
+      if (error?.name === 'NotFoundError') {
+        throw new NotFoundException('Project not found');
+      }
+      this.logger.error('findOne', 'Failed to fetch project', error);
       throw new InternalServerErrorException();
     }
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin': {
+        const isUserPartOfProject = (project.members as any[]).findIndex((member) => member?.id === userId) >= 0;
+        if (!isUserPartOfProject) {
+          this.logger.error('findOne', 'User has no access to the project');
+          throw new ForbiddenException('No access to project');
+        }
+        break;
+      }
+      default:
+        break;
+    }
+    return project;
   }
 
   async update(id: string, req: ProjectRequest, user: UserPayload) {
@@ -185,12 +188,13 @@ export class ProjectService {
       data = {
         ...data,
         members: {
-          set: members.map((id) => ({ id })),
+          set: members.map((memberId) => ({ id: memberId })),
         },
       };
     }
+    let project;
     try {
-      const project = await this.prisma.project.update({
+      project = await this.prisma.project.update({
         where: {
           id,
         },
@@ -204,32 +208,30 @@ export class ProjectService {
           members: { select: USER_BASIC_DETAILS },
         },
       });
-      this.logger.debug(project);
-      if (project) {
-        return project;
-      }
-      throw new NotFoundException();
+      return project;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
+          this.logger.error('update', 'Project not found', error);
           throw new NotFoundException();
         }
       }
-      this.logger.error('Failed to update project', error);
-      throw new InternalServerErrorException();
+      this.logger.error('update', 'Failed to update project', error);
+      throw new InternalServerErrorException('Failed to update project');
     }
   }
 
   async updateMembers(id: string, data: UpdateMembersRequest, user: UserPayload) {
     const { role, userId } = getUserDetails(user);
     await this.canUpdateProject(role, id, userId);
+    let project;
     try {
       let updateData: Prisma.ProjectUpdateInput = {};
       switch (data.type) {
         case 'modify':
           {
-            const itemsToRemove = data?.remove?.length > 0 ? data.remove.map((id) => ({ id })) : [];
-            const itemsToAdd = data?.add?.length > 0 ? data.add.map((id) => ({ id })) : [];
+            const itemsToRemove = data?.remove?.length > 0 ? data.remove.map((item) => ({ id: item })) : [];
+            const itemsToAdd = data?.add?.length > 0 ? data.add.map((item) => ({ id: item })) : [];
             updateData = {
               members: {
                 disconnect: itemsToRemove,
@@ -240,7 +242,7 @@ export class ProjectService {
           break;
         case 'set':
           {
-            const itemsToSet = data?.set.length > 0 ? data.set.map((id) => ({ id })) : [];
+            const itemsToSet = data?.set.length > 0 ? data.set.map((item) => ({ id: item })) : [];
             updateData = {
               members: {
                 set: itemsToSet,
@@ -249,7 +251,7 @@ export class ProjectService {
           }
           break;
       }
-      const project = await this.prisma.project.update({
+      project = await this.prisma.project.update({
         where: {
           id,
         },
@@ -263,18 +265,16 @@ export class ProjectService {
           members: { select: USER_BASIC_DETAILS },
         },
       });
-      if (project) {
-        return project;
-      }
-      throw new NotFoundException();
+      return project;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
+          this.logger.error('update', 'Project not found', error);
           throw new NotFoundException();
         }
       }
-      this.logger.error('Failed to update members', error);
-      throw new InternalServerErrorException();
+      this.logger.error('update', 'Failed to update members', error);
+      throw new InternalServerErrorException('Failed to update members');
     }
   }
 
@@ -283,6 +283,7 @@ export class ProjectService {
     switch (role.name as Roles) {
       case 'user':
       case 'project-admin':
+        this.logger.error('delete', `Role doesn't have permission to delete project`);
         throw new ForbiddenException('No permission to delete the project');
       default: {
         let project;
@@ -299,14 +300,18 @@ export class ProjectService {
           });
         } catch (error) {
           if (error?.name === 'NotFoundError') {
+            this.logger.error('delete', 'Project not found', error);
             throw new NotFoundException('Project not found');
           }
+          this.logger.error('delete', 'Failed to delete project', error);
           throw new InternalServerErrorException('Failed to delete project');
         }
         if (project.orgId !== org.id) {
+          this.logger.error('delete', 'User cannot delete project of different org');
           throw new ForbiddenException('No permission to delete the project');
         }
         if (project.boards.length > 0) {
+          this.logger.error('delete', 'Project contains boards, cannot delete');
           throw new ConflictException('Cannot delete project as it contains boards.');
         }
         break;
@@ -323,7 +328,7 @@ export class ProjectService {
       }
       throw new NotFoundException();
     } catch (error) {
-      this.logger.error('Failed to delete project', error);
+      this.logger.error('delete', 'Failed to delete project', error);
       throw new InternalServerErrorException();
     }
   }
@@ -331,6 +336,7 @@ export class ProjectService {
   private async canUpdateProject(role: Role, id: string, userId: string) {
     switch (role.name as Roles) {
       case 'user':
+        this.logger.error('update', 'User role cannot update project');
         throw new ForbiddenException('Cannot update project');
       case 'project-admin':
         try {
@@ -349,10 +355,12 @@ export class ProjectService {
           });
           const userPartOfProject = projectData?.members.length > 0;
           if (!userPartOfProject) {
+            this.logger.error('update', 'Project admins is not part of the project');
             throw new ForbiddenException('No permission to update the project');
           }
         } catch (error) {
           if (error?.name === 'NotFoundError') {
+            this.logger.error('update', 'Project not found');
             throw new NotFoundException('Project not found');
           }
         }

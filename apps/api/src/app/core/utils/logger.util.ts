@@ -5,7 +5,7 @@ export class CompitoLogger {
     this.logger = new Logger(scope);
   }
 
-  error(feature: string, operation: string, message: string, error?: any) {
-    this.logger.error(`${feature.toUpperCase()}:${operation.toUpperCase()} --> ${message}`, error);
+  error(operation: string, message: string, error?: any) {
+    this.logger.error(`${operation.toUpperCase()} --> ${message}`, error);
   }
 }
