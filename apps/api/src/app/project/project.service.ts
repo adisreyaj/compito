@@ -158,6 +158,7 @@ export class ProjectService {
       });
     } catch (error) {
       if (error?.name === 'NotFoundError') {
+        this.logger.error('findOne', 'Project not found', error);
         throw new NotFoundException('Project not found');
       }
       this.logger.error('findOne', 'Failed to fetch project', error);
