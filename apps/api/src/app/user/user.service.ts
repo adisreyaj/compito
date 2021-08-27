@@ -2,9 +2,9 @@ import { RequestParams, Role, Roles, UserPayload, UserRequest, UserSignupRequest
 import {
   BadRequestException,
   ForbiddenException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -15,13 +15,14 @@ import * as cuid from 'cuid';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { kebabCase } from 'voca';
 import { AuthService } from '../auth/auth.service';
+import { CompitoLogger } from '../core/utils/logger.util';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
 @Injectable()
 export class UserService {
-  private logger = new Logger('USER');
+  private logger = new CompitoLogger('USER');
 
   managementClient: ManagementClient<AppMetadata, UserMetadata>;
   authClient: AuthenticationClient;
@@ -35,6 +36,7 @@ export class UserService {
       const secret = this.config.get('SESSION_TOKEN_SECRET');
       const token: JwtPayload = verify(sessionToken, secret) as any;
       if (!token) {
+        this.logger.error('getUserDetails', 'Invalid session token');
         throw new ForbiddenException('Session not valid. Please login again!');
       }
       const [user, userInvite] = await this.prisma.$transaction([
@@ -81,6 +83,7 @@ export class UserService {
         }),
       ]);
       if (!user) {
+        this.logger.error('getUserDetails', 'User not found');
         throw new NotFoundException('User not found');
       }
       const { orgs = [], projects = [], roles = [] } = user;
@@ -95,9 +98,10 @@ export class UserService {
 
       if (token.org) {
         if (orgs.findIndex(({ id }) => id === token.org) < 0) {
+          this.logger.error('getUserDetails', 'User is not part of the selected org');
           throw new ForbiddenException('No access to org');
         }
-        const projectsPartOfOrg = projects.filter(({ orgId: org }) => org === token.org).map(({ id }) => id);
+        const projectsPartOfOrg = projects.filter((project) => project?.orgId === token.org).map(({ id }) => id);
         const org = orgs.find(({ id }) => id === token.org);
         return {
           org,
@@ -114,7 +118,11 @@ export class UserService {
         pendingInvites: inviteIds.length > 0,
       };
     } catch (error) {
-      throw new InternalServerErrorException('Failed to fetch user orgs');
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      this.logger.error('getUserDetails', 'Failed to fetch user details');
+      throw new InternalServerErrorException('Failed to fetch user details');
     }
   }
 
@@ -265,6 +273,7 @@ export class UserService {
         },
       });
     } catch (error) {
+      this.logger.error('getUserInvites', 'Failed to fetch user invites', error);
       throw new InternalServerErrorException('Failed to get invites');
     }
   }
@@ -282,9 +291,8 @@ export class UserService {
         },
         rejectOnNotFound: true,
       });
-      this.logger.debug('Admin role found', role.id);
     } catch (error) {
-      this.logger.error('Failed to fetch the roles');
+      this.logger.error('signup', 'Roles not configured', error);
       throw new InternalServerErrorException('Failed to create user!');
     }
     const { email, firstName, lastName, org, password } = data;
@@ -351,15 +359,14 @@ export class UserService {
             },
           }),
         ]);
-        this.logger.debug('User created locally', user.id);
         return { user, orgId: user.orgs[0].id };
       } catch (error) {
-        this.logger.error('Failed to create user in DB', error);
+        this.logger.error('signup', 'Failed to create user and in DB', error);
         throw new InternalServerErrorException('Failed to create user');
       }
     };
 
-    const deleteUserFromLocal = async (userId: string, orgId: string) => {
+    const deleteUserFromLocal = async (userId: string) => {
       try {
         await this.prisma.user.delete({
           where: {
@@ -367,7 +374,7 @@ export class UserService {
           },
         });
       } catch (error) {
-        this.logger.error('Failed to remove user from DB', error);
+        this.logger.error('signup', 'Failed to remove user from DB on failure', error);
         throw new InternalServerErrorException('Something went wrong');
       }
     };
@@ -375,10 +382,10 @@ export class UserService {
     const createUserInAuth0 = async (
       userId: string,
       orgId: string,
-      roles: Record<string, { name: string; id: string }>,
+      rolesData: Record<string, { name: string; id: string }>,
     ) => {
       try {
-        const data: SignUpUserData = {
+        const auth0UserData: SignUpUserData = {
           family_name: lastName,
           given_name: firstName,
           password,
@@ -387,13 +394,13 @@ export class UserService {
           user_metadata: {
             orgs: JSON.stringify([orgId]),
             userId: userId,
-            roles: JSON.stringify(roles),
+            roles: JSON.stringify(rolesData),
           },
         };
-        return await this.authClient.database.signUp(data);
+        return await this.authClient.database.signUp(auth0UserData);
       } catch (error) {
-        await deleteUserFromLocal(userId, orgId);
-        this.logger.error('Failed to create user in Auth0', error);
+        await deleteUserFromLocal(userId);
+        this.logger.error('signup', 'Failed to create user in Auth0', error);
         throw new InternalServerErrorException('Failed to signup');
       }
     };
@@ -404,9 +411,7 @@ export class UserService {
         [curr.orgId]: curr.role,
       };
     }, {});
-    const userInAuth0 = await createUserInAuth0(userSaved.user.id, userSaved.orgId, roles);
-    this.logger.debug('User created locally', userInAuth0._id);
-    return userInAuth0;
+    return createUserInAuth0(userSaved.user.id, userSaved.orgId, roles);
   }
 
   async findAll(query: RequestParams, user: UserPayload) {
@@ -434,7 +439,7 @@ export class UserService {
             });
             projects = userData.projects.map(({ id }) => id);
           } catch (error) {
-            this.logger.error('Failed to fetch user details');
+            this.logger.error('findAll', 'Failed to fetch user details', error);
             throw new InternalServerErrorException('Failed to fetch users');
           }
           whereCondition = {
@@ -511,7 +516,7 @@ export class UserService {
         },
       };
     } catch (error) {
-      this.logger.error('Failed to fetch orgs', error);
+      this.logger.error('fetchAll', 'Failed to fetch users', error);
       throw new InternalServerErrorException();
     }
   }
@@ -570,11 +575,12 @@ export class UserService {
         select: { ...USER_BASIC_DETAILS, createdAt: true, updatedAt: true, orgs: { select: { id: true, name: true } } },
       });
       if (!userData) {
+        this.logger.error('findOne', 'User not found');
         throw new NotFoundException('User not found');
       }
       return userData;
     } catch (error) {
-      this.logger.error('Failed to fetch orgs', error);
+      this.logger.error('findOne', 'Failed to fetch user', error);
       throw new InternalServerErrorException();
     }
   }
@@ -582,12 +588,14 @@ export class UserService {
   async updateUser(id: string, data: Partial<UserRequest>, user: UserPayload) {
     const { userId } = getUserDetails(user);
     if (id !== userId) {
+      this.logger.error('update', 'Cannot update other user data');
       throw new ForbiddenException('Not enough permissions to update the user details');
     }
     const { password, newPassword, orgId, email, roleId, ...rest } = data;
     let dataToUpdate: Prisma.UserUpdateInput = { ...rest };
     if (password !== null && newPassword !== null) {
       if (password === newPassword) {
+        this.logger.error('update', 'New password cannot be the same as current password');
         throw new BadRequestException('New password cannot be the same as your current password!');
       }
       try {
@@ -595,6 +603,7 @@ export class UserService {
           where: {
             id,
           },
+          rejectOnNotFound: true,
           select: {
             email: true,
             password: true,
@@ -602,7 +611,7 @@ export class UserService {
         });
         const passwordMatched = compareSync(password, userData.password);
         if (!passwordMatched) {
-          this.logger.error(`Current password doesn't match`);
+          this.logger.error('update', `Current password doesn't match`);
           throw new ForbiddenException(`Current password doesn't match`);
         }
         const passwordUpdatedInAuth0 = this.updateUserPasswordInAuth0(userData.email, newPassword);
@@ -614,7 +623,11 @@ export class UserService {
           password: hashSync(newPassword, 10),
         };
       } catch (error) {
-        this.logger.error(`USER:PASSWORD`, error);
+        if (error?.name === 'NotFoundError') {
+          this.logger.error('update', 'User not found', error);
+          throw new NotFoundException('User not found');
+        }
+        this.logger.error('update', 'Failed in find user and validate password stage', error);
         throw new InternalServerErrorException('Something went wrong!');
       }
     }
@@ -627,6 +640,7 @@ export class UserService {
         select: USER_BASIC_DETAILS,
       });
     } catch (error) {
+      this.logger.error('findOne', 'Failed to fetch user', error);
       throw new InternalServerErrorException('Failed to update user');
     }
   }
@@ -655,17 +669,16 @@ export class UserService {
             },
             rejectOnNotFound: true,
           });
-
-          if (userData.orgs.findIndex(({ id }) => id === org.id) < 0) {
+          if (userData.orgs.findIndex((item) => item?.id === org.id) < 0) {
             throw new ForbiddenException('Not enough permissions to update the role');
           }
           if (userData.roles?.length === 0) {
-            this.logger.error(`User doesn't have proper roles configured`);
-            throw new InternalServerErrorException();
+            this.logger.error('updateRole', `User doesn't have proper roles configured`);
+            throw new InternalServerErrorException('Something went wrong.');
           }
         } catch (error) {
           if (error?.name === 'NotFoundError') {
-            this.logger.error('Invite not found');
+            this.logger.error('updateRole', 'User not found', error);
             throw new NotFoundException('Invite not found');
           }
           throw new InternalServerErrorException();
@@ -673,7 +686,7 @@ export class UserService {
         break;
       }
       default:
-        this.logger.error(`Role doesn't have authority to update user role`);
+        this.logger.error('updateRole', `User doesn't have authority to update user role`);
         throw new ForbiddenException('Not enough permissions to update the user details');
     }
     try {
@@ -715,7 +728,7 @@ export class UserService {
         select: userSelectFields,
       });
     } catch (error) {
-      this.logger.error('Failed to update role', error);
+      this.logger.error('updateRole', 'Failed to update role', error);
       throw new InternalServerErrorException('Failed to update role');
     }
   }
@@ -748,10 +761,11 @@ export class UserService {
         rejectOnNotFound: true,
       });
     } catch (error) {
-      this.logger.error(error);
       if (error?.name === 'NotFoundError') {
+        this.logger.error('delete', 'User not found', error);
         throw new NotFoundException();
       }
+      this.logger.error('delete', 'Failed to delete user', error);
       throw new InternalServerErrorException('Failed to remove user');
     }
     switch (role.name) {
@@ -771,13 +785,15 @@ export class UserService {
             select: USER_BASIC_DETAILS,
           });
         } catch (error) {
+          this.logger.error('delete', 'Failed to remove user', error);
           throw new InternalServerErrorException('Failed to remove user');
         }
       }
       case 'admin': {
         try {
           const userInAdminOrg = userData.orgs.findIndex(({ id: orgId }) => org === orgId) >= 0;
-          if (!userInAdminOrg || userData.roles?.[0]?.role?.name === 'super-admin') {
+          if (!userInAdminOrg) {
+            this.logger.error('delete', 'Admin user is not part of the org, cannot remove user');
             throw new ForbiddenException('Not enough permissions');
           }
           return await this.prisma.user.update({
@@ -794,10 +810,12 @@ export class UserService {
             select: USER_BASIC_DETAILS,
           });
         } catch (error) {
+          this.logger.error('delete', 'Failed to remove user', error);
           throw new InternalServerErrorException('Failed to remove user');
         }
       }
       default:
+        this.logger.error('delete', 'User with normal role cannot remove user');
         throw new ForbiddenException('Not enough permissions');
     }
   }
@@ -819,9 +837,11 @@ export class UserService {
         );
         return true;
       } else {
+        this.logger.error('updatePassword', 'User not found in Auth0 database');
         return new BadRequestException('User not found');
       }
     } catch (error) {
+      this.logger.error('updatePassword', 'Something went wrong while updating password in Auth0', error);
       return new InternalServerErrorException();
     }
   };
