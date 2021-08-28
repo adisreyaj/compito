@@ -79,9 +79,13 @@ export class UsersComponent implements OnInit {
                 this.toast.success(`Invited ${data.email} successfully!`);
               }),
               // Reopen the modal with the filled data if fails
-              catchError(() => {
-                this.inviteUser(data);
-                this.toast.error('Failed to invite user!');
+              catchError((error) => {
+                if (error?.status === 400) {
+                  this.toast.error('User already part of org');
+                } else {
+                  this.inviteUser(data);
+                  this.toast.error('Failed to invite user!');
+                }
                 return throwError(new Error('Failed to invite user!'));
               }),
             );

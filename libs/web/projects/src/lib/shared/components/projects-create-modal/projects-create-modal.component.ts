@@ -4,6 +4,7 @@ import { CardEvent } from '@compito/api-interfaces';
 import { UserAvatarGroupData, userMapToArray } from '@compito/web/ui';
 import { DialogRef } from '@ngneat/dialog';
 import { User } from '@prisma/client';
+import cuid from 'cuid';
 import produce from 'immer';
 import { BehaviorSubject } from 'rxjs';
 import { kebabCase } from 'voca';
@@ -135,7 +136,7 @@ export class ProjectsCreateModalComponent implements OnInit {
       members: [[]],
     });
     this.projectForm.get('name')?.valueChanges.subscribe((data) => {
-      this.projectForm.get('slug')?.setValue(kebabCase(data));
+      this.projectForm.get('slug')?.setValue(`${kebabCase(data)}-${cuid()}`);
     });
   }
 }
