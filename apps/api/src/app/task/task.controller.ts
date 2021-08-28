@@ -97,7 +97,7 @@ export class TaskController {
 
   @Post(':id/attachments')
   @UseInterceptors(FilesInterceptor('files'))
-  addAttachments(@Param('id') id: string, @UploadedFiles() files: Express.Multer.File[], @Req() req: RequestWithUser) {
+  addAttachments(@Param('id') id: string, @UploadedFiles() files: any[], @Req() req: RequestWithUser) {
     return this.taskService.addAttachments(id, files, req.user);
   }
   @Delete(':id/attachments/:attachmentId')

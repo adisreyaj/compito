@@ -339,7 +339,7 @@ export class TaskService {
     }
   }
 
-  async addAttachments(id: string, files: Express.Multer.File[], user: UserPayload) {
+  async addAttachments(id: string, files: any[], user: UserPayload) {
     let uploadedFiles: { result: UploadedObjectInfo; filePath: string }[];
     const { org, userId, role } = getUserDetails(user);
     const folder = `${org.id}/attachments`;

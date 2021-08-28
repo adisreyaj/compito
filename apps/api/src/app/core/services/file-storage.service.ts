@@ -28,7 +28,7 @@ export class FileStorageService {
     return this.client.getObject(bucket, path);
   }
 
-  async upload(file: Express.Multer.File, name: string, folder: string) {
+  async upload(file: any, name: string, folder: string) {
     const bucket = this.config.get('BUCKET');
     const fileName = `${folder}/${name}.${extension(file.mimetype)}`;
     try {
