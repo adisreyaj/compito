@@ -23,7 +23,8 @@ export interface Task extends TaskBase, DocDates {
   tags: Tag[];
   createdBy: User;
   comments: Comment[];
-  subTasks: any[];
+  subTasks?: any[];
+  attachments: any[];
 }
 
 export interface TaskRequest extends TaskBase {

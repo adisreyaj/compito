@@ -4,7 +4,9 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
+  AssetUrlPipeModule,
   ButtonModule,
+  FileDndModule,
   IconModule,
   PageHeaderModule,
   TaskSharedModule,
@@ -43,6 +45,8 @@ import { TaskDetailModalComponent } from './shared/components/task-detail-modal/
     TaskSharedModule,
     UserSelectModule,
     ShimmerModule,
+    FileDndModule,
+    AssetUrlPipeModule,
   ],
   declarations: [BoardsComponent, TaskDetailModalComponent],
 })

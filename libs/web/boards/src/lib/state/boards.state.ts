@@ -61,7 +61,7 @@ export class BoardsState {
         (data) => {
           const groupedTasks = this.util.getTasksGroupedByList(data.tasks);
           const listsWithTasks = data.lists.map(
-            (data) => ({ ...data, tasks: groupedTasks[data.id] ?? [] } as BoardListWithTasks),
+            (list) => ({ ...list, tasks: groupedTasks[list.id] ?? [] } as BoardListWithTasks),
           );
           patchState({
             board: data,
