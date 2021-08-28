@@ -1,4 +1,12 @@
-<div class="flex flex-col">
+<div class="relative flex flex-col task-modal" fileDnD (fileDropped)="handleFileDropped($event)">
+  <div class="absolute top-0 left-0 z-40 hidden w-full h-full p-12 bg-white place-items-center file-over-overlay">
+    <div class="grid w-full h-full border-2 border-dashed rounded-md border-primary place-items-center">
+      <div class="flex flex-col items-center">
+        <p>Drop Files Here</p>
+        <p class="text-sm text-gray-600">Supported formats: jpg, png, pdf, txt, csv</p>
+      </div>
+    </div>
+  </div>
   <ng-container [ngSwitch]="(loadingState$ |async)?.type">
     <ng-container *ngSwitchCase="'SUCCESS'">
       <header class="p-4" [class.shadow-lg]="isScrolledSubject | async">
@@ -62,13 +70,42 @@
           </div>
         </section>
         <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Attachments' }">
+          </ng-container>
+          <div class="form-group" [style.minHeight.px]="122">
+            <section class="flex items-center py-2 space-x-2 overflow-x-auto whitespace-nowrap">
+              <ng-container *ngFor="let attachment of taskDetail?.attachments">
+                <article class="relative flex-shrink-0 p-1 bg-white border rounded-md group">
+                  <img width="96" height="96" class="object-cover w-24 h-24 rounded-md pointer-events-none"
+                       [src]="attachment.path | assetUrl" alt="Attachment">
+                  <button (click)="downloadAttachment(attachment);$event.stopPropagation()"
+                          class="absolute top-0 left-0 hidden w-full h-full p-1 bg-white rounded-md shadow-md bg-opacity-90 place-items-center group-hover:grid hover:shadow-xl ">
+                    <div class="flex flex-col items-center">
+                      <rmx-icon class="" name="download-line"></rmx-icon>
+                      <p class="text-xs">Download</p>
+                    </div>
+                  </button>
+                  <button (click)="removeAttachment(attachment);$event.stopPropagation()"
+                          class="absolute top-0 right-0 hidden p-1 text-white bg-red-500 rounded-full shadow-md hover:shadow-xl hover:bg-red-600 group-hover:block">
+                    <rmx-icon class="icon-xxs" name="close-line"></rmx-icon>
+                  </button>
+                </article>
+              </ng-container>
+              <ng-container *ngIf="taskDetail?.attachments?.length === 0">
+                <p class="text-sm text-gray-600">No attachments available. Drag and drop files in the modal to upload
+                </p>
+              </ng-container>
+            </section>
+          </div>
+        </section>
+        <section class="task-detail__section">
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Comments' }"></ng-container>
           <ul>
             <li class="mb-8" *ngIf="ref.data.user$ | async as user">
               <div class="flex items-start space-x-4">
                 <div>
                   <img [src]="'https://avatar.tobi.sh/' + user?.email" [alt]="user?.given_name" width="40" height="40"
-                       class="rounded-full" />
+                       class="rounded-full pointer-events-none" />
                 </div>
                 <div class="w-full form-group">
                   <textarea class="w-full" type="text" id="comment" [formControl]="comment" rows="3"></textarea>
@@ -87,8 +124,9 @@
             <ng-container *ngFor="let comment of taskDetail?.comments">
               <li class="py-4 border-b last:border-b-0 last:mb-4">
                 <div class="flex items-start space-x-4">
-                  <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
-                       width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
+                  <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName"
+                       class="rounded-full pointer-events-none" width="40" height="40"
+                       [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
                        [alt]="comment?.createdBy?.firstName" />
                   <div>
                     <p>{{ comment.content }}</p>
@@ -166,8 +204,9 @@
         <ng-container *ngFor="let comment of taskDetail?.comments">
           <li class="py-4 border-b last:border-b-0">
             <div class="flex items-start space-x-4">
-              <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName" class="rounded-full"
-                   width="40" height="40" [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
+              <img [tippy]="comment?.createdBy?.firstName + ' ' + comment?.createdBy?.lastName"
+                   class="rounded-full pointer-events-none" width="40" height="40"
+                   [src]="'https://avatar.tobi.sh/' + comment?.createdBy?.email"
                    [alt]="comment?.createdBy?.firstName" />
               <div>
                 <p>{{ comment.content }}</p>

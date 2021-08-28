@@ -12,7 +12,13 @@ export interface UserAvatarGroupData {
       <ul class="flex items-center -space-x-4">
         <ng-container *ngFor="let item of data | slice: 0:itemsToShow">
           <li [tippy]="item.name" class="rounded-full bg-white p-1 cursor-pointer">
-            <img class="rounded-full" [width]="size" [height]="size" [src]="item.image" [alt]="item.name" />
+            <img
+              class="rounded-full pointer-events-none"
+              [width]="size"
+              [height]="size"
+              [src]="item.image"
+              [alt]="item.name"
+            />
           </li>
         </ng-container>
         <ng-container *ngIf="data.length - itemsToShow > 0">

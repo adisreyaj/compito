@@ -1,5 +1,19 @@
 import { RequestParams, RequestWithUser, TaskRequest } from '@compito/api-interfaces';
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { Prisma } from '@prisma/client';
 import { PERMISSIONS } from '../core/config/permissions.config';
 import { Permissions } from '../core/decorators/permissions.decorator';
@@ -79,5 +93,15 @@ export class TaskController {
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.taskService.remove(id, req.user);
+  }
+
+  @Post(':id/attachments')
+  @UseInterceptors(FilesInterceptor('files'))
+  addAttachments(@Param('id') id: string, @UploadedFiles() files: Express.Multer.File[], @Req() req: RequestWithUser) {
+    return this.taskService.addAttachments(id, files, req.user);
+  }
+  @Delete(':id/attachments/:attachmentId')
+  removeAttachment(@Param('id') id: string, @Param('attachmentId') attachmentId: string, @Req() req: RequestWithUser) {
+    return this.taskService.removeAttachment(id, attachmentId, req.user);
   }
 }

@@ -34,10 +34,6 @@ export namespace BoardsAction {
     static readonly type = '[Task] Update task title';
     constructor(public taskId: string, public title: string, public listId: string) {}
   }
-  export class AddComment {
-    static readonly type = '[Task] Add comment';
-    constructor(public taskId: string, public listId: string, public content: string) {}
-  }
   export class UpdateTaskPriority {
     static readonly type = '[Task] Update task priority';
     constructor(public taskId: string, public priority: string, public listId: string) {}

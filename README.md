@@ -50,6 +50,12 @@ You can create new tasks with ease. Cards can be dragged and dropped as you prog
 
 ![Compito Project Board](/assets/board.jpg 'Compito Board')
 
+### Add attachments to task
+
+Attachment can be added to task by just dragging and dropping in to the modal.
+
+![Add attachments](/assets/attachments.gif 'Compito Board')
+
 ### Orgs Page
 
 User can be part of multiple orgs. User can view all the orgs he/she is part of. The user can only access the data of an org. When the user logs in, If they are part of multiple orgs, they will be asked to select an org to log in to.

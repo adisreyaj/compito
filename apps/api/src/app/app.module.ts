@@ -5,6 +5,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { TerminusModule } from '@nestjs/terminus';
 import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
+import { AssetsModule } from './assets/assets.module';
 import { AuthModule } from './auth/auth.module';
 import { BoardsModule } from './boards/boards.module';
 import { AuthGuard } from './core/guards/auth.guard';
@@ -28,6 +29,7 @@ import { UserModule } from './user/user.module';
     }),
     HttpModule,
     TerminusModule,
+    AssetsModule,
     AuthModule,
     OrganizationModule,
     ProjectModule,

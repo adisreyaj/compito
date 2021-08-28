@@ -32,7 +32,8 @@ model User {
   projectsCreated   Project[]      @relation("projectCreatedBy")
   orgsCreated       Organization[] @relation("orgCreatedBy")
   roles             UserRoleOrg[]
-  userInvite        UserInvite[]
+  userInvites        UserInvite[]
+  attachments       Attachment[]
 }
 
 model Organization {
@@ -48,8 +49,9 @@ model Organization {
   tasks       Task[]
   tags        Tag[]
   boards      Board[]
-  userRoleOrg UserRoleOrg[]
-  userInvite  UserInvite[]
+  userRoleOrgs UserRoleOrg[]
+  userInvites  UserInvite[]
+  attachments  Attachment[]
 }
 
 model Project {
@@ -109,6 +111,7 @@ model Task {
   completed    Boolean      @default(false)
   subTasks     SubTask[]
   comments     Comment[]
+  attachments   Attachment[]
 }
 
 model SubTask {
@@ -205,6 +208,19 @@ model UserInvite {
   invitedById String
   role        Role         @relation(fields: [roleId], references: [id])
   roleId      String
+}
+
+model Attachment {
+  id          String       @id @default(cuid())
+  label       String?
+  path        String
+  org         Organization @relation(fields: [orgId], references: [id])
+  orgId       String
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime     @default(now())
+  task        Task?        @relation(fields: [taskId], references: [id])
+  taskId      String?
 }
 
 enum Priority {
