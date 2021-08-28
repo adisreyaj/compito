@@ -5,17 +5,19 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  Inject,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { BoardList, CardEvent, DataLoading, DataLoadingState, Task, User, UserDetails } from '@compito/api-interfaces';
-import { ToastService, UserAvatarGroupData, userMapToArray } from '@compito/web/ui';
+import { API_TOKEN, AssetUrlPipe, ToastService, UserAvatarGroupData, userMapToArray } from '@compito/web/ui';
 import { DialogRef } from '@ngneat/dialog';
 import { Store } from '@ngxs/store';
+import { saveAs } from 'file-saver';
 import produce from 'immer';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { debounceTime, switchMap } from 'rxjs/operators';
+import { debounceTime, skip, switchMap } from 'rxjs/operators';
 import { BoardsService } from '../../../boards.service';
 import { BoardsAction } from '../../../state/boards.actions';
 @Component({
@@ -23,6 +25,11 @@ import { BoardsAction } from '../../../state/boards.actions';
   templateUrl: './task-detail-modal.component.html',
   styles: [
     `
+      .task-modal.file-over {
+        .file-over-overlay {
+          @apply grid;
+        }
+      }
       .task-detail {
         &__section {
           &:not(:last-child) {
@@ -75,6 +82,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private toast: ToastService,
     private boardService: BoardsService,
+    @Inject(API_TOKEN) private apiUrl: string,
   ) {}
 
   ngOnInit(): void {
@@ -82,6 +90,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     this.boardService.getTask(this.ref.data?.taskId).subscribe(
       (task) => {
         this.taskDetail = task;
+        this.cdr.markForCheck();
         const assignees = task?.assignees ?? [];
         this.description.setValue(task.description ?? '');
         this.priority.setValue(task.priority ?? '');
@@ -98,6 +107,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     );
     this.priority.valueChanges
       .pipe(
+        skip(1),
         debounceTime(200),
         switchMap((priority) =>
           this.store.dispatch(new BoardsAction.UpdateTaskPriority(this.taskId, priority, this.listId)),
@@ -106,12 +116,14 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
       .subscribe();
     this.title.valueChanges
       .pipe(
+        skip(1),
         debounceTime(1000),
         switchMap((title) => this.store.dispatch(new BoardsAction.UpdateTaskTitle(this.taskId, title, this.listId))),
       )
       .subscribe();
     this.description.valueChanges
       .pipe(
+        skip(1),
         debounceTime(1000),
         switchMap((description) =>
           this.store.dispatch(new BoardsAction.UpdateTaskDescription(this.taskId, description, this.listId)),
@@ -154,9 +166,12 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   addComment() {
     if (this.comment.valid) {
       this.boardService.addComment(this.taskId, this.comment.value).subscribe((data) => {
-        this.taskDetail = produce(this.taskDetail, (draft) => {
-          draft?.comments.push(data);
-        });
+        if (this.taskDetail) {
+          this.taskDetail = produce(this.taskDetail, (draft) => {
+            draft.comments.push(data);
+          });
+          this.cdr.markForCheck();
+        }
         this.clearCommentField();
         this.cdr.markForCheck();
       });
@@ -186,8 +201,40 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
     );
   }
 
+  handleFileDropped(event: FileList) {
+    if (event.length > 3) {
+      this.toast.error('Maximum allowed 3 files at a time!');
+    } else {
+      let files: File[] = [];
+      for (let index = 0; index < event.length; index++) {
+        const file = event.item(index);
+        if (file) {
+          files = [...files, file];
+        }
+      }
+      this.boardService.addAttachments(this.taskId, files).subscribe((data) => {
+        if (this.taskDetail) {
+          this.taskDetail = produce(this.taskDetail, (draft) => {
+            draft.attachments = data.attachments;
+          });
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  downloadAttachment(attachment: any) {
+    const assetPipe = new AssetUrlPipe(this.apiUrl);
+    const path = assetPipe.transform(attachment?.path);
+    if (path) {
+      const filePath = attachment.path.split('/');
+      const fileName = filePath[filePath.length - 1];
+      saveAs(path, fileName);
+    }
+  }
+
   get priorities() {
-    return this.ref.data.priorities$ as Observable<string[]>;
+    return this.ref.data.priorities$;
   }
 
   private get taskId() {

@@ -1,4 +1,12 @@
-<div class="flex flex-col">
+<div class="relative flex flex-col task-modal" fileDnD (fileDropped)="handleFileDropped($event)">
+  <div class="absolute top-0 left-0 z-40 hidden w-full h-full p-12 bg-white place-items-center file-over-overlay">
+    <div class="grid w-full h-full border-2 border-dashed rounded-md border-primary place-items-center">
+      <div class="flex flex-col items-center">
+        <p>Drop Files Here</p>
+        <p class="text-sm text-gray-600">Supported formats: jpg, png, pdf, txt, csv</p>
+      </div>
+    </div>
+  </div>
   <ng-container [ngSwitch]="(loadingState$ |async)?.type">
     <ng-container *ngSwitchCase="'SUCCESS'">
       <header class="p-4" [class.shadow-lg]="isScrolledSubject | async">
@@ -59,6 +67,23 @@
           <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Description' }"></ng-container>
           <div class="form-group">
             <textarea class="w-full" type="text" id="description" rows="4" [formControl]="description"></textarea>
+          </div>
+        </section>
+        <section class="task-detail__section">
+          <ng-container *ngTemplateOutlet="sectionHeader; context: { $implicit: 'Attachments' }"></ng-container>
+          <div class="form-group">
+            <ul class="flex items-center space-x-2 overflow-x-auto">
+              <ng-container *ngFor="let attachment of taskDetail?.attachments">
+                <li class="relative p-1 bg-white border rounded-md">
+                  <img width="112" height="112" class="object-cover rounded-md w-28 h-28"
+                       [src]="attachment.path | assetUrl" alt="Attachment">
+                  <button (click)="downloadAttachment(attachment)"
+                          class="absolute p-1 bg-white rounded-md shadow-md hover:bg-primary-gradient hover:shadow-xl hover:text-white bottom-2 right-2">
+                    <rmx-icon class="icon-xs" name="download-line"></rmx-icon>
+                  </button>
+                </li>
+              </ng-container>
+            </ul>
           </div>
         </section>
         <section class="task-detail__section">

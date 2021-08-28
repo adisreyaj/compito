@@ -169,6 +169,16 @@ export class TaskService {
           createdBy: {
             select: USER_BASIC_DETAILS,
           },
+          attachments: {
+            select: {
+              id: true,
+              path: true,
+              createdAt: true,
+              createdBy: {
+                select: USER_BASIC_DETAILS,
+              },
+            },
+          },
           comments: {
             select: {
               id: true,

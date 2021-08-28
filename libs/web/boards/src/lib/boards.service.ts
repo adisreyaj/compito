@@ -62,6 +62,13 @@ export class BoardsService {
     return this.http.post<any>(`${this.tasksApi}/${taskId}/comments`, { content });
   }
 
+  addAttachments(taskId: string, files: File[]) {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+    return this.http.post<Task>(`${this.tasksApi}/${taskId}/attachments`, formData);
+  }
   moveTask(taskId: string, newListId: string) {
     const data: Partial<TaskRequest> = {
       list: newListId,
@@ -77,6 +84,6 @@ export class BoardsService {
   }
 
   deleteTask(id: string) {
-    return this.http.delete<any>(`${this.tasksApi}/${id}`);
+    return this.http.delete<Task>(`${this.tasksApi}/${id}`);
   }
 }
