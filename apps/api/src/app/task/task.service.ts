@@ -8,6 +8,9 @@ import {
 } from '@nestjs/common';
 import { Priority, Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import * as cuid from 'cuid';
+import { UploadedObjectInfo } from 'minio';
+import { FileStorageService } from '../core/services/file-storage.service';
 import { CompitoLogger } from '../core/utils/logger.util';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
@@ -17,7 +20,7 @@ import { USER_BASIC_DETAILS } from './task.config';
 @Injectable()
 export class TaskService {
   private logger = new CompitoLogger('TASK');
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private fileStorage: FileStorageService) {}
 
   async create(data: TaskRequest, user: UserPayload) {
     try {
@@ -257,6 +260,16 @@ export class TaskService {
               email: true,
             },
           },
+          attachments: {
+            select: {
+              id: true,
+              path: true,
+              createdAt: true,
+              createdBy: {
+                select: USER_BASIC_DETAILS,
+              },
+            },
+          },
         },
       });
     } catch (error) {
@@ -359,7 +372,7 @@ export class TaskService {
             throw new ForbiddenException('Not enough permissions to update the task!');
           }
         } catch (error) {
-          this.logger.error('Task Update', error);
+          this.logger.error('canUpdateTask', 'Task Update', error);
           throw new InternalServerErrorException('Failed to update task!');
         }
         break;
@@ -371,5 +384,75 @@ export class TaskService {
         break;
     }
     return taskData;
+  }
+
+  async addAttachments(id: string, files: Express.Multer.File[], user: UserPayload) {
+    let uploadedFiles: { result: UploadedObjectInfo; filePath: string }[];
+    const { org, userId } = getUserDetails(user);
+    const folder = `${org.id}/attachments`;
+    try {
+      await this.prisma.task.findUnique({
+        where: {
+          id,
+        },
+        rejectOnNotFound: true,
+      });
+    } catch (error) {
+      if (error?.name === 'NotFoundError') {
+        this.logger.error('update', 'Task not found', error);
+        throw new NotFoundException('Task not found');
+      }
+      this.logger.error('addAttachments', 'Failed to upload attachment', error);
+      throw new InternalServerErrorException('Failed to add attachments to task!');
+    }
+    try {
+      uploadedFiles = await Promise.all(files.map((file) => this.fileStorage.upload(file, cuid(), folder)));
+      const attachments: Prisma.AttachmentUncheckedCreateWithoutTaskInput[] = uploadedFiles
+        .filter(Boolean)
+        .map((item) => ({
+          createdById: userId,
+          orgId: org.id,
+          path: item.filePath,
+        }));
+      return await this.prisma.task.update({
+        where: {
+          id,
+        },
+        data: {
+          attachments: {
+            createMany: {
+              data: attachments,
+            },
+          },
+        },
+        include: {
+          createdBy: {
+            select: USER_BASIC_DETAILS,
+          },
+          assignees: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              image: true,
+              email: true,
+            },
+          },
+          attachments: {
+            select: {
+              id: true,
+              path: true,
+              createdAt: true,
+              createdBy: {
+                select: USER_BASIC_DETAILS,
+              },
+            },
+          },
+        },
+      });
+    } catch (error) {
+      this.logger.error('addAttachments', 'Failed to upload attachment', error);
+      throw new InternalServerErrorException('Failed to add attachments to task!');
+    }
   }
 }

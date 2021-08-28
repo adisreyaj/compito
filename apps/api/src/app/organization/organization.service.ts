@@ -59,7 +59,7 @@ export class OrganizationService {
             id: userId,
           },
         },
-        userRoleOrg: {
+        userRoleOrgs: {
           create: {
             roleId: role.id,
             userId,
@@ -72,7 +72,7 @@ export class OrganizationService {
       return await this.prisma.organization.create({
         data: orgData,
         include: {
-          userRoleOrg: {
+          userRoleOrgs: {
             where: {
               userId,
             },
@@ -121,7 +121,7 @@ export class OrganizationService {
           [sort]: order,
         },
         include: {
-          userRoleOrg: {
+          userRoleOrgs: {
             where: {
               userId,
             },
