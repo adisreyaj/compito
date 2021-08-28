@@ -1,18 +1,19 @@
 import { Roles, UserPayload } from '@compito/api-interfaces';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { CompitoLogger } from '../core/utils/logger.util';
 import { getUserDetails } from '../core/utils/payload.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
 
 @Injectable()
 export class InviteService {
-  logger = new Logger('INVITE');
+  logger = new CompitoLogger('INVITE');
   constructor(private prisma: PrismaService) {}
   async invite(data: { email: string; role: string }, user: UserPayload) {
     const { org, userId, role } = getUserDetails(user);
@@ -22,6 +23,28 @@ export class InviteService {
         throw new ForbiddenException('No permission to invite user');
       default:
         break;
+    }
+    let userWithEmail;
+    try {
+      userWithEmail = await this.prisma.user.findFirst({
+        where: {
+          email: data.email,
+          orgs: {
+            some: {
+              id: {
+                in: [org.id],
+              },
+            },
+          },
+        },
+      });
+    } catch (error) {
+      this.logger.error('invite', 'Failed get user details', error);
+      throw new InternalServerErrorException('Failed to invite user');
+    }
+    if (userWithEmail) {
+      this.logger.error('invite', 'User already part of the org');
+      throw new BadRequestException('User already part of the org');
     }
     try {
       return await this.prisma.userInvite.create({
@@ -53,13 +76,13 @@ export class InviteService {
         },
       });
     } catch (error) {
-      this.logger.error('Failed to create invite', error);
+      this.logger.error('invite', 'Failed to create invite', error);
       throw new InternalServerErrorException('Failed to create invite');
     }
   }
 
   async cancel(id: string, user: UserPayload) {
-    const { org, userId, role } = getUserDetails(user);
+    const { org, role } = getUserDetails(user);
     switch (role.name as Roles) {
       case 'user':
       case 'project-admin':
@@ -76,7 +99,7 @@ export class InviteService {
         rejectOnNotFound: true,
       });
       if (org.id !== invite.orgId) {
-        this.logger.error(`Org doesn't match`);
+        this.logger.error('cancelInvite', `Org doesn't match`);
         throw new ForbiddenException('No permission to revoke invite');
       }
       await this.prisma.userInvite.delete({
@@ -87,7 +110,7 @@ export class InviteService {
       return { message: 'Invite revoked successfully!' };
     } catch (error) {
       if (error?.name === 'NotFoundError') {
-        this.logger.error('Invite not found');
+        this.logger.error('cancelInvite', 'Invite not found');
         throw new NotFoundException('Invite not found');
       }
       this.logger.error('Failed to revoke the invite', error);
@@ -99,6 +122,8 @@ export class InviteService {
     switch (role.name as Roles) {
       case 'user':
       case 'project-admin':
+        this.logger.error('getInvites', 'No permission to view invites');
+
         throw new ForbiddenException('No permission to invite user');
       default:
         break;
@@ -124,7 +149,7 @@ export class InviteService {
         },
       });
     } catch (error) {
-      this.logger.error('Failed to retrieve invites');
+      this.logger.error('getInvites', 'Failed to retrieve invites', error);
       throw new InternalServerErrorException('Failed to retrieve invites');
     }
   }
@@ -143,12 +168,12 @@ export class InviteService {
         rejectOnNotFound: true,
       });
       if (email !== invite.email) {
-        this.logger.error('Invite belongs to some other user');
+        this.logger.error('acceptInvite', 'Invite belongs to some other user');
         throw new ForbiddenException('Not allowed');
       }
     } catch (error) {
       if (error?.name === 'NotFoundError') {
-        this.logger.error('Invite not found');
+        this.logger.error('acceptInvite', 'Invite not found', error);
         throw new NotFoundException('Invite not valid');
       }
     }
@@ -188,7 +213,7 @@ export class InviteService {
       ]);
       return { message: 'Invite accepted!' };
     } catch (error) {
-      this.logger.error('Failed to accept invite', error);
+      this.logger.error('acceptInvite', 'Failed to accept invite', error);
       throw new InternalServerErrorException('Failed to accept invite');
     }
   }
@@ -211,12 +236,12 @@ export class InviteService {
         rejectOnNotFound: true,
       });
       if (email !== invite.email) {
-        this.logger.error('Invite belongs to some other user');
+        this.logger.error('rejectInvite', 'Invite belongs to some other user');
         throw new ForbiddenException('Not allowed');
       }
     } catch (error) {
       if (error?.name === 'NotFoundError') {
-        this.logger.error('Invite not found');
+        this.logger.error('rejectInvite', 'Invite not found', error);
         throw new NotFoundException('Invite not valid');
       }
     }
