@@ -69,6 +69,11 @@ export class BoardsService {
     });
     return this.http.post<Task>(`${this.tasksApi}/${taskId}/attachments`, formData);
   }
+
+  removeAttachment(taskId: string, attachmentId: string) {
+    return this.http.delete(`${this.tasksApi}/${taskId}/attachments/${attachmentId}`);
+  }
+
   moveTask(taskId: string, newListId: string) {
     const data: Partial<TaskRequest> = {
       list: newListId,

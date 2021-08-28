@@ -39,4 +39,15 @@ export class FileStorageService {
       return null;
     }
   }
+
+  async delete(path: string) {
+    const bucket = this.config.get('BUCKET');
+    try {
+      await this.client.removeObject(bucket, path);
+      return true;
+    } catch (error) {
+      this.logger.error('delete', 'Failed to delete object', error);
+      return false;
+    }
+  }
 }

@@ -212,18 +212,50 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
           files = [...files, file];
         }
       }
-      this.boardService.addAttachments(this.taskId, files).subscribe((data) => {
-        if (this.taskDetail) {
-          this.taskDetail = produce(this.taskDetail, (draft) => {
-            draft.attachments = data.attachments;
-          });
-          this.cdr.markForCheck();
-        }
-      });
+      this.boardService.addAttachments(this.taskId, files).subscribe(
+        (data) => {
+          if (this.taskDetail) {
+            this.taskDetail = produce(this.taskDetail, (draft) => {
+              draft.attachments = data.attachments;
+            });
+            this.cdr.markForCheck();
+          }
+        },
+        () => {
+          this.toast.error('Failed to add attachment');
+        },
+      );
     }
   }
 
-  downloadAttachment(attachment: any) {
+  removeAttachment(attachment: { id: string }) {
+    const taskDetailOriginal = produce(this.taskDetail, () => {
+      return;
+    });
+    if (this.taskDetail) {
+      this.taskDetail = produce(this.taskDetail, (draft) => {
+        const removeItemIndex = draft.attachments.findIndex((item) => item?.id === attachment?.id);
+        if (removeItemIndex >= 0) {
+          draft.attachments.splice(removeItemIndex, 1);
+        }
+      });
+      this.cdr.markForCheck();
+    }
+    this.boardService.removeAttachment(this.taskId, attachment.id).subscribe(
+      () => {
+        return;
+      },
+      () => {
+        this.taskDetail = produce(taskDetailOriginal, () => {
+          return;
+        });
+        this.cdr.markForCheck();
+        this.toast.error('Failed to remove attachment');
+      },
+    );
+  }
+
+  downloadAttachment(attachment: { path: string }) {
     const assetPipe = new AssetUrlPipe(this.apiUrl);
     const path = assetPipe.transform(attachment?.path);
     if (path) {

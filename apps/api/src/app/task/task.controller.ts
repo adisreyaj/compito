@@ -100,4 +100,8 @@ export class TaskController {
   addAttachments(@Param('id') id: string, @UploadedFiles() files: Express.Multer.File[], @Req() req: RequestWithUser) {
     return this.taskService.addAttachments(id, files, req.user);
   }
+  @Delete(':id/attachments/:attachmentId')
+  removeAttachment(@Param('id') id: string, @Param('attachmentId') attachmentId: string, @Req() req: RequestWithUser) {
+    return this.taskService.removeAttachment(id, attachmentId, req.user);
+  }
 }

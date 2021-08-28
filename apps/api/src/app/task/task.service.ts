@@ -339,82 +339,11 @@ export class TaskService {
     }
   }
 
-  private async canUpdateTask(id: string, role: Role, org: string, userId: string) {
-    let taskData;
-    try {
-      taskData = await this.prisma.task.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          orgId: true,
-          projectId: true,
-        },
-        rejectOnNotFound: true,
-      });
-    } catch (error) {
-      if (error?.name === 'NotFoundError') {
-        this.logger.error('canUpdateTask', 'Task not found', error);
-        throw new NotFoundException('Task not found');
-      }
-      this.logger.error('canUpdateTask', 'Failed to fetch task', error);
-      throw new InternalServerErrorException('Failed to update task');
-    }
-    switch (role.name as Roles) {
-      case 'user':
-      case 'project-admin':
-        try {
-          const user = await this.prisma.user.findUnique({
-            where: {
-              id: userId,
-            },
-            select: {
-              projects: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          });
-          const projects = user.projects.map((project) => project.id);
-          if (projects.findIndex((projectId) => projectId === taskData.projectId) < 0) {
-            this.logger.error('canUpdateTask', `Task belongs to project which user doesn't have access`);
-            throw new ForbiddenException('Not enough permissions to update the task!');
-          }
-        } catch (error) {
-          this.logger.error('canUpdateTask', 'Task Update', error);
-          throw new InternalServerErrorException('Failed to update task!');
-        }
-        break;
-      default:
-        if (org !== taskData.orgId) {
-          this.logger.error('canUpdateTask', `Task belongs to org which user doesn't have access`);
-          throw new ForbiddenException('Not enough permissions to update the task!');
-        }
-        break;
-    }
-    return taskData;
-  }
-
   async addAttachments(id: string, files: Express.Multer.File[], user: UserPayload) {
     let uploadedFiles: { result: UploadedObjectInfo; filePath: string }[];
-    const { org, userId } = getUserDetails(user);
+    const { org, userId, role } = getUserDetails(user);
     const folder = `${org.id}/attachments`;
-    try {
-      await this.prisma.task.findUnique({
-        where: {
-          id,
-        },
-        rejectOnNotFound: true,
-      });
-    } catch (error) {
-      if (error?.name === 'NotFoundError') {
-        this.logger.error('update', 'Task not found', error);
-        throw new NotFoundException('Task not found');
-      }
-      this.logger.error('addAttachments', 'Failed to upload attachment', error);
-      throw new InternalServerErrorException('Failed to add attachments to task!');
-    }
+    await this.canUpdateTask(id, role, org.id, userId);
     try {
       uploadedFiles = await Promise.all(files.map((file) => this.fileStorage.upload(file, cuid(), folder)));
       const attachments: Prisma.AttachmentUncheckedCreateWithoutTaskInput[] = uploadedFiles
@@ -464,5 +393,115 @@ export class TaskService {
       this.logger.error('addAttachments', 'Failed to upload attachment', error);
       throw new InternalServerErrorException('Failed to add attachments to task!');
     }
+  }
+
+  async removeAttachment(id: string, attachmentId: string, user: UserPayload) {
+    const { role, org, userId } = getUserDetails(user);
+    await this.canUpdateTask(id, role, org.id, userId);
+    let attachment;
+    try {
+      attachment = await this.prisma.attachment.findUnique({
+        where: {
+          id: attachmentId,
+        },
+        rejectOnNotFound: true,
+        select: {
+          id: true,
+          path: true,
+        },
+      });
+    } catch (error) {
+      if (error?.name === 'NotFoundError') {
+        this.logger.error('removeAttachment', 'Attachment found', error);
+        throw new NotFoundException('Attachment not found');
+      }
+      this.logger.error('removeAttachment', 'Failed to fetch attachment', error);
+      throw new InternalServerErrorException('Failed to remove attachment');
+    }
+    const isAttachmentDeleted = await this.fileStorage.delete(attachment.path);
+    if (!isAttachmentDeleted) {
+      throw new InternalServerErrorException('Failed to remove attachment');
+    }
+    try {
+      await this.prisma.task.update({
+        where: {
+          id,
+        },
+        data: {
+          attachments: {
+            delete: {
+              id: attachmentId,
+            },
+          },
+        },
+      });
+      return { message: 'Attachment deleted successfully' };
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          this.logger.error('update', 'Task not found', error);
+          throw new NotFoundException('Task not found');
+        }
+      }
+      this.logger.error('update', 'Failed to remove attachment', error);
+      throw new InternalServerErrorException('Failed to remove attachment');
+    }
+  }
+
+  private async canUpdateTask(id: string, role: Role, orgId: string, userId: string) {
+    let taskData;
+    try {
+      taskData = await this.prisma.task.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          orgId: true,
+          projectId: true,
+        },
+        rejectOnNotFound: true,
+      });
+    } catch (error) {
+      if (error?.name === 'NotFoundError') {
+        this.logger.error('canUpdateTask', 'Task not found', error);
+        throw new NotFoundException('Task not found');
+      }
+      this.logger.error('canUpdateTask', 'Failed to fetch task', error);
+      throw new InternalServerErrorException('Failed to update task');
+    }
+    switch (role.name as Roles) {
+      case 'user':
+      case 'project-admin':
+        try {
+          const user = await this.prisma.user.findUnique({
+            where: {
+              id: userId,
+            },
+            select: {
+              projects: {
+                select: {
+                  id: true,
+                },
+              },
+            },
+          });
+          const projects = user.projects.map((project) => project.id);
+          if (projects.findIndex((projectId) => projectId === taskData.projectId) < 0) {
+            this.logger.error('canUpdateTask', `Task belongs to project which user doesn't have access`);
+            throw new ForbiddenException('Not enough permissions to update the task!');
+          }
+        } catch (error) {
+          this.logger.error('canUpdateTask', 'Task Update', error);
+          throw new InternalServerErrorException('Failed to update task!');
+        }
+        break;
+      default:
+        if (orgId !== taskData.orgId) {
+          this.logger.error('canUpdateTask', `Task belongs to org which user doesn't have access`);
+          throw new ForbiddenException('Not enough permissions to update the task!');
+        }
+        break;
+    }
+    return taskData;
   }
 }
