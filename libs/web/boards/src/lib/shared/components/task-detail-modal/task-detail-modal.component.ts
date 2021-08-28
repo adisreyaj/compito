@@ -68,6 +68,8 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
   taskDetail: Task | null = null;
   isScrolledSubject = new BehaviorSubject(false);
   loadingState$ = new BehaviorSubject<DataLoading>({ type: DataLoadingState.init });
+
+  attachmentsLoading$ = new BehaviorSubject<number[]>([]);
   @ViewChild('contentContainer') contentContainer: ElementRef<HTMLDivElement> | null = null;
 
   constructor(
@@ -212,6 +214,7 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
           files = [...files, file];
         }
       }
+      this.attachmentsLoading$.next(Array(files.length).fill(1));
       this.boardService.addAttachments(this.taskId, files).subscribe(
         (data) => {
           if (this.taskDetail) {
@@ -223,6 +226,9 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
         },
         () => {
           this.toast.error('Failed to add attachment');
+        },
+        () => {
+          this.attachmentsLoading$.next([]);
         },
       );
     }
