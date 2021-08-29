@@ -18,16 +18,16 @@ import { Task } from '@compito/api-interfaces';
     <header>
       <p
         class="cursor-pointer hover:text-primary line-clamp-1"
-        [routerLink]="['/boards', data.board.id, 'tasks', data.id]"
+        [routerLink]="['/app/boards', data.board.id, 'tasks', data.id]"
       >
         {{ data?.title }}
       </p>
       <p class="text-sm text-gray-500">
-        <span class="cursor-pointer hover:text-primary" [routerLink]="['/projects', data.project.id]">{{
+        <span class="cursor-pointer hover:text-primary" [routerLink]="['/app/projects', data.project.id]">{{
           data?.project?.name
         }}</span>
         <span class="mx-1">></span>
-        <span class="cursor-pointer hover:text-primary" [routerLink]="['/boards', data.board.id]">{{
+        <span class="cursor-pointer hover:text-primary" [routerLink]="['/app/boards', data.board.id]">{{
           data?.board?.name
         }}</span>
       </p>

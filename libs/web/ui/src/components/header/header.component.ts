@@ -25,7 +25,7 @@ import { formatUser } from '../../util/format-user.operator';
             <li>
               <a
                 class="flex items-center space-x-2"
-                routerLink="/"
+                routerLink="/app"
                 routerLinkActive="text-gray-800"
                 (click)="menuOpen.next(false)"
                 [routerLinkActiveOptions]="{ exact: true }"
@@ -52,7 +52,7 @@ import { formatUser } from '../../util/format-user.operator';
         <ng-container *ngIf="user$ | async as user">
           <a
             class="text-xs text-gray-500 hidden md:block"
-            [routerLink]="['/orgs', user?.org?.id]"
+            [routerLink]="['/app/orgs', user?.org?.id]"
             tippy="Org you are currently logged into"
           >
             Org: <span class="font-medium text-sm text-gray-700">{{ user?.org?.name }}</span>
@@ -92,7 +92,7 @@ import { formatUser } from '../../util/format-user.operator';
     </header>
     <ng-template #userDropdown let-hide>
       <div class="flex flex-col w-48">
-        <div class="dropdown-item" routerLink="/profile" (click)="hide()">Profile</div>
+        <div class="dropdown-item" routerLink="/app/profile" (click)="hide()">Profile</div>
         <div class="text-red-600 dropdown-item" (click)="auth.logout(); hide()">Logout</div>
       </div>
     </ng-template>

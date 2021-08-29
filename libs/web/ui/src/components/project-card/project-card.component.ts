@@ -20,7 +20,7 @@ import { CardEvent, Project } from '@compito/api-interfaces';
       </button>
       <header class="flex items-center justify-between">
         <div>
-          <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/projects', data.id]">
+          <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/app/projects', data.id]">
             {{ data?.name }}
           </p>
           <p class="text-gray-400 text-sm line-clamp-2" [style.minHeight.px]="40">{{ data?.description }}</p>

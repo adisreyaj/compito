@@ -62,7 +62,7 @@ import { Store } from '@ngxs/store';
           <input class="w-full" type="text" id="role" formControlName="roleName" />
         </div>
         <footer class="flex justify-end space-x-4 mt-4">
-          <button btn type="button" variant="secondary" routerLink="/">Cancel</button>
+          <button btn type="button" variant="secondary" routerLink="/app">Cancel</button>
           <button
             btn
             type="submit"
