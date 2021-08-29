@@ -36,7 +36,7 @@ import { ProjectsState } from '../../state/projects.state';
 export class ProjectsDetailComponent implements OnInit {
   breadcrumbs: Breadcrumb[] = [
     { label: 'Home', link: '/' },
-    { label: 'Projects', link: '/projects' },
+    { label: 'Projects', link: '/app/projects' },
   ];
   selectedMembers = new Map<string, User>();
   @Select(UsersState.getAllUsers)
