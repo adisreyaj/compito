@@ -8,7 +8,7 @@
   <h3 align="center">Compito - Tasks Done Right ✔️</h3>
 
   <p align="center">
-    A simple and user friendly project management application without support for multiple Orgs and RBAC
+    A simple and user friendly project management application with support for multiple Orgs and RBAC
     <br />
     <br />
     <a href="https://compito.adi.so">View Demo</a>
