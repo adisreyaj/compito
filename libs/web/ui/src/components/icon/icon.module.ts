@@ -14,6 +14,7 @@ import {
   RiDownloadLine,
   RiDragMoveLine,
   RiFolder4Line,
+  RiGithubLine,
   RiHome5Line,
   RiInformationLine,
   RiMenuLine,
@@ -21,10 +22,13 @@ import {
   RiMore2Fill,
   RiNotification2Line,
   RiTableLine,
+  RiTwitterLine,
   RiUserSettingsLine,
   RiUserShared2Line,
 } from 'angular-remix-icon';
 const icons = {
+  RiGithubLine,
+  RiTwitterLine,
   RiMenuLine,
   RiDownloadLine,
   RiInformationLine,

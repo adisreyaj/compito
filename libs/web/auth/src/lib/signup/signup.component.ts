@@ -110,6 +110,7 @@ export class SignupComponent implements OnInit {
           this.router.navigate(['/auth/login']);
         },
         () => {
+          this.toast.error('Something went wrong! Please contact support.');
           this.loading$.next(false);
         },
       );

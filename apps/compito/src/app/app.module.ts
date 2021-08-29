@@ -30,7 +30,7 @@ enableMapSet();
       domain: environment.auth.domain,
       audience: environment.auth.audience,
       clientId: environment.auth.clientId,
-      redirectUri: window.location.origin,
+      redirectUri: `${window.location.origin}/app`,
       errorPath: '/auth/login',
       cacheLocation: 'localstorage',
       useRefreshTokens: false,
