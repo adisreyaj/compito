@@ -132,19 +132,19 @@ export class HeaderComponent {
   menu = [
     {
       label: 'My Tasks',
-      link: '/tasks',
+      link: '/app/tasks',
     },
     {
       label: 'Projects',
-      link: '/projects',
+      link: '/app/projects',
     },
     {
       label: 'Users',
-      link: '/users',
+      link: '/app/users',
     },
     {
       label: 'Orgs',
-      link: '/orgs',
+      link: '/app/orgs',
     },
   ];
   user$: Observable<UserDetails | null> = this.auth.user$.pipe(formatUser());
