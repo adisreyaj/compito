@@ -393,7 +393,7 @@ export class UserService {
           connection,
 
           user_metadata: {
-            server_signup: true,
+            server_signup: 'true',
             orgs: JSON.stringify([orgId]),
             userId: userId,
             roles: JSON.stringify(rolesData),
