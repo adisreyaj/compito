@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { extension } from 'mime-types';
 import { Client } from 'minio';
-import { CompitoLogger } from '../utils/logger.util';
+import { CompitoLoggerService } from '../utils/logger.service';
 
 @Injectable()
 export class FileStorageService {
   private client: Client;
-  private logger = new CompitoLogger('FILE_STORAGE');
-  constructor(private config: ConfigService) {
+  private logger = this.compitoLogger.getLogger('FILE_STORAGE');
+  constructor(private config: ConfigService, private compitoLogger: CompitoLoggerService) {
     this.client = this.createMinioInstance();
   }
 

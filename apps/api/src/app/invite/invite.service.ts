@@ -6,15 +6,15 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CompitoLogger } from '../core/utils/logger.util';
+import { CompitoLoggerService } from '../core/utils/logger.service';
 import { getUserDetails } from '../core/utils/payload.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
 
 @Injectable()
 export class InviteService {
-  logger = new CompitoLogger('INVITE');
-  constructor(private prisma: PrismaService) {}
+  logger = this.compitoLogger.getLogger('INVITE');
+  constructor(private prisma: PrismaService, private compitoLogger: CompitoLoggerService) {}
   async invite(data: { email: string; role: string }, user: UserPayload) {
     const { org, userId, role } = getUserDetails(user);
     switch (role.name as Roles) {

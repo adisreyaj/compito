@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, Task } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { CompitoLogger } from '../core/utils/logger.util';
+import { CompitoLoggerService } from '../core/utils/logger.service';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
@@ -19,8 +19,8 @@ import { GET_SINGLE_BOARD_SELECT } from './boards.config';
 
 @Injectable()
 export class BoardsService {
-  private logger = new CompitoLogger('BOARD');
-  constructor(private prisma: PrismaService) {}
+  private logger = this.compitoLogger.getLogger('BOARD');
+  constructor(private prisma: PrismaService, private compitoLogger: CompitoLoggerService) {}
 
   async create(data: BoardRequest, user: UserPayload) {
     const { org, role, userId } = getUserDetails(user);
@@ -45,7 +45,7 @@ export class BoardsService {
           });
           const userPartOfProject = projectData?.members.length > 0;
           if (!userPartOfProject) {
-            this.logger.error('board', 'create', 'User is not part of the project');
+            this.logger.error('create', 'User is not part of the project');
             throw new ForbiddenException('No permission to create board');
           }
         } catch (error) {
