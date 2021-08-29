@@ -391,6 +391,9 @@ export class UserService {
           password,
           email,
           connection,
+          app_metadata: {
+            server_signup: true,
+          },
           user_metadata: {
             orgs: JSON.stringify([orgId]),
             userId: userId,
