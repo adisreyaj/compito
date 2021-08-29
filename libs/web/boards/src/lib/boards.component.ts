@@ -165,7 +165,7 @@ export class BoardsComponent implements OnInit {
     this.board$
       .pipe(
         filter((data) => data != null),
-        map((data) => (data ? { link: `/projects/${data.project.id}`, label: data.project.name } : null)),
+        map((data) => (data ? { link: `/app/projects/${data.project.id}`, label: data.project.name } : null)),
         take(1),
       )
       .subscribe((data: Breadcrumb | null) => {
