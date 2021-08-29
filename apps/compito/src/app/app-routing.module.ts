@@ -5,6 +5,11 @@ import { AuthGuard } from '@auth0/auth0-angular';
 const routes: Route[] = [
   {
     path: '',
+    pathMatch: 'full',
+    loadChildren: () => import('./landing/landing/landing.module').then((m) => m.LandingModule),
+  },
+  {
+    path: 'app',
     canActivateChild: [AuthGuard],
     loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
