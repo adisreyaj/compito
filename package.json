@@ -1,7 +1,15 @@
 {
   "name": "compito",
   "version": "0.0.0",
+  "author": {
+    "name": "Adithya Sreyaj",
+    "email": "adi.sreyaj@gmail.com"
+  },
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/adisreyaj/compito",
+    "type": "git"
+  },
   "scripts": {
     "ng": "nx",
     "after:install": "node ./decorate-angular-cli.js",
@@ -38,7 +46,7 @@
     "prisma:generate:watch": "npx prisma generate --watch",
     "prisma:format": "npx prisma format"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "^12.1.0",
     "@angular/cdk": "^12.2.0",
