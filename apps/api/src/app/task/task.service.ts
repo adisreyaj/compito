@@ -11,7 +11,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as cuid from 'cuid';
 import { UploadedObjectInfo } from 'minio';
 import { FileStorageService } from '../core/services/file-storage.service';
-import { CompitoLogger } from '../core/utils/logger.util';
+import { CompitoLoggerService } from '../core/utils/logger.service';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
@@ -19,8 +19,12 @@ import { USER_BASIC_DETAILS } from './task.config';
 
 @Injectable()
 export class TaskService {
-  private logger = new CompitoLogger('TASK');
-  constructor(private prisma: PrismaService, private fileStorage: FileStorageService) {}
+  private logger = this.compitoLogger.getLogger('TASK');
+  constructor(
+    private prisma: PrismaService,
+    private fileStorage: FileStorageService,
+    private compitoLogger: CompitoLoggerService,
+  ) {}
 
   async create(data: TaskRequest, user: UserPayload) {
     try {

@@ -44,7 +44,8 @@
     "prisma:studio": "npx prisma studio",
     "prisma:generate": "npx prisma generate",
     "prisma:generate:watch": "npx prisma generate --watch",
-    "prisma:format": "npx prisma format"
+    "prisma:format": "npx prisma format",
+    "update:nest": "nest update"
   },
   "private": false,
   "dependencies": {
@@ -72,7 +73,9 @@
     "@ngneat/overview": "^1.0.0",
     "@ngxs/store": "^3.7.2",
     "@nrwl/angular": "12.8.0",
+    "@ntegral/nestjs-sentry": "^2.0.9",
     "@prisma/client": "^2.30.0",
+    "@sentry/node": "^6.11.0",
     "@sreyaj/ng-shimmer": "^2.0.0",
     "@tailwindcss/line-clamp": "^0.2.1",
     "@tinkoff/angular-contenteditable-accessor": "^1.2.0",

@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { CompitoLogger } from '../core/utils/logger.util';
+import { CompitoLoggerService } from '../core/utils/logger.service';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
@@ -24,8 +24,8 @@ import { USER_BASIC_DETAILS } from '../task/task.config';
 
 @Injectable()
 export class OrganizationService {
-  private logger = new CompitoLogger('ORG');
-  constructor(private prisma: PrismaService) {}
+  private logger = this.compitoLogger.getLogger('ORG');
+  constructor(private prisma: PrismaService, private compitoLogger: CompitoLoggerService) {}
 
   async create(data: OrganizationRequest, user: UserPayload) {
     const { userId } = getUserDetails(user);

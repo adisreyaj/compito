@@ -15,18 +15,23 @@ import * as cuid from 'cuid';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { kebabCase } from 'voca';
 import { AuthService } from '../auth/auth.service';
-import { CompitoLogger } from '../core/utils/logger.util';
+import { CompitoLoggerService } from '../core/utils/logger.service';
 import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
 @Injectable()
 export class UserService {
-  private logger = new CompitoLogger('USER');
+  private logger = this.compitoLogger.getLogger('USER');
 
   managementClient: ManagementClient<AppMetadata, UserMetadata>;
   authClient: AuthenticationClient;
-  constructor(private config: ConfigService, private prisma: PrismaService, private auth: AuthService) {
+  constructor(
+    private config: ConfigService,
+    private prisma: PrismaService,
+    private auth: AuthService,
+    private compitoLogger: CompitoLoggerService,
+  ) {
     this.managementClient = this.auth.management;
     this.authClient = this.auth.auth;
   }

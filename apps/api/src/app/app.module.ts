@@ -1,8 +1,10 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { TerminusModule } from '@nestjs/terminus';
+import { SentryModule } from '@ntegral/nestjs-sentry';
+import { LogLevel } from '@sentry/types';
 import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AssetsModule } from './assets/assets.module';
@@ -15,6 +17,7 @@ import { ProjectModule } from './project/project.module';
 import { RoleModule } from './role/role.module';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,6 +29,17 @@ import { UserModule } from './user/user.module';
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn',
         redact: ['req.headers.authorization', 'res.headers'],
       },
+    }),
+    SentryModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (cfg: ConfigService) => ({
+        dsn: cfg.get('SENTRY_API_DSN'),
+        debug: false,
+        environment: cfg.get('NODE_ENV'),
+        release: cfg.get('SENTRY_RELEASE'),
+        logLevel: LogLevel.Error,
+      }),
+      inject: [ConfigService],
     }),
     HttpModule,
     TerminusModule,
