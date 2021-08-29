@@ -8,7 +8,7 @@
   <h3 align="center">Compito - Tasks Done Right ✔️</h3>
 
   <p align="center">
-    A simple and user friendly project management application without support for multiple Orgs and RBAC
+    A simple and user friendly project management application with support for multiple Orgs and RBAC
     <br />
     <br />
     <a href="https://compito.adi.so">View Demo</a>
@@ -16,6 +16,16 @@
     <a href="https://github.com/adisreyaj/compito/issues">Report Bug</a>
     ·
     <a href="https://github.com/adisreyaj/compito/issues">Request Feature</a>
+  </p>
+
+  <p align="center">
+   <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white">
+   <img src="https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white">
+   <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white">
+   <img src="https://img.shields.io/badge/auth0-%23eb5424.svg?style=for-the-badge&logo=auth0&logoColor=white">
+   <img src="https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white">
+   <img src="https://img.shields.io/badge/prisma-%231a202c.svg?style=for-the-badge&logo=prisma&logoColor=white">
+   <img src="https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white">
   </p>
 </p>
 
