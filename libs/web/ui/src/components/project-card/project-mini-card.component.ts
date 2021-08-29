@@ -6,7 +6,7 @@ import { Project } from '@compito/api-interfaces';
   template: `
     <article
       *ngIf="data"
-      [routerLink]="['/projects', data.id]"
+      [routerLink]="['/app/projects', data.id]"
       class="p-4 relative rounded-md border group cursor-pointer transition-all hover:shadow-lg duration-200 ease-in
       border-gray-100 bg-white shadow-sm hover:border-gray-200"
     >

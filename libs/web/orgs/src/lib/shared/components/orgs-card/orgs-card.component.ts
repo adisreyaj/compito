@@ -17,7 +17,7 @@ import { CardEvent, Organization, UserDetails } from '@compito/api-interfaces';
         <rmx-icon class="icon-xs" name="more-2-fill"></rmx-icon>
       </button>
       <header>
-        <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/orgs', data.id]">
+        <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/app/orgs', data.id]">
           {{ data?.name }}
         </p>
         <p class="text-xs text-gray-400 ">

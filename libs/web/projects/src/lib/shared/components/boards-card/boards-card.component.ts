@@ -19,7 +19,7 @@ import { Board, CardEvent } from '@compito/api-interfaces';
       </button>
       <header class="">
         <div class="flex items-center">
-          <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/boards', data.id]">
+          <p class="text-md font-medium cursor-pointer hover:text-primary" [routerLink]="['/app/boards', data.id]">
             {{ data?.name }}
           </p>
         </div>
