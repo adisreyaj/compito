@@ -16,6 +16,8 @@
     <a href="https://github.com/adisreyaj/compito/issues">Report Bug</a>
     ·
     <a href="https://github.com/adisreyaj/compito/issues">Request Feature</a>
+    ·
+    <a href="https://blog.sreyaj.dev/compito-project-management-app-angular-nestjs-auth0">Blog</a>
   </p>
 
   <p align="center">
@@ -187,6 +189,11 @@ Auth0 is used for authenticating the users. You'll need to setup few things in A
 1. The identifier that of the API will be the `audience`
 1. Under the `Machine to Machine Applications` tab, make sure our M-M application is enabled.
 1. Under `Authentication` > `Database`, make sure in the `Applications` tab, both the Application has been enabled.
+
+## Blog
+
+Read more about this project and how to setup here:
+https://blog.sreyaj.dev/compito-project-management-app-angular-nestjs-auth0
 
 ## Roadmap
 
