@@ -224,8 +224,9 @@ export class TaskDetailModalComponent implements OnInit, AfterViewInit {
             this.cdr.markForCheck();
           }
         },
-        () => {
-          this.toast.error('Failed to add attachment');
+        (error) => {
+          this.toast.error(error?.error?.message ?? 'Failed to add attachment');
+          this.attachmentsLoading$.next([]);
         },
         () => {
           this.attachmentsLoading$.next([]);

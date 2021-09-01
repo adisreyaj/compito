@@ -118,8 +118,11 @@
           </article>
         </ng-container>
         <ng-container *ngIf="taskDetail?.attachments?.length === 0 && (attachmentsLoading$ | async)?.length === 0">
-          <p class="text-sm text-gray-600">No attachments available. Drag and drop files in the modal to upload
-          </p>
+          <div>
+            <p class="text-sm text-gray-600">No attachments available. Drag and drop files in the modal to upload them.
+            </p>
+            <p class="text-sm text-gray-600">Allowed formats: jpg, png, pdf, txt, csv</p>
+          </div>
         </ng-container>
       </section>
     </div>
