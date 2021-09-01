@@ -1,5 +1,6 @@
 import { RequestParams, RequestWithUser, TaskRequest } from '@compito/api-interfaces';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -22,7 +23,6 @@ import { PermissionsGuard } from '../core/guards/permissions.guard';
 import { RolesGuard } from '../core/guards/roles.guard';
 import { getUserDetails } from '../core/utils/payload.util';
 import { TaskService } from './task.service';
-
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}
@@ -96,7 +96,22 @@ export class TaskController {
   }
 
   @Post(':id/attachments')
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(
+    FilesInterceptor('files', 3, {
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+      fileFilter: (_, file, cb) => {
+        const allowedFileExtensions = ['jpg', 'jpeg', 'png', 'pdf', 'csv', 'txt'];
+        const fileExt = file.originalname.split('.').pop();
+        if (allowedFileExtensions.includes(fileExt)) {
+          return cb(null, true);
+        }
+        console.error(fileExt + 'is not allowed');
+        return cb(new BadRequestException('File format not allowed'), false);
+      },
+    }),
+  )
   addAttachments(@Param('id') id: string, @UploadedFiles() files: any[], @Req() req: RequestWithUser) {
     return this.taskService.addAttachments(id, files, req.user);
   }
