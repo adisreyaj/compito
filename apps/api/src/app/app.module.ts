@@ -10,6 +10,7 @@ import { AppController } from './app.controller';
 import { AssetsModule } from './assets/assets.module';
 import { AuthModule } from './auth/auth.module';
 import { BoardsModule } from './boards/boards.module';
+import { ENV_VALIDATION_SCHEMA } from './core/config/env.config';
 import { AuthGuard } from './core/guards/auth.guard';
 import { InviteModule } from './invite/invite.module';
 import { OrganizationModule } from './organization/organization.module';
@@ -17,11 +18,11 @@ import { ProjectModule } from './project/project.module';
 import { RoleModule } from './role/role.module';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validationSchema: ENV_VALIDATION_SCHEMA,
     }),
     LoggerModule.forRoot({
       pinoHttp: {
