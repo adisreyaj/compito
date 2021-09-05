@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Task } from '@compito/api-interfaces';
 
 @Component({
@@ -9,7 +9,7 @@ import { Task } from '@compito/api-interfaces';
         <li
           *ngFor="let task of data"
           class="border-b p-2 group first:rounded-t-md last:rounded-b-md last:border-b-0 bg-white cursor-pointer hover:bg-gray-50 transition-all duration-200"
-          [routerLink]="['/boards', task.board.id, 'tasks', task.id]"
+          [routerLink]="['/app/boards', task.board.id, 'tasks', task.id]"
         >
           <header>
             <p class="group-hover:text-primary">
@@ -33,10 +33,7 @@ import { Task } from '@compito/api-interfaces';
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TaskListComponent implements OnInit {
+export class TaskListComponent {
   @Input() data: Task[] | null = [];
   @Input() title = 'Tasks';
-  constructor() {}
-
-  ngOnInit(): void {}
 }
