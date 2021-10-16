@@ -86,7 +86,7 @@ While inviting other users to the org, a role can be specified. The role will be
 
 ## Built With
 
-![Tech Stack](/assets/stack.png 'Technologies used')
+![Tech Stack](https://cardify.vercel.app/api/badges?technologies=typescript,angular,tailwindcss,prisma,auth0,nestjs,postgresql,nx&width=150 'Technologies used')
 
 - [Angular](https://angular.io/)
 - [Tailwind](https://tailwindcss.com/)
