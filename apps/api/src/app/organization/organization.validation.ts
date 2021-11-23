@@ -1,20 +1,20 @@
-import { array, object, string } from 'joi';
+import * as Joi from 'joi';
 
-export const createOrgValidationSchema = object({
-  name: string().required().min(2).max(64),
-  slug: string().optional(),
-  members: array().optional(),
+export const createOrgValidationSchema = Joi.object({
+  name: Joi.string().required().min(2).max(64),
+  slug: Joi.string().optional(),
+  members: Joi.array().optional(),
 });
 
-export const updateOrgValidationSchema = object({
-  name: string().min(2).max(64).optional().allow(null),
-  slug: string().optional(),
-  members: array().optional(),
+export const updateOrgValidationSchema = Joi.object({
+  name: Joi.string().min(2).max(64).optional().allow(null),
+  slug: Joi.string().optional(),
+  members: Joi.array().optional(),
 });
 
-export const updateMembersValidationSchema = object({
-  type: string().required().valid('modify', 'set'),
-  set: array().items(string()).optional().allow(null),
-  add: array().items(string()).optional().allow(null),
-  remove: array().items(string()).optional().allow(null),
+export const updateMembersValidationSchema = Joi.object({
+  type: Joi.string().required().valid('modify', 'set'),
+  set: Joi.array().items(Joi.string()).optional().allow(null),
+  add: Joi.array().items(Joi.string()).optional().allow(null),
+  remove: Joi.array().items(Joi.string()).optional().allow(null),
 });
