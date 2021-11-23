@@ -1,24 +1,24 @@
-import { object, string } from 'joi';
+import * as Joi from 'joi';
 
-export const userNameValidation = object({
-  firstName: string().required().min(1).max(200),
-  lastName: string().required().min(1).max(200),
+export const userNameValidation = Joi.object({
+  firstName: Joi.string().required().min(1).max(200),
+  lastName: Joi.string().required().min(1).max(200),
 });
 
-export const userSignupValidationSchema = object({
-  email: string().email().required().min(5).max(200),
-  password: string().required().min(6).max(32),
-  org: string().required().min(3).max(64),
+export const userSignupValidationSchema = Joi.object({
+  email: Joi.string().email().required().min(5).max(200),
+  password: Joi.string().required().min(6).max(32),
+  org: Joi.string().required().min(3).max(64),
 }).concat(userNameValidation);
 
-export const roleUpdateValidationSchema = object({
-  roleId: string().required(),
+export const roleUpdateValidationSchema = Joi.object({
+  roleId: Joi.string().required(),
 });
 
-export const userUpdateValidationSchema = object({
-  image: string(),
-  firstName: string().min(1).max(200).optional(),
-  lastName: string().min(1).max(200).optional(),
-  password: string().min(6).max(32),
-  newPassword: string().min(6).max(32),
+export const userUpdateValidationSchema = Joi.object({
+  image: Joi.string(),
+  firstName: Joi.string().min(1).max(200).optional(),
+  lastName: Joi.string().min(1).max(200).optional(),
+  password: Joi.string().min(6).max(32),
+  newPassword: Joi.string().min(6).max(32),
 }).with('password', 'newPassword');

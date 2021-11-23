@@ -8,9 +8,7 @@
       "architect": {
         "build": {
           "builder": "@nrwl/node:build",
-          "outputs": [
-            "{options.outputPath}"
-          ],
+          "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
@@ -39,22 +37,19 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/api/**/*.ts"
-            ]
+            "lintFilePatterns": ["apps/api/**/*.ts"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/apps/api"
-          ],
+          "outputs": ["coverage/apps/api"],
           "options": {
             "jestConfig": "apps/api/jest.config.js",
             "passWithNoTests": true
           }
         }
-      }
+      },
+      "tags": []
     },
     "api-interfaces": {
       "root": "libs/api-interfaces",
@@ -64,12 +59,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/api-interfaces/**/*.ts"
-            ]
+            "lintFilePatterns": ["libs/api-interfaces/**/*.ts"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "compito": {
       "projectType": "application",
@@ -79,9 +73,7 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
-          "outputs": [
-            "{options.outputPath}"
-          ],
+          "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/compito",
             "index": "apps/compito/src/index.html",
@@ -89,18 +81,10 @@
             "polyfills": "apps/compito/src/polyfills.ts",
             "tsConfig": "apps/compito/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "apps/compito/src/favicon.ico",
-              "apps/compito/src/assets"
-            ],
-            "styles": [
-              "apps/compito/src/styles.scss"
-            ],
+            "assets": ["apps/compito/src/favicon.ico", "apps/compito/src/assets"],
+            "styles": ["apps/compito/src/styles.scss"],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "apps/compito/src/styles",
-                "apps/compito/src/styles/partials"
-              ]
+              "includePaths": ["apps/compito/src/styles", "apps/compito/src/styles/partials"]
             },
             "scripts": []
           },
@@ -161,23 +145,19 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/compito/src/**/*.ts",
-              "apps/compito/src/**/*.html"
-            ]
+            "lintFilePatterns": ["apps/compito/src/**/*.ts", "apps/compito/src/**/*.html"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/apps/compito"
-          ],
+          "outputs": ["coverage/apps/compito"],
           "options": {
             "jestConfig": "apps/compito/jest.config.js",
             "passWithNoTests": true
           }
         }
-      }
+      },
+      "tags": []
     },
     "compito-e2e": {
       "root": "apps/compito-e2e",
@@ -200,12 +180,12 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/compito-e2e/**/*.{js,ts}"
-            ]
+            "lintFilePatterns": ["apps/compito-e2e/**/*.{js,ts}"]
           }
         }
-      }
+      },
+      "tags": [],
+      "implicitDependencies": ["compito"]
     },
     "web-auth": {
       "projectType": "library",
@@ -215,9 +195,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/auth"
-          ],
+          "outputs": ["coverage/libs/web/auth"],
           "options": {
             "jestConfig": "libs/web/auth/jest.config.js",
             "passWithNoTests": true
@@ -226,13 +204,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/auth/src/**/*.ts",
-              "libs/web/auth/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/auth/src/**/*.ts", "libs/web/auth/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-boards": {
       "projectType": "library",
@@ -242,9 +218,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/boards"
-          ],
+          "outputs": ["coverage/libs/web/boards"],
           "options": {
             "jestConfig": "libs/web/boards/jest.config.js",
             "passWithNoTests": true
@@ -253,13 +227,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/boards/src/**/*.ts",
-              "libs/web/boards/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/boards/src/**/*.ts", "libs/web/boards/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-home": {
       "projectType": "library",
@@ -269,9 +241,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/home"
-          ],
+          "outputs": ["coverage/libs/web/home"],
           "options": {
             "jestConfig": "libs/web/home/jest.config.js",
             "passWithNoTests": true
@@ -280,13 +250,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/home/src/**/*.ts",
-              "libs/web/home/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/home/src/**/*.ts", "libs/web/home/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-orgs": {
       "projectType": "library",
@@ -296,9 +264,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/orgs"
-          ],
+          "outputs": ["coverage/libs/web/orgs"],
           "options": {
             "jestConfig": "libs/web/orgs/jest.config.js",
             "passWithNoTests": true
@@ -307,13 +273,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/orgs/src/**/*.ts",
-              "libs/web/orgs/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/orgs/src/**/*.ts", "libs/web/orgs/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-profile": {
       "projectType": "library",
@@ -323,9 +287,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/profile"
-          ],
+          "outputs": ["coverage/libs/web/profile"],
           "options": {
             "jestConfig": "libs/web/profile/jest.config.js",
             "passWithNoTests": true
@@ -334,13 +296,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/profile/src/**/*.ts",
-              "libs/web/profile/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/profile/src/**/*.ts", "libs/web/profile/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-projects": {
       "projectType": "library",
@@ -350,9 +310,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/projects"
-          ],
+          "outputs": ["coverage/libs/web/projects"],
           "options": {
             "jestConfig": "libs/web/projects/jest.config.js",
             "passWithNoTests": true
@@ -361,13 +319,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/projects/src/**/*.ts",
-              "libs/web/projects/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/projects/src/**/*.ts", "libs/web/projects/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-settings": {
       "projectType": "library",
@@ -377,9 +333,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/settings"
-          ],
+          "outputs": ["coverage/libs/web/settings"],
           "options": {
             "jestConfig": "libs/web/settings/jest.config.js",
             "passWithNoTests": true
@@ -388,13 +342,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/settings/src/**/*.ts",
-              "libs/web/settings/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/settings/src/**/*.ts", "libs/web/settings/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-tasks": {
       "projectType": "library",
@@ -404,9 +356,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/tasks"
-          ],
+          "outputs": ["coverage/libs/web/tasks"],
           "options": {
             "jestConfig": "libs/web/tasks/jest.config.js",
             "passWithNoTests": true
@@ -415,13 +365,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/tasks/src/**/*.ts",
-              "libs/web/tasks/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/tasks/src/**/*.ts", "libs/web/tasks/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-ui": {
       "projectType": "library",
@@ -431,9 +379,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/ui"
-          ],
+          "outputs": ["coverage/libs/web/ui"],
           "options": {
             "jestConfig": "libs/web/ui/jest.config.js",
             "passWithNoTests": true
@@ -442,13 +388,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/ui/src/**/*.ts",
-              "libs/web/ui/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/ui/src/**/*.ts", "libs/web/ui/src/**/*.html"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "web-users": {
       "projectType": "library",
@@ -458,9 +402,7 @@
       "architect": {
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/libs/web/users"
-          ],
+          "outputs": ["coverage/libs/web/users"],
           "options": {
             "jestConfig": "libs/web/users/jest.config.js",
             "passWithNoTests": true
@@ -469,44 +411,11 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/web/users/src/**/*.ts",
-              "libs/web/users/src/**/*.html"
-            ]
+            "lintFilePatterns": ["libs/web/users/src/**/*.ts", "libs/web/users/src/**/*.html"]
           }
         }
-      }
-    }
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/angular"
-  },
-  "schematics": {
-    "@nrwl/angular": {
-      "application": {
-        "linter": "eslint"
       },
-      "library": {
-        "linter": "eslint"
-      },
-      "storybook-configuration": {
-        "linter": "eslint"
-      }
-    },
-    "@nrwl/angular:application": {
-      "style": "scss",
-      "linter": "eslint",
-      "unitTestRunner": "jest",
-      "e2eTestRunner": "cypress"
-    },
-    "@nrwl/angular:library": {
-      "style": "scss",
-      "linter": "eslint",
-      "unitTestRunner": "jest"
-    },
-    "@nrwl/angular:component": {
-      "style": "scss"
+      "tags": []
     }
-  },
-  "defaultProject": "compito"
+  }
 }

@@ -14,12 +14,8 @@
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test",
-          "e2e"
-        ]
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "parallel": 1
       }
     }
   },
@@ -31,51 +27,35 @@
       }
     ]
   },
-  "projects": {
-    "api": {
-      "tags": []
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "defaultProject": "compito",
+  "generators": {
+    "@nrwl/angular": {
+      "application": {
+        "linter": "eslint"
+      },
+      "library": {
+        "linter": "eslint"
+      },
+      "storybook-configuration": {
+        "linter": "eslint"
+      }
     },
-    "api-interfaces": {
-      "tags": []
+    "@nrwl/angular:application": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
     },
-    "compito": {
-      "tags": []
+    "@nrwl/angular:library": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest"
     },
-    "compito-e2e": {
-      "tags": [],
-      "implicitDependencies": [
-        "compito"
-      ]
-    },
-    "web-auth": {
-      "tags": []
-    },
-    "web-boards": {
-      "tags": []
-    },
-    "web-home": {
-      "tags": []
-    },
-    "web-orgs": {
-      "tags": []
-    },
-    "web-profile": {
-      "tags": []
-    },
-    "web-projects": {
-      "tags": []
-    },
-    "web-settings": {
-      "tags": []
-    },
-    "web-tasks": {
-      "tags": []
-    },
-    "web-ui": {
-      "tags": []
-    },
-    "web-users": {
-      "tags": []
+    "@nrwl/angular:component": {
+      "style": "scss"
     }
   }
 }

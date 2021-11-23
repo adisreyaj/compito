@@ -1,6 +1,6 @@
-import { object, string } from 'joi';
+import * as Joi from 'joi';
 
-export const createInviteValidationSchema = object({
-  email: string().required().email(),
-  role: string().required(),
+export const createInviteValidationSchema = Joi.object({
+  email: Joi.string().required().email(),
+  role: Joi.string().required(),
 });

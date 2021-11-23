@@ -5,8 +5,7 @@ import { AuthService } from '@auth0/auth0-angular';
 import { DataLoading, DataLoadingState } from '@compito/api-interfaces';
 import { ToastService } from '@compito/web/ui';
 import { ENV_TOKEN } from '@compito/web/ui/tokens';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { pluck } from 'rxjs/operators';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { OrgSelectionService } from './org-selection.service';
 
 @Component({
@@ -51,7 +50,7 @@ export class OrgSelectionComponent implements OnInit {
   loadingDetailsState = new BehaviorSubject<DataLoading>({ type: DataLoadingState.loading });
   loadingDetailsState$ = this.loadingDetailsState.asObservable();
 
-  userEmail$: Observable<string> = this.auth.user$.pipe(pluck('email'));
+  userEmail$: Observable<string | null> = this.auth.user$.pipe(map((user) => user?.email ?? null));
   constructor(
     private orgService: OrgSelectionService,
     private activatedRoute: ActivatedRoute,
