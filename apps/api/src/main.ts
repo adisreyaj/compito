@@ -8,7 +8,8 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
+  const port = process.env.PORT || 3333;
+  const configService: ConfigService = app.get(ConfigService);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   const allowList = ['http://localhost:4200', 'https://compito.adi.so'];
@@ -23,7 +24,7 @@ async function bootstrap() {
   });
   app.use(compression());
   app.use(helmet());
-  if (configService.get('NODE_ENV') === 'PRODUCTION') {
+  if (configService.get('NODE_ENV', { infer: true }) === 'PRODUCTION') {
     app.use(
       rateLimit({
         windowMs: 1 * 60 * 1000, // 1 minutes
@@ -31,10 +32,9 @@ async function bootstrap() {
       }),
     );
   }
-  const port = process.env.PORT || 3333;
   await app.listen(port, () => {
     Logger.log('Listening at http://localhost:' + port + '/' + globalPrefix);
   });
 }
 
-bootstrap();
+bootstrap().catch((err) => console.error(err));

@@ -11,69 +11,29 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2017",
-      "dom"
-    ],
+    "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@compito/api-interfaces": [
-        "libs/api-interfaces/src/index.ts"
-      ],
-      "@compito/web/auth": [
-        "libs/web/auth/src/index.ts"
-      ],
-      "@compito/web/boards": [
-        "libs/web/boards/src/index.ts"
-      ],
-      "@compito/web/boards/*": [
-        "libs/web/boards/src/lib/*"
-      ],
-      "@compito/web/home": [
-        "libs/web/home/src/index.ts"
-      ],
-      "@compito/web/orgs": [
-        "libs/web/orgs/src/index.ts"
-      ],
-      "@compito/web/orgs/*": [
-        "libs/web/orgs/src/lib/*"
-      ],
-      "@compito/web/profile": [
-        "libs/web/profile/src/index.ts"
-      ],
-      "@compito/web/projects": [
-        "libs/web/projects/src/index.ts"
-      ],
-      "@compito/web/projects/*": [
-        "libs/web/projects/src/lib/*"
-      ],
-      "@compito/web/settings": [
-        "libs/web/settings/src/index.ts"
-      ],
-      "@compito/web/tasks": [
-        "libs/web/tasks/src/index.ts"
-      ],
-      "@compito/web/tasks/*": [
-        "libs/web/tasks/src/lib/*"
-      ],
-      "@compito/web/ui": [
-        "libs/web/ui/src/index.ts"
-      ],
-      "@compito/web/ui/*": [
-        "libs/web/ui/src/*"
-      ],
-      "@compito/web/users": [
-        "libs/web/users/src/index.ts"
-      ],
-      "@compito/web/users/*": [
-        "libs/web/users/src/lib/*"
-      ]
+      "@compito/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@compito/web/auth": ["libs/web/auth/src/index.ts"],
+      "@compito/web/boards": ["libs/web/boards/src/index.ts"],
+      "@compito/web/boards/*": ["libs/web/boards/src/lib/*"],
+      "@compito/web/home": ["libs/web/home/src/index.ts"],
+      "@compito/web/orgs": ["libs/web/orgs/src/index.ts"],
+      "@compito/web/orgs/*": ["libs/web/orgs/src/lib/*"],
+      "@compito/web/profile": ["libs/web/profile/src/index.ts"],
+      "@compito/web/projects": ["libs/web/projects/src/index.ts"],
+      "@compito/web/projects/*": ["libs/web/projects/src/lib/*"],
+      "@compito/web/settings": ["libs/web/settings/src/index.ts"],
+      "@compito/web/tasks": ["libs/web/tasks/src/index.ts"],
+      "@compito/web/tasks/*": ["libs/web/tasks/src/lib/*"],
+      "@compito/web/ui": ["libs/web/ui/src/index.ts"],
+      "@compito/web/ui/*": ["libs/web/ui/src/*"],
+      "@compito/web/users": ["libs/web/users/src/index.ts"],
+      "@compito/web/users/*": ["libs/web/users/src/lib/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }
