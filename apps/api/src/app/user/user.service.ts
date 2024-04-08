@@ -10,7 +10,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { AppMetadata, AuthenticationClient, ManagementClient, SignUpUserData, UserMetadata } from 'auth0';
-import { compareSync, hashSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcryptjs';
 import * as cuid from 'cuid';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { kebabCase } from 'voca';
