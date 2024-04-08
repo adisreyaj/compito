@@ -26,11 +26,13 @@ nixPkgs = [
     'nodejs_18',
     'npm-9_x',
     'openssl',
+    'python311'
 ]
 nixLibs = [
     'libuuid',
     'libGL',
 ]
+aptPkgs = ['build-essential']
 nixOverlays = ['https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz']
 nixpkgsArchive = 'bf744fe90419885eefced41b3e5ae442d732712d'
 
