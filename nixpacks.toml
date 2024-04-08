@@ -1,0 +1,39 @@
+providers = ['node']
+buildImage = 'ghcr.io/railwayapp/nixpacks:ubuntu-1707782610'
+
+[variables]
+CI = 'true'
+NIXPACKS_METADATA = 'node'
+NODE_ENV = 'production'
+NIXPACKS_NX_APP_NAME = 'api'
+NPM_CONFIG_PRODUCTION = 'false'
+[phases.build]
+dependsOn = ['install']
+cmds = ['npm run build api']
+cacheDirectories = ['node_modules/.cache']
+
+[phases.install]
+dependsOn = ['setup']
+cmds = ['npm install']
+cacheDirectories = [
+    '/root/.cache/Cypress',
+    '/root/.npm',
+]
+paths = ['/app/node_modules/.bin']
+
+[phases.setup]
+nixPkgs = [
+    'nodejs_18',
+    'npm-9_x',
+    'openssl',
+]
+nixLibs = [
+    'libuuid',
+    'libGL',
+]
+nixOverlays = ['https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz']
+nixpkgsArchive = 'bf744fe90419885eefced41b3e5ae442d732712d'
+
+[start]
+cmd = 'npm run start api'
+
