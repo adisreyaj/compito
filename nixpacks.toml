@@ -14,7 +14,7 @@ cacheDirectories = ['node_modules/.cache']
 
 [phases.install]
 dependsOn = ['setup']
-cmds = ['npm install --legacy-peer-deps','npm run after:install']
+cmds = ['npm install --legacy-peer-deps','npm run after:install', 'npm run migrate:deploy']
 cacheDirectories = [
     '/root/.cache/Cypress',
     '/root/.npm',
