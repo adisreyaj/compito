@@ -20,12 +20,13 @@ import { getUserDetails } from '../core/utils/payload.util';
 import { parseQuery } from '../core/utils/query-parse.util';
 import { PrismaService } from '../prisma.service';
 import { USER_BASIC_DETAILS } from '../task/task.config';
+
 @Injectable()
 export class UserService {
-  private logger = this.compitoLogger.getLogger('USER');
-
   managementClient: ManagementClient<AppMetadata, UserMetadata>;
   authClient: AuthenticationClient;
+  private logger = this.compitoLogger.getLogger('USER');
+
   constructor(
     private config: ConfigService,
     private prisma: PrismaService,
@@ -126,7 +127,7 @@ export class UserService {
       if (error instanceof HttpException) {
         throw error;
       }
-      this.logger.error('getUserDetails', 'Failed to fetch user details');
+      this.logger.error('getUserDetails', 'Failed to fetch user details', error);
       throw new InternalServerErrorException('Failed to fetch user details');
     }
   }
